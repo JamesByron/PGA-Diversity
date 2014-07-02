@@ -193,10 +193,12 @@ int main(int argc, char * argv[])
   //printf("SingleNode: about to open test instance file\n");
   //get test instances from file
   ifstream file;
+  //cout << "l196" << endl;
   file.open(filename.c_str());
   string line;
   while(!file.eof())
     {
+	  //cout << "l201" << endl;
       getline(file, line);
       if (line != "")
 	{
@@ -204,14 +206,14 @@ int main(int argc, char * argv[])
 	  all_tests.push_back(ti);
 	}
     }
-  
+  //cout << "l209" << endl;
   if (argc == 15 && NUM_ISLANDS > 18)
     { printf("Invalid combination of depth and number of islands\n"); usage(); exit(-1); }
 
   //initialize all islands
   //printf("Initializing the islands (and populations, etc.)\n");
   TestSet ts;
-   
+  //cout << "l214" << endl;
   if (argc > 15) 
     {
       printf("Not yet supporting stratified islands with split training/test sets\n"); exit(-1);
@@ -268,6 +270,7 @@ int main(int argc, char * argv[])
 
   for(int gen=0; gen < MAX_GENERATIONS; gen++)
     {
+      cout << gen << " ";
       //printf("Starting generation %d\n", gen);
       mostFit = 0.0;
       // later, we'll add a loop over the islands that are being simulated on this one node
