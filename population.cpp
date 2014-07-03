@@ -18,7 +18,11 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
 {
   myTestSet = ts;
   POP_SIZE = popsize;
-  HEMMING_DIST = new int[POP_SIZE][POP_SIZE];
+
+  HAMMING_DIST.resize(POP_SIZE);
+  for (int i = 0; i < POP_SIZE; ++i) {
+	  HAMMING_DIST[i].resize(POP_SIZE);
+  }
 
   //printf("Population: starting constructor\n");
   //set the default values
@@ -38,23 +42,34 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
   //printf("Population: finished constructor\n");
 }
 
-int calculateHemmingPair(string a, string b) {
-	int HemDiff = 0;
-	if (a.length() != b.length) return -1;	// complain
+int Population::calculateHammingPair(string a, string b) {
+	int HamDiff = 0;
+	if (a.length() != b.length()) return -1;	// complain
 	for (int i = 0; i < a.length(); ++i) {
-		if (a[i] != b[i]) ++HemDiff;
+		if (a[i] != b[i]) ++HamDiff;
 	}
-	return HemDiff;
+	return HamDiff;
 }
 
-void Population::updateHemmingDist() {
+void Population::updateHammingDist() {
 	for (int i = 0; i < POP_SIZE; ++i) {
 		string iString = mypop[i].getStringRule();
 		for (int j = i+1; j < POP_SIZE; ++j) {
 			string jString = mypop[j].getStringRule();
-			HEMMING_DIST[i][j] = calculateHemmingPair(iString, jString);
+			HAMMING_DIST[i][j] = calculateHammingPair(iString, jString);
 		}
 	}
+}
+
+string Population::getHammingString() { // This is not final code!
+	string output = "";
+	for (int i = 0; i < POP_SIZE; ++i) {
+		for (int j = 0; j < POP_SIZE; ++j) {
+			//output += to_string(HEMMING_DIST[i][j]) += " "; it no workie...yet
+		}
+		output += "\n";
+	}
+	return output;
 }
 
 

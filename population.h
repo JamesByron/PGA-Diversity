@@ -13,6 +13,7 @@ class Population
 public:
   Population(int n, int nprocs, TestSet ts, int popsize);
   // accessors
+  string getHammingString();
   int getGeneration() { return generation; }
   float getPopulationMaxFitness() { return maxFitness; }
   float getPopulationAvgFitness() { return totalFitness/POP_SIZE; }
@@ -36,8 +37,8 @@ public:
   void nextGeneration(int PROB_MUTATE);
 private:
   // functions
-  int calculateHemmingPair(string a, string b);
-  void updateHemmingDist();
+  int calculateHammingPair(string a, string b);
+  void updateHammingDist();
   void unselectAll();
   int selectIndividual(int availablepop);
   int tournamentSelect(int availablepop);
@@ -45,7 +46,7 @@ private:
   int selectWeakIndividual();
   // variables
   int POP_SIZE;
-  int HEMMING_DIST[][];
+  vector<vector<int> > HAMMING_DIST;
   TestSet myTestSet;
   int generation;
   float avgFitness;
