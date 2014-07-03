@@ -36,6 +36,8 @@ public:
   void nextGeneration(int PROB_MUTATE);
 private:
   // functions
+  int calculateHemmingPair(string a, string b);
+  void updateHemmingDist();
   void unselectAll();
   int selectIndividual(int availablepop);
   int tournamentSelect(int availablepop);
@@ -43,6 +45,7 @@ private:
   int selectWeakIndividual();
   // variables
   int POP_SIZE;
+  int HEMMING_DIST[][];
   TestSet myTestSet;
   int generation;
   float avgFitness;

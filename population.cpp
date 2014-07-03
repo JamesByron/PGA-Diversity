@@ -18,6 +18,7 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
 {
   myTestSet = ts;
   POP_SIZE = popsize;
+  HEMMING_DIST = new int[POP_SIZE][POP_SIZE];
 
   //printf("Population: starting constructor\n");
   //set the default values
@@ -35,6 +36,25 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
   myrank = n;
   numprocs = nprocs;
   //printf("Population: finished constructor\n");
+}
+
+int calculateHemmingPair(string a, string b) {
+	int HemDiff = 0;
+	if (a.length() != b.length) return -1;	// complain
+	for (int i = 0; i < a.length(); ++i) {
+		if (a[i] != b[i]) ++HemDiff;
+	}
+	return HemDiff;
+}
+
+void Population::updateHemmingDist() {
+	for (int i = 0; i < POP_SIZE; ++i) {
+		string iString = mypop[i].getStringRule();
+		for (int j = i+1; j < POP_SIZE; ++j) {
+			string jString = mypop[j].getStringRule();
+			HEMMING_DIST[i][j] = calculateHemmingPair(iString, jString);
+		}
+	}
 }
 
 
