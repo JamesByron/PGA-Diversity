@@ -42,6 +42,7 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
   //printf("Population: finished constructor\n");
 }
 
+// Calculates the hamming distance for a pair of strings
 int Population::calculateHammingPair(string a, string b) {
 	int HamDiff = 0;
 	if (a.length() != b.length()) return -1;	// complain
@@ -51,6 +52,7 @@ int Population::calculateHammingPair(string a, string b) {
 	return HamDiff;
 }
 
+// Stores the hamming distance in a 2-dimensional vector
 void Population::updateHammingDist() {
 	for (int i = 0; i < POP_SIZE; ++i) {
 		string iString = mypop[i].getStringRule();
