@@ -35,10 +35,13 @@ public:
   void generateOffspring(int n);
   // switch to next generation
   void nextGeneration(int PROB_MUTATE);
+  int getInternalPopulationDiversity();
+  int getExternalPopulationDiversity(Individual2 input);
+  vector<int> calculateHammingForAll(Individual2 input);
 private:
   // functions
   int calculateHammingPair(string a, string b);
-  void updateHammingDist();
+  void updateInternalHammingDist();
   void unselectAll();
   int selectIndividual(int availablepop);
   int tournamentSelect(int availablepop);
