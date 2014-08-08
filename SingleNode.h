@@ -21,6 +21,7 @@ class SingleNode
   // public variables
   Population * a_pop;
   Individual2 * customs;
+  Individual2 getIndividual(int index);
  private:
   bool selectIndividual(int ind);
   int myrank;

@@ -35,6 +35,7 @@ public:
   void generateOffspring(int n);
   // switch to next generation
   void nextGeneration(int PROB_MUTATE);
+  Individual2 getIndividual(int index);
   int getInternalPopulationDiversity();
   int getExternalPopulationDiversity(Individual2 input);
   vector<int> calculateHammingForAll(Individual2 input);

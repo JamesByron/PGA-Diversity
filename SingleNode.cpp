@@ -88,6 +88,9 @@ void SingleNode::doOneGeneration(int thisgen)
   a_pop->updatePopulationFitness(WHICH_FITNESS);
 }
   
+Individual2 SingleNode::getIndividual(int index) {
+	return a_pop->getIndividual(index);
+}
 
 int SingleNode::sendMigrants()
 {

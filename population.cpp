@@ -42,6 +42,10 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
 	//printf("Population: finished constructor\n");
 }
 
+Individual2 Population::getIndividual(int index) {
+	return mypop[index];
+}
+
 //  computes the population diversity within this population
 int Population::getExternalPopulationDiversity(Individual2 input){
 	vector<int> hamming = calculateHammingForAll(input);
