@@ -92,6 +92,10 @@ Individual2 SingleNode::getIndividual(int index) {
 	return a_pop->getIndividual(index);
 }
 
+int SingleNode::compareIndividualToPopulation(Individual2 input) {
+	a_pop->getExternalPopulationDiversity(input);
+}
+
 int SingleNode::sendMigrants()
 {
   Individual2 * migrants = new Individual2[NUM_IMMIGRANTS];
@@ -113,6 +117,33 @@ int SingleNode::sendMigrants()
   return NUM_IMMIGRANTS;
 }
 
+// compares every individual to every other individual in all the nodes.
+// This operation is very expensive.
+int getDiversityForAllNodes() {
+	// get number of nodes NUM_ISLANDS
+	// get number of indivuals in each node POP_SIZE
+	// nested for loop
+	// get the max number
+	int bestDiversity = 0;
+	int temp = 0;
+	Individual2 currentIndividual;
+	for (int i = 0; i < NUM_ISLANDS; ++i) {
+		SingleNode currentNode = islands[i];
+		for (int j = 0; j < POP_SIZE; ++j) {
+			currentIndividual = currentNode.getIndividual(j);
+			for (int k = 0; k < NUM_ISLANDS; ++k) {
+				temp = islands[k].compareIndividualToPopulation(currentIndividual);
+				//cout << temp << " "; // See every comparison of individuals
+				if (temp > bestDiversity) {
+					bestDiversity = temp;
+					//cout << bestDiversity << " ";
+				}
+			}
+		}
+		//cout << endl;
+	}
+	return bestDiversity;
+}
 
 void usage(){
   printf("Arguments to Singlenode version of GAchess executable:\n");
@@ -274,6 +305,7 @@ int main(int argc, char * argv[])
   for(int gen=0; gen < MAX_GENERATIONS; gen++)
     {
       cout << gen << " ";
+      getDiversityForAllNodes();
       //printf("Starting generation %d\n", gen);
       mostFit = 0.0;
       // later, we'll add a loop over the islands that are being simulated on this one node

@@ -60,7 +60,7 @@ int Population::getExternalPopulationDiversity(Individual2 input){
 // computes the hamming distance between the input individual and each individual in this population
 vector<int> Population::calculateHammingForAll(Individual2 input){
 	string inputString = input.getStringRule();
-	vector<int> hamming = new vector<int>();
+	vector<int> hamming;
 	hamming.resize(POP_SIZE);
 	for (int i = 0; i < POP_SIZE; ++i) {
 		string compareString = mypop[i].getStringRule();
