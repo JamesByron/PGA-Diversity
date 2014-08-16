@@ -302,10 +302,10 @@ int main(int argc, char * argv[])
   float mostFit=0;
   int mostFitIsland=-1;
 
+  cout << "Counting generations: ";
   for(int gen=0; gen < MAX_GENERATIONS; gen++)
     {
       cout << gen << " ";
-      getDiversityForAllNodes();
       //printf("Starting generation %d\n", gen);
       mostFit = 0.0;
       // later, we'll add a loop over the islands that are being simulated on this one node
@@ -327,12 +327,12 @@ int main(int argc, char * argv[])
 		  mostFitIsland = island;
 		}
 
-	      fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f\n",
-		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev());
+	      fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Island Diversity: %i\n",
+		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), i.a_pop->getInternalPopulationDiversity());
 	    }
 	}
       if( (gen+1) % WHEN_PRINT_DATA == 0 )
-	fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. ---->\n", mostFit, mostFitIsland, i.a_pop->getGeneration());
+	fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Overall diversity between all islands is %i. ---->\n", mostFit, mostFitIsland, i.a_pop->getGeneration(), getDiversityForAllNodes());
       if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
       
       if (((gen+1) % WHEN_FULL_TEST) == 0) // need the +1 because population's gen-count has been updated during doOneGen
@@ -347,10 +347,10 @@ int main(int argc, char * argv[])
 		  mostFit = i.a_pop->getPopulationMaxFitness();
 		  mostFitIsland = island;
 		}
-	      fprintf(logFile, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f\n", i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev());
+	      fprintf(logFile, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Island Diversity %i\n", i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), i.a_pop->getInternalPopulationDiversity());
 	      i.a_pop->getBestIndividual().dumpConfMat(logFile);
 	    }
-	   fprintf(logFile, "<---- Most Fit EVALUATED OVER ALL TESTS: %f on island %i at generation %i. ---->\n", mostFit, mostFitIsland, i.a_pop->getGeneration());
+	   fprintf(logFile, "<---- Most Fit EVALUATED OVER ALL TESTS: %f on island %i at generation %i. Overall diversity between all islands is %i. ---->\n", mostFit, mostFitIsland, i.a_pop->getGeneration(), getDiversityForAllNodes());
 	}
       if ( gen+1 > WHEN_FULL_TEST * 10 ) WHEN_FULL_TEST *= 10;
     }
