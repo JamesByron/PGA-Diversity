@@ -47,21 +47,32 @@ Individual2 Population::getIndividual(int index) {
 }
 
 //  computes the population diversity within this population
-int Population::getExternalPopulationDiversity(Individual2 input){
+vector<int> Population::getExternalPopulationDiversity(Individual2 input){
 	vector<int> hamming = calculateHammingForAll(input);
 	string inputString = input.getStringRule();
 	int best = hamming[0];
+	int worst = 1000; // Start with a high number.
+	int total = hamming[0];
+	// Get the best, worst, and total hamming distances.
 	for (int i = 1; i < hamming.size(); ++i) {
 		best = max(best, hamming[i]);  // A papulation's diversity is based on its most divergent individual.
+		if (hamming[i] != 0) {
+			worst = min(worst, hamming[i]);
+			total += hamming[i];
+		}
 	}
-	return best;
+	vector<int> output (4);
+	output[0] = best;
+	output[1] = worst;
+	output[2] = total;
+	output[3] = hamming.size();
+	return output;
 }
 
 // computes the hamming distance between the input individual and each individual in this population
 vector<int> Population::calculateHammingForAll(Individual2 input){
 	string inputString = input.getStringRule();
-	vector<int> hamming;
-	hamming.resize(POP_SIZE);
+	vector<int> hamming (POP_SIZE);
 	for (int i = 0; i < POP_SIZE; ++i) {
 		string compareString = mypop[i].getStringRule();
 		hamming[i] = calculateHammingPair(inputString, compareString);
@@ -70,17 +81,29 @@ vector<int> Population::calculateHammingForAll(Individual2 input){
 }
 
 //  computes the population diversity within this population
-int Population::getInternalPopulationDiversity(){
+vector<int> Population::getInternalPopulationDiversity(){
 	int best = 0;
+	int worst = 1000;
+	int total = 0;
+	int denominator = 0;
+	// Get the best, worst, and total hamming distances. Also get the denominator for calculating the average.
 	for (int i = 0; i < POP_SIZE; ++i) {
 		string iString = mypop[i].getStringRule();
 		for (int j = i+1; j < POP_SIZE; ++j) {
 			string jString = mypop[j].getStringRule();
 			int temp = calculateHammingPair(iString, jString);
 			best = max(best, temp);
+			worst = min(worst, temp); // In the case of internal diversity, we allow for worst to be 0 so that we can see uniformity among individuals.
+			total += temp;
+			++denominator;
 		}
 	}
-	return best;
+	vector<int> output (4);
+	output[0] = best;
+	output[1] = worst;
+	output[2] = total;
+	output[3] = denominator;
+	return output;
 }
 
 // Calculates the hamming distance for a pair of strings

@@ -92,10 +92,6 @@ Individual2 SingleNode::getIndividual(int index) {
 	return a_pop->getIndividual(index);
 }
 
-int SingleNode::compareIndividualToPopulation(Individual2 input) {
-	a_pop->getExternalPopulationDiversity(input);
-}
-
 int SingleNode::sendMigrants()
 {
   Individual2 * migrants = new Individual2[NUM_IMMIGRANTS];
@@ -119,30 +115,37 @@ int SingleNode::sendMigrants()
 
 // compares every individual to every other individual in all the nodes.
 // This operation is very expensive.
-int getDiversityForAllNodes() {
+vector<int> getDiversityForAllNodes() {
 	// get number of nodes NUM_ISLANDS
 	// get number of indivuals in each node POP_SIZE
 	// nested for loop
-	// get the max number
 	int bestDiversity = 0;
-	int temp = 0;
+	int worstDiversity = 1000;
+	int total = 0;
+	int denominator = 0;
+	vector<int> temp;
 	Individual2 currentIndividual;
+	SingleNode currentNode;
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
-		SingleNode currentNode = islands[i];
+		currentNode = islands[i];
 		for (int j = 0; j < POP_SIZE; ++j) {
 			currentIndividual = currentNode.getIndividual(j);
 			for (int k = 0; k < NUM_ISLANDS; ++k) {
-				temp = islands[k].compareIndividualToPopulation(currentIndividual);
+				temp = islands[k].a_pop->getExternalPopulationDiversity(currentIndividual);
 				//cout << temp << " "; // See every comparison of individuals
-				if (temp > bestDiversity) {
-					bestDiversity = temp;
-					//cout << bestDiversity << " ";
-				}
+				bestDiversity = max(bestDiversity, temp[0]);
+				worstDiversity = min(worstDiversity, temp[1]);
+				total += temp[2];
+				denominator += temp[3];
 			}
 		}
-		//cout << endl;
 	}
-	return bestDiversity;
+	vector<int> output (4);
+	output[0] = bestDiversity;
+	output[1] = worstDiversity;
+	output[2] = total;
+	output[3] = denominator;
+	return output;
 }
 
 void usage(){
@@ -326,13 +329,18 @@ int main(int argc, char * argv[])
 		  mostFit = i.a_pop->getPopulationMaxFitness();
 		  mostFitIsland = island;
 		}
-
-	      fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Island Diversity: %i\n",
-		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), i.a_pop->getInternalPopulationDiversity());
+	      vector<int> diversity = i.a_pop->getInternalPopulationDiversity();
+	      float avg = (float)diversity[2] / (float)diversity[3];
+	      fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f\n",
+		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), diversity[0], diversity[1], avg);
 	    }
 	}
-      if( (gen+1) % WHEN_PRINT_DATA == 0 )
-	fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Overall diversity between all islands is %i. ---->\n", mostFit, mostFitIsland, i.a_pop->getGeneration(), getDiversityForAllNodes());
+      if( (gen+1) % WHEN_PRINT_DATA == 0 ) {
+	      vector<int> diversity = getDiversityForAllNodes();
+	      float avg = (float)diversity[2] / (float)diversity[3];
+	      fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Max Diversity: %i Min Diversity: %i Average Diversity: %f. ---->\n",
+	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), diversity[0], diversity[1], avg);
+      }
       if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
       
       if (((gen+1) % WHEN_FULL_TEST) == 0) // need the +1 because population's gen-count has been updated during doOneGen
@@ -347,10 +355,14 @@ int main(int argc, char * argv[])
 		  mostFit = i.a_pop->getPopulationMaxFitness();
 		  mostFitIsland = island;
 		}
-	      fprintf(logFile, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Island Diversity %i\n", i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), i.a_pop->getInternalPopulationDiversity());
+	      vector<int> diversity = i.a_pop->getInternalPopulationDiversity();
+	      float avg = (float)diversity[2] / (float)diversity[3];
+	      fprintf(logFile, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Overall Max Diversity: %i Overall Min Diversity: %i Overall Average Diversity: %f\n", i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), diversity[0], diversity[1], avg);
 	      i.a_pop->getBestIndividual().dumpConfMat(logFile);
 	    }
-	   fprintf(logFile, "<---- Most Fit EVALUATED OVER ALL TESTS: %f on island %i at generation %i. Overall diversity between all islands is %i. ---->\n", mostFit, mostFitIsland, i.a_pop->getGeneration(), getDiversityForAllNodes());
+       vector<int> diversity = getDiversityForAllNodes();
+       float avg = (float)diversity[2] / (float)diversity[3];
+	   fprintf(logFile, "<---- Most Fit EVALUATED OVER ALL TESTS: %f on island %i at generation %i.  Overall Max Diversity: %i Overall Min Diversity: %i Overall Average Diversity: %f. ---->\n", mostFit, mostFitIsland, i.a_pop->getGeneration(), diversity[0], diversity[1], avg);
 	}
       if ( gen+1 > WHEN_FULL_TEST * 10 ) WHEN_FULL_TEST *= 10;
     }
