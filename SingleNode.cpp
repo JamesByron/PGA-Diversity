@@ -159,7 +159,6 @@ vector<float> getDiversityForAllNodes() {
 			varianceTotal += powf(((float) storeHammingVecs[i][j] - average), 2.0);
 		}
 	}
-
 	vector<float> output (4);
 	output[0] = (float) bestDiversity;
 	output[1] = (float) worstDiversity;
