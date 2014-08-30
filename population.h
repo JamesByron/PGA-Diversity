@@ -36,8 +36,8 @@ public:
   // switch to next generation
   void nextGeneration(int PROB_MUTATE);
   Individual2 getIndividual(int index);
-  vector<int> getInternalPopulationDiversity();
-  vector<int> getExternalPopulationDiversity(Individual2 input);
+  vector<float> getInternalPopulationDiversity();
+  //vector<float> getExternalPopulationDiversity(Individual2 input);
   vector<int> calculateHammingForAll(Individual2 input);
 private:
   // functions

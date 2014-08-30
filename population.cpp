@@ -46,10 +46,11 @@ Individual2 Population::getIndividual(int index) {
 	return mypop[index];
 }
 
+/*
 //  computes the population diversity within this population
 vector<int> Population::getExternalPopulationDiversity(Individual2 input){
 	vector<int> hamming = calculateHammingForAll(input);
-	string inputString = input.getStringRule();
+	//string inputString = input.getStringRule();
 	int best = hamming[0];
 	int worst = 1000; // Start with a high number.
 	int total = hamming[0];
@@ -61,13 +62,20 @@ vector<int> Population::getExternalPopulationDiversity(Individual2 input){
 			total += hamming[i];
 		}
 	}
-	vector<int> output (4);
-	output[0] = best;
-	output[1] = worst;
-	output[2] = total;
-	output[3] = hamming.size();
+	//calculate the variance
+	//float variance = 0.0;
+	//float average = (float) total / (float) hamming.size();
+	//for (int i = 0; i < hamming.size(); ++i) {
+		//variance += powf(((float) hamming[i] - average), 2.0);
+	//}
+	vector<> values (3);
+	values[0] = (float) best;
+	values[1] = (float) worst;
+	values[2] = (float) total;
+	vector<vector<int>> output (2);
 	return output;
 }
+*/
 
 // computes the hamming distance between the input individual and each individual in this population
 vector<int> Population::calculateHammingForAll(Individual2 input){
@@ -81,11 +89,12 @@ vector<int> Population::calculateHammingForAll(Individual2 input){
 }
 
 //  computes the population diversity within this population
-vector<int> Population::getInternalPopulationDiversity(){
+vector<float> Population::getInternalPopulationDiversity(){
 	int best = 0;
 	int worst = 1000;
 	int total = 0;
 	int denominator = 0;
+	vector<int> varianceVec (POP_SIZE*POP_SIZE);
 	// Get the best, worst, and total hamming distances. Also get the denominator for calculating the average.
 	for (int i = 0; i < POP_SIZE; ++i) {
 		string iString = mypop[i].getStringRule();
@@ -95,14 +104,21 @@ vector<int> Population::getInternalPopulationDiversity(){
 			best = max(best, temp);
 			worst = min(worst, temp); // In the case of internal diversity, we allow for worst to be 0 so that we can see uniformity among individuals.
 			total += temp;
+			varianceVec[denominator] = temp;
 			++denominator;
 		}
 	}
-	vector<int> output (4);
-	output[0] = best;
-	output[1] = worst;
-	output[2] = total;
-	output[3] = denominator;
+	//calculate the variance
+	float variance = 0.0;
+	float average = (float) total / (float) denominator;
+	for (int i = 0; i < denominator; ++i) {
+		variance += powf(((float) varianceVec[i] - average), 2.0);
+	}
+	vector<float> output (4);
+	output[0] = (float) best;
+	output[1] = (float) worst;
+	output[2] = average;
+	output[3] = variance / (float) denominator;
 	return output;
 }
 
