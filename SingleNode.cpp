@@ -125,6 +125,7 @@ vector<float> getDiversityForAllNodes() {
 	int denominatorAvg = 0;
 	vector<int> tempV;
 	int numLoops = NUM_ISLANDS * NUM_ISLANDS * POP_SIZE;
+	int startingPoints[numLoops];
 	int position = 0;
 	vector< vector<int> > storeHammingVecs (numLoops, vector<int>(POP_SIZE));
 	Individual2 currentIndividual;
@@ -133,18 +134,22 @@ vector<float> getDiversityForAllNodes() {
 		currentNode = islands[i];
 		for (int j = 0; j < POP_SIZE; ++j) {
 			currentIndividual = currentNode.getIndividual(j);
-			for (int k = 0; k < NUM_ISLANDS; ++k) {
+			for (int k = i; k < NUM_ISLANDS; ++k) {
 				tempV = islands[k].a_pop->calculateHammingForAll(currentIndividual);
 
 				// Get the best, worst, and total hamming distances.
-				for (int i = 0; i < POP_SIZE; ++i) {
-					bestDiversity = max(bestDiversity, tempV[i]);  // A papulation's diversity is based on its most divergent individual.
-					if (tempV[i] != 0) {
-						worstDiversity = min(worstDiversity, tempV[i]);
-						totalAvg += tempV[i];
-					}
+				int l = 0;
+				if (k == i) l = (j + 1);  // If searching the current node, set the starting place to one beyond the current individual.
+				for (int m = l; m < POP_SIZE; ++m) {
+					bestDiversity = max(bestDiversity, tempV[m]);  // A papulation's diversity is based on its most divergent individual.
+					//if (tempV[m] != 0) {
+					worstDiversity = min(worstDiversity, tempV[i]);
+					totalAvg += tempV[l];
+					++denominatorAvg;
+					//}
 				}
-				denominatorAvg += tempV.size();
+				//denominatorAvg += tempV.size();
+				startingPoints[position] = l;
 				storeHammingVecs[position] = tempV;
 				++position;
 			}
@@ -154,8 +159,8 @@ vector<float> getDiversityForAllNodes() {
 	//calculate the variance
 	float varianceTotal = 0.0;
 	float average = (float) totalAvg / (float) denominatorAvg;
-	for (int i = 0; i < numLoops; ++i) {
-		for (int j = 0; j < POP_SIZE; ++j) {
+	for (int i = 0; i < position; ++i) {
+		for (int j = startingPoints[i]; j < POP_SIZE; ++j) {
 			varianceTotal += powf(((float) storeHammingVecs[i][j] - average), 2.0);
 		}
 	}
@@ -163,7 +168,7 @@ vector<float> getDiversityForAllNodes() {
 	output[0] = (float) bestDiversity;
 	output[1] = (float) worstDiversity;
 	output[2] = average;
-	output[3] = varianceTotal / ((float) numLoops * (float) POP_SIZE);
+	output[3] = varianceTotal / ((float) denominatorAvg);
 	return output;
 }
 
@@ -386,7 +391,7 @@ int main(int argc, char * argv[])
 
   // print end time
   end = time(NULL);
-  fprintf(logFile, "Elapsed timend %f seconds or %f minutes\n", difftime(end, start), difftime(end, start)/60.0 );
+  fprintf(logFile, "Elapsed time %f seconds or %f minutes\n", difftime(end, start), difftime(end, start)/60.0 );
   fclose(logFile);
   return 0;
 }
