@@ -143,8 +143,8 @@ vector<float> getDiversityForAllNodes() {
 				for (int m = l; m < POP_SIZE; ++m) {
 					bestDiversity = max(bestDiversity, tempV[m]);  // A papulation's diversity is based on its most divergent individual.
 					//if (tempV[m] != 0) {
-					worstDiversity = min(worstDiversity, tempV[i]);
-					totalAvg += tempV[l];
+					worstDiversity = min(worstDiversity, tempV[m]);
+					totalAvg += tempV[m];
 					++denominatorAvg;
 					//}
 				}
@@ -333,6 +333,7 @@ int main(int argc, char * argv[])
   for(int gen=0; gen < MAX_GENERATIONS; gen++)
     {
       cout << gen << " ";
+      cout.flush();
       //printf("Starting generation %d\n", gen);
       mostFit = 0.0;
       // later, we'll add a loop over the islands that are being simulated on this one node
