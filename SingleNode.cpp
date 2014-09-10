@@ -116,60 +116,55 @@ int SingleNode::sendMigrants()
 // compares every individual to every other individual in all the nodes.
 // This operation is very expensive.
 vector<float> getDiversityForAllNodes() {
-	// get number of nodes NUM_ISLANDS
-	// get number of indivuals in each node POP_SIZE
-	// nested for loop
-	int bestDiversity = 0;
-	int worstDiversity = 1000; // Start with a high number.
-	int totalAvg = 0;
-	int denominatorAvg = 0;
-	vector<int> tempV;
-	int numLoops = NUM_ISLANDS * NUM_ISLANDS * POP_SIZE;
-	int startingPoints[numLoops];
-	int position = 0;
-	vector< vector<int> > storeHammingVecs (numLoops, vector<int>(POP_SIZE));
-	Individual2 currentIndividual;
-	SingleNode currentNode;
-	for (int i = 0; i < NUM_ISLANDS; ++i) {
-		currentNode = islands[i];
-		for (int j = 0; j < POP_SIZE; ++j) {
-			currentIndividual = currentNode.getIndividual(j);
-			for (int k = i; k < NUM_ISLANDS; ++k) {
-				tempV = islands[k].a_pop->calculateHammingForAll(currentIndividual);
-
-				// Get the best, worst, and total hamming distances.
-				int l = 0;
-				if (k == i) l = (j + 1);  // If searching the current node, set the starting place to one beyond the current individual.
-				for (int m = l; m < POP_SIZE; ++m) {
-					bestDiversity = max(bestDiversity, tempV[m]);  // A papulation's diversity is based on its most divergent individual.
-					//if (tempV[m] != 0) {
-					worstDiversity = min(worstDiversity, tempV[m]);
-					totalAvg += tempV[m];
-					++denominatorAvg;
-					//}
-				}
-				//denominatorAvg += tempV.size();
-				startingPoints[position] = l;
-				storeHammingVecs[position] = tempV;
-				++position;
-			}
-		}
+  // get number of nodes NUM_ISLANDS
+  // get number of indivuals in each node POP_SIZE
+  // nested for loop
+  int TOTAL_POP = POP_SIZE * NUM_ISLANDS;
+  int bestDiversity = 0;
+  int worstDiversity = 1000; // Start with a high number.
+  vector<int> tempV;
+  Individual2 currentIndividual;
+  SingleNode currentNode;
+  vector< vector<int> > diversetable (TOTAL_POP, vector<int>(TOTAL_POP));
+  for (int i = 0; i < NUM_ISLANDS; ++i) {
+    currentNode = islands[i];
+    for (int j = 0; j < POP_SIZE; ++j) {
+      currentIndividual = currentNode.getIndividual(j);
+      for (int k = i; k < NUM_ISLANDS; ++k) {
+	tempV = islands[k].a_pop->calculateHammingForAll(currentIndividual);
+	// now add these to the table
+	for (int x=0; x < POP_SIZE; x++){
+	  diversetable[i*POP_SIZE+j][k*POP_SIZE+x] = tempV[x];
+	  diversetable[k*POP_SIZE+x][i*POP_SIZE+j] = tempV[x];
 	}
+      }
+    }
+  }
 
-	//calculate the variance
-	float varianceTotal = 0.0;
-	float average = (float) totalAvg / (float) denominatorAvg;
-	for (int i = 0; i < position; ++i) {
-		for (int j = startingPoints[i]; j < POP_SIZE; ++j) {
-			varianceTotal += powf(((float) storeHammingVecs[i][j] - average), 2.0);
-		}
-	}
-	vector<float> output (4);
-	output[0] = (float) bestDiversity;
-	output[1] = (float) worstDiversity;
-	output[2] = average;
-	output[3] = varianceTotal / ((float) denominatorAvg);
-	return output;
+  // go back and compute each individual's average hamming distance distance
+  vector<int> individs (POP_SIZE * NUM_ISLANDS);
+  int ptotal = 0;
+  for (int i=0; i < POP_SIZE*NUM_ISLANDS; i++){
+    for (int j=0; j < POP_SIZE*NUM_ISLANDS; j++){
+      individs[i] += diversetable[i][j];
+      ptotal += diversetable[i][j];
+      // can come back later and add the best, worst etc. if we want
+    }
+    individs[i] /= POP_SIZE*NUM_ISLANDS - 1;
+  }
+
+  //calculate the variance
+  float varianceTotal = 0.0;
+  float average = (float) ptotal / (float) (POP_SIZE*NUM_ISLANDS * (POP_SIZE*NUM_ISLANDS - 1));
+  for (int i = 0; i < POP_SIZE*NUM_ISLANDS; ++i) {
+    varianceTotal += powf(((float) individs[i]/(POP_SIZE*NUM_ISLANDS) - average), 2.0);
+  }
+  vector<float> output (4);
+  output[0] = (float) bestDiversity;
+  output[1] = (float) worstDiversity;
+  output[2] = average;
+  output[3] = varianceTotal / ((float) POP_SIZE*NUM_ISLANDS);
+  return output;
 }
 
 void usage(){

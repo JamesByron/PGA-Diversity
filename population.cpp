@@ -93,32 +93,43 @@ vector<float> Population::getInternalPopulationDiversity(){
 	int best = 0;
 	int worst = 1000;
 	int total = 0;
-	int denominator = 0;
-	vector<int> varianceVec (POP_SIZE*POP_SIZE);
+	vector< vector<int> > diversetable (POP_SIZE, vector<int>(POP_SIZE));
 	// Get the best, worst, and total hamming distances. Also get the denominator for calculating the average.
 	for (int i = 0; i < POP_SIZE; ++i) {
-		string iString = mypop[i].getStringRule();
-		for (int j = i+1; j < POP_SIZE; ++j) {
-			string jString = mypop[j].getStringRule();
-			int temp = calculateHammingPair(iString, jString);
-			best = max(best, temp);
-			worst = min(worst, temp); // In the case of internal diversity, we allow for worst to be 0 so that we can see uniformity among individuals.
-			total += temp;
-			varianceVec[denominator] = temp;
-			++denominator;
-		}
+	  string iString = mypop[i].getStringRule();
+	  for (int j = i+1; j < POP_SIZE; ++j) {
+	    string jString = mypop[j].getStringRule();
+	    int temp = calculateHammingPair(iString, jString);
+	    diversetable[i][j] = temp;
+	    diversetable[j][i] = temp;
+	    best = max(best, temp);
+	    worst = min(worst, temp); // In the case of internal diversity, we allow for worst to be 0 so that we can see uniformity among individuals.
+	  }
 	}
+
+	//caclulate the total diversities for each individual
+	vector<int> individs (POP_SIZE);
+	int counter = 0;
+	int ptotal = 0;
+	for (int i=0; i < POP_SIZE; i++){
+	  for (int j=0; j < POP_SIZE; j++){
+	    individs[i] += diversetable[i][j];
+	    ptotal += diversetable[i][j];
+	  }
+	  individs[i] /= POP_SIZE - 1; // note: int division
+	}
+
 	//calculate the variance
 	float variance = 0.0;
-	float average = (float) total / (float) denominator;
-	for (int i = 0; i < denominator; ++i) {
-		variance += powf(((float) varianceVec[i] - average), 2.0);
+	float average = (float) ptotal / (float) (POP_SIZE * (POP_SIZE - 1));
+	for (int i = 0; i < POP_SIZE ; ++i) {
+		variance += powf(((float) individs[i]/POP_SIZE - average), 2.0);
 	}
 	vector<float> output (4);
 	output[0] = (float) best;
 	output[1] = (float) worst;
 	output[2] = average;
-	output[3] = variance / (float) denominator;
+	output[3] = variance / (float) POP_SIZE;
 	return output;
 }
 
