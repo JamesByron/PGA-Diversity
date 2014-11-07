@@ -115,7 +115,7 @@ int SingleNode::sendMigrants()
 
 // compares every individual to every other individual in all the nodes.
 // This operation is very expensive.
-vector<float> getDiversityForAllNodes() {
+vector<float> getHammingDiversityForAllNodes() {
   // get number of nodes NUM_ISLANDS
   // get number of indivuals in each node POP_SIZE
   // nested for loop
@@ -349,13 +349,13 @@ int main(int argc, char * argv[])
 		  mostFit = i.a_pop->getPopulationMaxFitness();
 		  mostFitIsland = island;
 		}
-	      vector<float> diversity = i.a_pop->getInternalPopulationDiversity();
+	      vector<float> diversity = i.a_pop->getInternalHammingDiversity();
 	      fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
 		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	    }
 	}
       if( (gen+1) % WHEN_PRINT_DATA == 0 ) {
-    	  vector<float> diversity = getDiversityForAllNodes();
+    	  vector<float> diversity = getHammingDiversityForAllNodes();
 	      fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. ---->\n",
 	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
       }
@@ -373,12 +373,12 @@ int main(int argc, char * argv[])
 		  mostFit = i.a_pop->getPopulationMaxFitness();
 		  mostFitIsland = island;
 		}
-	      vector<float> diversity = i.a_pop->getInternalPopulationDiversity();
+	      vector<float> diversity = i.a_pop->getInternalHammingDiversity();
 	      fprintf(logFile, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
 	    	  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	      i.a_pop->getBestIndividual().dumpConfMat(logFile);
 	    }
-	   vector<float> diversity = getDiversityForAllNodes();
+	   vector<float> diversity = getHammingDiversityForAllNodes();
 	   fprintf(logFile, "<---- Most Fit EVALUATED OVER ALL TESTS: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. ---->\n",
 		   mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	}

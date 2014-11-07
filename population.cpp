@@ -88,8 +88,8 @@ vector<int> Population::calculateHammingForAll(Individual2 input){
 	return hamming;
 }
 
-//  computes the population diversity within this population
-vector<float> Population::getInternalPopulationDiversity(){
+//  computes the hamming diversity within this population
+vector<float> Population::getInternalHammingDiversity(){
 	int best = 0;
 	int worst = 1000;
 	int total = 0;
