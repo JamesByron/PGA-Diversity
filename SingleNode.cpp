@@ -167,6 +167,26 @@ vector<float> getHammingDiversityForAllNodes() {
   return output;
 }
 
+/*
+ * Computes the variance of the fitness of the individuals in the entire population.
+ * Assumes that the fitness has been updated across the popualtions.
+ */
+float getFitnessVariance() {
+	int counter = 0;
+	float mean, x, delta, var = 0.0;
+	for (int i = 0; i < NUM_ISLANDS; ++i) {
+		for (int j = 0; j < POP_SIZE; ++j) {
+			++counter;
+			x = islands[i].getIndividual(j).getFitness();
+			delta = x - mean;
+			mean = mean + (delta / (float)counter);
+			var = var + (delta * (x - mean));
+		}
+	}
+	var = var / (float)counter;
+	return var;
+}
+
 void usage(){
   printf("Arguments to Singlenode version of GAchess executable:\n");
   printf(" 1.  test instance data file\n");
