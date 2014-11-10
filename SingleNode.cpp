@@ -172,6 +172,7 @@ vector<float> getHammingDiversityForAllNodes() {
  * Assumes that the fitness has been updated across the popualtions.
  */
 float getFitnessVariance() {
+	// TODO: Generalize this so it can be effective for entire test set and not just training sets
 	int counter = 0;
 	float mean, x, delta, var = 0.0;
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
@@ -187,6 +188,10 @@ float getFitnessVariance() {
 	return var;
 	}
 
+/**
+ * Computes the fitness of each individual within each island across the given test set.
+ * Returns a three-dimensional vector of [islands][individuals][test instances]
+ */
 vector< vector< vector<float> > > getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
 	// use the full test set
 	// then for the furst island
@@ -423,13 +428,13 @@ int main(int argc, char * argv[])
 		  mostFitIsland = island;
 		}
 	      vector<float> diversity = i.a_pop->getInternalHammingDiversity();
-	      vector< vector< vector<float> > > phenotype = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY);
-	      float performance = getFitnessVariance();
 	      fprintf(logFile, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
 	    	  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	      i.a_pop->getBestIndividual().dumpConfMat(logFile);
 	    }
 	   vector<float> diversity = getHammingDiversityForAllNodes();
+	   //vector< vector< vector<float> > > phenotype = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY);
+	   //float performance = getFitnessVariance();
 	   fprintf(logFile, "<---- Most Fit EVALUATED OVER ALL TESTS: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. ---->\n",
 		   mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	}
