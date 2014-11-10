@@ -49,13 +49,14 @@ public:
   void unselect() { selected = false;}
   void dumpConfMat(FILE *lf);
   void sortNums(int * cpts, int j);
+  void resetConfMat();
 private:
   void auxBreedNCross(Individual2 * kids, Individual2 ind, int crossThisTime);
   void countFeats(signed char * featcounts, TestInstance2 ti);
   unsigned char toUChar(string s);
   void splitbytes(unsigned char * n1, unsigned char * n2, unsigned char r1, unsigned char r2, int split);
   string byteToString(unsigned char c);
-  void resetConfMat();
+  //void resetConfMat(); moved to public
   //void sortNums(int * cpts, int j);
   bool selected;
   float fitness;

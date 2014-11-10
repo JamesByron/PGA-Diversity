@@ -185,7 +185,36 @@ float getFitnessVariance() {
 	}
 	var = var / (float)counter;
 	return var;
-}
+	}
+
+vector< vector< vector<float> > > getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
+	// use the full test set
+	// then for the furst island
+	// then for the first individual
+	// compute how that individuals performs on each of the test cases
+	// create a Vector that records how it did on each test case
+	// repeat for all individuals and islands, adding a new nested vector
+	// return that
+		SingleNode tempIsland;
+		Individual2 tempIndividual;
+		vector< vector< vector<float> > > diversetableH (NUM_ISLANDS, vector< vector<float> >(POP_SIZE, vector<float>(testInstances.size()))); // for hi-fi classification
+		//vector< vector< vector<int> > > diversetableL (NUM_ISLANDS, vector< vector<int> >(POP_SIZE, vector<int>(testInstances.size())));  // for low-fi classification, but we need to return something else
+		for (int i = 0; i < NUM_ISLANDS; ++i) {
+			tempIsland = islands[i];
+			for (int j = 0; j < POP_SIZE; ++j) {
+				tempIndividual = tempIsland.getIndividual(j);
+				tempIndividual.resetConfMat();
+				for (int k = 0; k < testInstances.size(); ++k) {
+					switch (classification) {
+						case 'h': diversetableH[i][j][k] = tempIndividual.classiHiFi(testInstances[k]); break;
+						case 'l': diversetableH[i][j][k] = (float)tempIndividual.classify(testInstances[k]); break;
+					}
+				}
+			}
+		}
+		return diversetableH;
+	}
+
 
 void usage(){
   printf("Arguments to Singlenode version of GAchess executable:\n");
@@ -394,6 +423,8 @@ int main(int argc, char * argv[])
 		  mostFitIsland = island;
 		}
 	      vector<float> diversity = i.a_pop->getInternalHammingDiversity();
+	      vector< vector< vector<float> > > phenotype = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY);
+	      float performance = getFitnessVariance();
 	      fprintf(logFile, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
 	    	  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	      i.a_pop->getBestIndividual().dumpConfMat(logFile);
