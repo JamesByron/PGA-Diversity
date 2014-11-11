@@ -219,17 +219,17 @@ vector< vector<float> > calculateFitnessDetail(vector<TestInstance2> testInstanc
  */
 float getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
 	float fitnessTotalsArray[testInstances.size()];
-	for (int i = 0; i < sizeof(fitnessTotalsArray); ++i) {
+	for (int i = 0; i < testInstances.size(); ++i) {
 		fitnessTotalsArray[i] = 0.0;
 	}
 	vector< vector<float> > detailedFitness = calculateFitnessDetail(testInstances, classification, fitnessTotalsArray);  // this stores data in the array and returns detailed results also
 	int numerator = 0;
-	for (int i = 0; i < sizeof(fitnessTotalsArray); ++i) {
+	for (int i = 0; i < testInstances.size(); ++i) {
 		if (fitnessTotalsArray[i] == 0.0) {   // if nobody got this problem right, count it as non-diverse
 			numerator++;
 		}
 	}
-	return (float)1.0-(numerator/(float)sizeof(fitnessTotalsArray));
+	return (float)1.0-(numerator/(float)testInstances.size());
 }
 
 void usage(){
