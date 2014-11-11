@@ -192,34 +192,45 @@ float getFitnessVariance(vector<TestInstance2> testInstances, char classificatio
  * Computes the fitness of each individual within each island across the given test set.
  * Returns a three-dimensional vector of [islands][individuals][test instances]
  */
-vector< vector<float> > getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
-	// use the full test set
-	// then for the furst island
-	// then for the first individual
-	// compute how that individuals performs on each of the test cases
-	// create a Vector that records how it did on each test case
-	// repeat for all individuals and islands, adding a new nested vector
-	// return that
-		SingleNode tempIsland;
-		Individual2 tempIndividual;
-		vector< vector<float> > diversetableH (NUM_ISLANDS*POP_SIZE, vector<float>(testInstances.size())); // for hi-fi classification
-		//vector< vector< vector<int> > > diversetableL (NUM_ISLANDS, vector< vector<int> >(POP_SIZE, vector<int>(testInstances.size())));  // for low-fi classification, but we need to return something else
-		for (int i = 0; i < NUM_ISLANDS; ++i) {
-			tempIsland = islands[i];
-			for (int j = 0; j < POP_SIZE; ++j) {
-				tempIndividual = tempIsland.getIndividual(j);
-				tempIndividual.resetConfMat();
-				for (int k = 0; k < testInstances.size(); ++k) {
-					switch (classification) {
-						case 'h': diversetableH[(i*POP_SIZE)+j][k] = tempIndividual.classiHiFi(testInstances[k]); break;
-						case 'l': diversetableH[(i*POP_SIZE)+j][k] = (float)tempIndividual.classify(testInstances[k]); break;
-					}
+vector< vector<float> > calculateFitnessDetail(vector<TestInstance2> testInstances, char classification, float * fitnessTotals) {
+	SingleNode tempIsland;
+	Individual2 tempIndividual;
+	vector< vector<float> > diversetableH (NUM_ISLANDS*POP_SIZE, vector<float>(testInstances.size())); // for hi-fi classification
+	//vector< vector< vector<int> > > diversetableL (NUM_ISLANDS, vector< vector<int> >(POP_SIZE, vector<int>(testInstances.size())));  // for low-fi classification, but we need to return something else
+	for (int i = 0; i < NUM_ISLANDS; ++i) {
+		tempIsland = islands[i];
+		for (int j = 0; j < POP_SIZE; ++j) {
+			tempIndividual = tempIsland.getIndividual(j);
+			tempIndividual.resetConfMat();
+			for (int k = 0; k < testInstances.size(); ++k) {
+				switch (classification) {
+					case 'h': diversetableH[(i*POP_SIZE)+j][k] = tempIndividual.classiHiFi(testInstances[k]); break;
+					case 'l': diversetableH[(i*POP_SIZE)+j][k] = (float)tempIndividual.classify(testInstances[k]); break;
 				}
+				fitnessTotals[k] += diversetableH[(i*POP_SIZE)+j][k]; // Collect the fitness totals in the array.
 			}
 		}
-		return diversetableH;
 	}
+	return diversetableH;
+}
 
+/**
+ * This function may be better broken up to allow for the vector and float to be returned separately.
+ */
+float getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
+	float fitnessTotalsArray[testInstances.size()];
+	for (int i = 0; i < sizeof(fitnessTotalsArray); ++i) {
+		fitnessTotalsArray[i] = 0.0;
+	}
+	vector< vector<float> > detailedFitness = calculateFitnessDetail(testInstances, classification, fitnessTotalsArray);  // this stores data in the array and returns detailed results also
+	int numerator = 0;
+	for (int i = 0; i < sizeof(fitnessTotalsArray); ++i) {
+		if (fitnessTotalsArray[i] == 0.0) {   // if nobody got this problem right, count it as non-diverse
+			numerator++;
+		}
+	}
+	return (float)1.0-(numerator/(float)sizeof(fitnessTotalsArray));
+}
 
 void usage(){
   printf("Arguments to Singlenode version of GAchess executable:\n");
@@ -410,8 +421,10 @@ int main(int argc, char * argv[])
 	}
       if( (gen+1) % WHEN_PRINT_DATA == 0 ) {
     	  vector<float> diversity = getHammingDiversityForAllNodes();
-	      fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. ---->\n",
-	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
+    	  float PhenotypeDiv = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY);
+    	  float FitnessDiv = getFitnessVariance(all_tests, WHICH_CLASSIFY);
+	      fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. Phenotype: %f Fitness Div: %f ---->\n",
+	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3], PhenotypeDiv, FitnessDiv);
       }
       if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
       
