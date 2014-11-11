@@ -192,7 +192,7 @@ float getFitnessVariance(vector<TestInstance2> testInstances, char classificatio
  * Computes the fitness of each individual within each island across the given test set.
  * Returns a three-dimensional vector of [islands][individuals][test instances]
  */
-vector< vector< vector<float> > > getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
+vector< vector<float> > getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
 	// use the full test set
 	// then for the furst island
 	// then for the first individual
@@ -202,7 +202,7 @@ vector< vector< vector<float> > > getPhenotypeDiversity(vector<TestInstance2> te
 	// return that
 		SingleNode tempIsland;
 		Individual2 tempIndividual;
-		vector< vector< vector<float> > > diversetableH (NUM_ISLANDS, vector< vector<float> >(POP_SIZE, vector<float>(testInstances.size()))); // for hi-fi classification
+		vector< vector<float> > diversetableH (NUM_ISLANDS*POP_SIZE, vector<float>(testInstances.size())); // for hi-fi classification
 		//vector< vector< vector<int> > > diversetableL (NUM_ISLANDS, vector< vector<int> >(POP_SIZE, vector<int>(testInstances.size())));  // for low-fi classification, but we need to return something else
 		for (int i = 0; i < NUM_ISLANDS; ++i) {
 			tempIsland = islands[i];
@@ -211,8 +211,8 @@ vector< vector< vector<float> > > getPhenotypeDiversity(vector<TestInstance2> te
 				tempIndividual.resetConfMat();
 				for (int k = 0; k < testInstances.size(); ++k) {
 					switch (classification) {
-						case 'h': diversetableH[i][j][k] = tempIndividual.classiHiFi(testInstances[k]); break;
-						case 'l': diversetableH[i][j][k] = (float)tempIndividual.classify(testInstances[k]); break;
+						case 'h': diversetableH[(i*POP_SIZE)+j][k] = tempIndividual.classiHiFi(testInstances[k]); break;
+						case 'l': diversetableH[(i*POP_SIZE)+j][k] = (float)tempIndividual.classify(testInstances[k]); break;
 					}
 				}
 			}
