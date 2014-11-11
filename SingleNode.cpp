@@ -171,11 +171,11 @@ vector<float> getHammingDiversityForAllNodes() {
  * Computes the variance of the fitness of the individuals in the entire population.
  * Assumes that the fitness has been updated across the popualtions.
  */
-float getFitnessVariance() {
-	// TODO: Generalize this so it can be effective for entire test set and not just training sets
+float getFitnessVariance(vector<TestInstance2> testInstances, char classification) {
 	int counter = 0;
 	float mean, x, delta, var = 0.0;
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
+		islands[i].a_pop->updatePopulationFitness(testInstances, classification);
 		for (int j = 0; j < POP_SIZE; ++j) {
 			++counter;
 			x = islands[i].getIndividual(j).getFitness();
