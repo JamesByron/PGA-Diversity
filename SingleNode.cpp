@@ -186,13 +186,13 @@ float getFitnessVariance(vector<TestInstance2> testInstances, char classificatio
 	}
 	var = var / (float)counter;
 	return var;
-	}
+}
 
 /**
  * Computes the fitness of each individual within each island across the given test set.
  * Returns a three-dimensional vector of [islands][individuals][test instances]
  */
-vector< vector<float> > calculateFitnessDetail(vector<TestInstance2> testInstances, char classification, float * fitnessTotals) {
+vector< vector<float> > calculateFitnessDetail(vector<TestInstance2> testInstances, char classification) {
 	SingleNode tempIsland;
 	Individual2 tempIndividual;
 	vector< vector<float> > diversetableH (NUM_ISLANDS*POP_SIZE, vector<float>(testInstances.size())); // for hi-fi classification
@@ -204,30 +204,46 @@ vector< vector<float> > calculateFitnessDetail(vector<TestInstance2> testInstanc
 			tempIndividual.resetConfMat();
 			for (int k = 0; k < testInstances.size(); ++k) {
 				switch (classification) {
-					case 'h': diversetableH[(i*POP_SIZE)+j][k] = tempIndividual.classiHiFi(testInstances[k]); break;
-					case 'l': diversetableH[(i*POP_SIZE)+j][k] = (float)tempIndividual.classify(testInstances[k]); break;
+				case 'h': diversetableH[(i*POP_SIZE)+j][k] = tempIndividual.classiHiFi(testInstances[k]); break;
+				case 'l': diversetableH[(i*POP_SIZE)+j][k] = (float)tempIndividual.classify(testInstances[k]); break;
 				}
-				fitnessTotals[k] += diversetableH[(i*POP_SIZE)+j][k]; // Collect the fitness totals in the array.
 			}
 		}
 	}
 	return diversetableH;
 }
 
+vector<float> calculateFitnessTotals(vector< vector<float> > details, int numTestInstances) {
+	vector<float> fitnessTotals (numTestInstances);
+	for (int i = 0; i < numTestInstances; ++i) {
+		fitnessTotals[i] = 0;
+	}
+	for (int i = 0; i < NUM_ISLANDS*POP_SIZE; ++i) {
+		for (int j = 0; j < numTestInstances; ++j) {
+			fitnessTotals[j] += details[i][j];
+		}
+	}
+	return fitnessTotals;
+}
+
 /**
  * This function may be better broken up to allow for the vector and float to be returned separately.
  */
 float getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
-	float fitnessTotalsArray[testInstances.size()];
+	vector< vector<float> > detailedFitness = calculateFitnessDetail(testInstances, classification);  // this stores data in the array and returns detailed results also
+	vector<float> fitnessTotals = calculateFitnessTotals(detailedFitness, testInstances.size());
+	vector<int> rankings (testInstances.size());
 	for (int i = 0; i < testInstances.size(); ++i) {
-		fitnessTotalsArray[i] = 0.0;
+		rankings[i] = 0;
 	}
-	vector< vector<float> > detailedFitness = calculateFitnessDetail(testInstances, classification, fitnessTotalsArray);  // this stores data in the array and returns detailed results also
 	int numerator = 0;
-	for (int i = 0; i < testInstances.size(); ++i) {
-		if (fitnessTotalsArray[i] == 0.0) {   // if nobody got this problem right, count it as non-diverse
-			numerator++;
+	for (int i = 0; i < testInstances.size(); ++i) { // for every value, one at a time
+		for (int j = 0; j < testInstances.size(); ++j) {
+			if ((fitnessTotals[i] <= fitnessTotals[j]) && ((i <= j) || (fitnessTotals[i] != fitnessTotals[j]))) { // i >= j makes sure we don't get duplicates in the rankings
+				rankings[i] = rankings[i]+1;
+			}
 		}
+		if (fitnessTotals[i] == 0.0) numerator++;  // if nobody got this problem right, count it as non-diverse
 	}
 	return (float)1.0-(numerator/(float)testInstances.size());
 }
