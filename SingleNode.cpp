@@ -226,26 +226,61 @@ vector<float> calculateFitnessTotals(vector< vector<float> > details, int numTes
 	return fitnessTotals;
 }
 
+vector<int> calculateFitnessRankings(vector<float> fitnessTotals) {
+	vector<int> rankings (fitnessTotals.size());
+	//int numerator = 0;
+	for (int i = 0; i < fitnessTotals.size(); ++i) { // for every value, one at a time
+		rankings[i] = 0;
+		for (int j = 0; j < fitnessTotals.size(); ++j) {
+			if ((fitnessTotals[i] <= fitnessTotals[j]) && ((i <= j) || (fitnessTotals[i] != fitnessTotals[j]))) { // i >= j makes sure we don't get duplicates in the rankings
+				rankings[i] = rankings[i]+1;
+			}
+		}
+		//if (fitnessTotals[i] == 0.0) numerator++;  // if nobody got this problem right, count it as non-diverse
+	}
+	//return (float)1.0-(numerator/(float)testInstances.size());
+	return rankings;
+}
+
+vector<float> scaleToTarget(vector<float> vec, float targetTotal) {
+	float scale = 0.0;
+	vector<float> output (vec.size());
+	for (int i = 0; i < vec.size(); ++i) {
+		scale += vec[i];
+	}
+	scale = targetTotal / scale;
+	for (int i = 0; i < vec.size(); ++i) {
+		output[i] = vec[i] * scale;
+	}
+	return output;
+}
+
+vector<float> calculateFitnessWeights(vector<float> fitnessTotals, float scale) {
+	vector<float> weights (fitnessTotals.size());
+	float total = 0.0;
+	for (int i = 0; i < fitnessTotals.size(); ++i) { // for every value, one at a time
+		weights[i] = 0;
+		total += fitnessTotals[i];
+	}
+	for (int i = 0; i < fitnessTotals.size(); ++i) {
+		weights[i] = total / fitnessTotals[i];
+	}
+	if (scale != 0.0) {
+		cout << " Scaling fitness weights ";
+		return scaleToTarget(weights, scale);
+	}
+	return weights;
+}
+
 /**
  * This function may be better broken up to allow for the vector and float to be returned separately.
  */
 float getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
 	vector< vector<float> > detailedFitness = calculateFitnessDetail(testInstances, classification);  // this stores data in the array and returns detailed results also
 	vector<float> fitnessTotals = calculateFitnessTotals(detailedFitness, testInstances.size());
-	vector<int> rankings (testInstances.size());
-	for (int i = 0; i < testInstances.size(); ++i) {
-		rankings[i] = 0;
-	}
-	int numerator = 0;
-	for (int i = 0; i < testInstances.size(); ++i) { // for every value, one at a time
-		for (int j = 0; j < testInstances.size(); ++j) {
-			if ((fitnessTotals[i] <= fitnessTotals[j]) && ((i <= j) || (fitnessTotals[i] != fitnessTotals[j]))) { // i >= j makes sure we don't get duplicates in the rankings
-				rankings[i] = rankings[i]+1;
-			}
-		}
-		if (fitnessTotals[i] == 0.0) numerator++;  // if nobody got this problem right, count it as non-diverse
-	}
-	return (float)1.0-(numerator/(float)testInstances.size());
+	//vector<int> rankings =  calculateFitnessRankings(fitnessTotals);
+	vector<float> weights =  calculateFitnessWeights(fitnessTotals, 0.0);
+	return 0.0;
 }
 
 void usage(){
