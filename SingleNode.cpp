@@ -168,8 +168,7 @@ vector<float> getHammingDiversityForAllNodes() {
 }
 
 /*
- * Computes the variance of the fitness of the individuals in the entire population.
- * Assumes that the fitness has been updated across the popualtions.
+ * Computes the variance of the fitness of the individuals in the entire population with the given test set.
  */
 float getFitnessVariance(vector<TestInstance2> testInstances, char classification) {
 	int counter = 0;
@@ -190,7 +189,7 @@ float getFitnessVariance(vector<TestInstance2> testInstances, char classificatio
 
 /**
  * Computes the fitness of each individual within each island across the given test set.
- * Returns a three-dimensional vector of [islands][individuals][test instances]
+ * Returns a two-dimensional vector of [islands * individuals][test instances]
  */
 vector< vector<float> > calculateFitnessDetail(vector<TestInstance2> testInstances, char classification) {
 	SingleNode tempIsland;
@@ -213,12 +212,16 @@ vector< vector<float> > calculateFitnessDetail(vector<TestInstance2> testInstanc
 	return diversetableH;
 }
 
+/**
+ * Add up the fitness values from that all the individuals for each test instance.
+ * Returns a vector with as many items as numTestInstances, or the number of test instances.
+ */
 vector<float> calculateFitnessTotals(vector< vector<float> > details, int numTestInstances) {
 	vector<float> fitnessTotals (numTestInstances);
 	for (int i = 0; i < numTestInstances; ++i) {
 		fitnessTotals[i] = 0;
 	}
-	for (int i = 0; i < NUM_ISLANDS*POP_SIZE; ++i) {
+	for (int i = 0; i < details.size(); ++i) {
 		for (int j = 0; j < numTestInstances; ++j) {
 			fitnessTotals[j] += details[i][j];
 		}
@@ -226,6 +229,11 @@ vector<float> calculateFitnessTotals(vector< vector<float> > details, int numTes
 	return fitnessTotals;
 }
 
+/**
+ * Ranks values in the given vector starting with 1 as the largest value up to n as the smallest value.
+ * Ranking values are not repeated.
+ * Returns a vector of int that is the same size as the input vector.
+ */
 vector<int> calculateFitnessRankings(vector<float> fitnessTotals) {
 	vector<int> rankings (fitnessTotals.size());
 	//int numerator = 0;
@@ -242,7 +250,10 @@ vector<int> calculateFitnessRankings(vector<float> fitnessTotals) {
 	return rankings;
 }
 
-vector<float> scaleToTarget(vector<float> vec, float targetTotal) {
+/**
+ * Scales the weights such that their combined total equals the given target total.
+ */
+vector<float> scaleToTotal(vector<float> vec, float targetTotal) {
 	float scale = 0.0;
 	vector<float> output (vec.size());
 	for (int i = 0; i < vec.size(); ++i) {
@@ -255,7 +266,28 @@ vector<float> scaleToTarget(vector<float> vec, float targetTotal) {
 	return output;
 }
 
-vector<float> calculateFitnessWeights(vector<float> fitnessTotals, float scale) {
+/**
+ * Scale the weights in the given vector so that their max is the given limit and the other values are scaled accordingly.
+ */
+vector<float> scaleToLimit(vector<float> vec, float limit) {
+	float max = 0.0;
+	vector<float> output (vec.size());
+	for (int i = 0; i < vec.size(); ++i) {
+		if (max < vec[i]) max = vec[i];
+	}
+	float scale = limit / max;
+	for (int i = 0; i < vec.size(); ++i) {
+		output[i] = vec[i] * scale;
+	}
+	return output;
+}
+
+/**
+ * Returns a vector of weights where the largest number had the smallest total fitness in the given input vector of fitness totals.
+ * Larger fitness values carry less weight and have smaller numbers in the output vector.
+ * Returned vector is the same size as the input vector.
+ */
+vector<float> calculateFitnessWeights(vector<float> fitnessTotals) {
 	vector<float> weights (fitnessTotals.size());
 	float total = 0.0;
 	for (int i = 0; i < fitnessTotals.size(); ++i) { // for every value, one at a time
@@ -265,21 +297,41 @@ vector<float> calculateFitnessWeights(vector<float> fitnessTotals, float scale) 
 	for (int i = 0; i < fitnessTotals.size(); ++i) {
 		weights[i] = total / fitnessTotals[i];
 	}
-	if (scale != 0.0) {
-		cout << " Scaling fitness weights ";
-		return scaleToTarget(weights, scale);
-	}
 	return weights;
 }
 
 /**
- * This function may be better broken up to allow for the vector and float to be returned separately.
+ * Returns a vector that represents the relavance of each individual.
+ * Each individual's fitness on each test instance is multiplied by the weight associated with that test instance.
+ * Returned vector is the same size as the input detaiedFitness vector or (islands * population-size).
+ */
+vector<float> calculateIndividualRelavance(vector< vector<float> > detailedFitness, vector<float> weights) {
+	vector<float> relavanceVec (detailedFitness.size());
+	if (detailedFitness[0].size() != weights.size()) { // check the inputs
+		cout << "Error at calculateIndividualRelavance: indiviual fitness vectors and fitness weights vector do not match" << endl;
+		exit(-1);
+	}
+	for (int i = 0; i < detailedFitness.size(); ++i) {
+		float individualValue = 0.0;
+		for (int j = 0; j < weights.size(); ++j) {
+			individualValue += detailedFitness[i][j] * weights[j]; // Sum the product of the individual's performance and the veight of each test instance.
+		}
+		relavanceVec[i] = individualValue;
+	}
+	return relavanceVec;
+}
+
+/**
+ *
  */
 float getPhenotypeDiversity(vector<TestInstance2> testInstances, char classification) {
 	vector< vector<float> > detailedFitness = calculateFitnessDetail(testInstances, classification);  // this stores data in the array and returns detailed results also
 	vector<float> fitnessTotals = calculateFitnessTotals(detailedFitness, testInstances.size());
 	//vector<int> rankings =  calculateFitnessRankings(fitnessTotals);
-	vector<float> weights =  calculateFitnessWeights(fitnessTotals, 0.0);
+	vector<float> weights =  calculateFitnessWeights(fitnessTotals);
+	//weights = scaleToTotal(weights, 1.0); // Scales the weights such that their total equals the scale
+	//weights = scaleToLimit(weights, 1.0); // Scale the weights so that their max is the given limit and the other values are scaled accordingly.
+	vector<float> individualRelavance = calculateIndividualRelavance(detailedFitness, weights);
 	return 0.0;
 }
 
