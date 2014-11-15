@@ -170,21 +170,33 @@ vector<float> getHammingDiversityForAllNodes() {
 /*
  * Computes the variance of the fitness of the individuals in the entire population with the given test set.
  */
-float getFitnessVariance(vector<TestInstance2> testInstances, char classification) {
+vector<float> getFitnessDiversity(vector<TestInstance2> testInstances, char classification) {
 	int counter = 0;
-	float mean, x, delta, var = 0.0;
+	float worst = 1000.0;
+	float mean, x, delta, var, best = 0.0;
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		islands[i].a_pop->updatePopulationFitness(testInstances, classification);
 		for (int j = 0; j < POP_SIZE; ++j) {
 			++counter;
 			x = islands[i].getIndividual(j).getFitness();
+			if (x < worst) worst = x;
+			else if (x > best) best = x;
+			//average += x;
 			delta = x - mean;
 			mean = mean + (delta / (float)counter);
 			var = var + (delta * (x - mean));
 		}
 	}
-	var = var / (float)counter;
-	return var;
+	//average = average / (float) counter;
+	//if (counter != (POP_SIZE*NUM_ISLANDS)) cout << "counter: " << counter << " total islands: " << POP_SIZE * NUM_ISLANDS << endl; // would indicate a problem in the counter
+	//if (mean != average) cout << "mean: " << mean << " Average: " << average << endl; // Very small floating point error in calculating mean
+	//return var;
+	vector<float> output (4);
+	output[0] = best;
+	output[1] = worst;
+	output[2] = mean; //the accuracy of mean is probably sufficient
+	output[3] = var / (float)counter; // counter = POP_SIZE * NUM_ISLANDS
+	return output;
 }
 
 /**
@@ -525,9 +537,9 @@ int main(int argc, char * argv[])
       if( (gen+1) % WHEN_PRINT_DATA == 0 ) {
     	  vector<float> diversity = getHammingDiversityForAllNodes();
     	  float PhenotypeDiv = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY);
-    	  float FitnessDiv = getFitnessVariance(all_tests, WHICH_CLASSIFY);
+    	  vector<float> FitnessDiv = getFitnessDiversity(all_tests, WHICH_CLASSIFY);
 	      fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. Phenotype: %f Fitness Div: %f ---->\n",
-	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3], PhenotypeDiv, FitnessDiv);
+	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3], PhenotypeDiv, FitnessDiv[3]);
       }
       if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
       
