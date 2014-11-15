@@ -148,7 +148,9 @@ vector<float> getHammingDiversityForAllNodes() {
     for (int j=0; j < POP_SIZE*NUM_ISLANDS; j++){
       individs[i] += diversetable[i][j];
       ptotal += diversetable[i][j];
-      // can come back later and add the best, worst etc. if we want
+      //if ((0 == diversetable[i][j]) && (i != j)) cout << "i:" << i << " j:" << j << endl; // Which of the individuals are identical
+      if (bestDiversity < diversetable[i][j]) bestDiversity  = diversetable[i][j];
+      else if ((worstDiversity > diversetable[i][j]) && (i != j)) worstDiversity = diversetable[i][j];
     }
     individs[i] /= POP_SIZE*NUM_ISLANDS - 1;
   }
@@ -169,6 +171,7 @@ vector<float> getHammingDiversityForAllNodes() {
 
 /*
  * Computes the variance of the fitness of the individuals in the entire population with the given test set.
+ * Returned vector is <best, worst, average, variance>
  */
 vector<float> getFitnessDiversity(vector<TestInstance2> testInstances, char classification) {
 	int counter = 0;
