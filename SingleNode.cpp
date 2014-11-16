@@ -5,7 +5,7 @@
 #include "SingleNode.h"
 #include <time.h>
 #include <stdlib.h>
-
+#include <math.h>
 
 using namespace std;
 
@@ -168,6 +168,19 @@ vector<float> getHammingDiversityForAllNodes() {
   output[2] = average;
   output[3] = varianceTotal / ((float) POP_SIZE*NUM_ISLANDS);
   return output;
+}
+
+void seeInside(vector<float> input, string leadStr) {
+	bool bad = false;
+	cout << endl << leadStr;
+	for (int i = 0; i < input.size(); ++i) {
+		if ((i % 10) == 0) cout << endl;
+		if (isnanf(input[i]) != 0) bad = true;
+		cout << input[i] << ", ";
+	}
+	cout << endl;
+	cout.flush();
+	if (bad) {cout << endl << endl << "Found nan!" << endl; cout.flush(); exit(-1);}
 }
 
 /*
@@ -338,7 +351,13 @@ vector<float> calculateFitnessWeights(vector<float> fitnessTotals) {
 		total += fitnessTotals[i];
 	}
 	for (int i = 0; i < fitnessTotals.size(); ++i) {
-		weights[i] = total / fitnessTotals[i];
+		float temp = total / fitnessTotals[i];
+		/*if (isnanf(temp*0.0) != 0){// != 0) { //  Debug: infinite values are returned if the denominator is 0
+			cout << endl << "Found inf number at i:" << i << " and " <<  total << " / " << fitnessTotals[i] << endl;
+			seeInside(fitnessTotals, "Fitness Totals that ended the game:");
+			exit(-1);
+		}*/
+		weights[i] = temp;
 	}
 	return weights;
 }
@@ -358,6 +377,10 @@ vector<float> calculateIndividualRelavance(vector< vector<float> > detailedFitne
 		float individualValue = 0.0;
 		for (int j = 0; j < weights.size(); ++j) {
 			individualValue += detailedFitness[i][j] * weights[j]; // Sum the product of the individual's performance and the veight of each test instance.
+			/*if (isnanf(individualValue) != 0) {
+				cout << endl << "nan i:" << i << ", j:" << j << "= "<< detailedFitness[i][j] << "*" << weights[j] << " and " << "vector: " << endl;
+				seeInside(weights, "weights that caused error: ");
+				exit(-1); }*/
 		}
 		relavanceVec[i] = individualValue;
 	}
@@ -375,6 +398,9 @@ vector<float> getPhenotypeDiversity(vector<TestInstance2> testInstances, char cl
 	//weights = scaleToTotal(weights, 1.0); // Scales the weights such that their total equals the scale
 	//weights = scaleToLimit(weights, 1.0); // Scale the weights so that their max is the given limit and the other values are scaled accordingly.
 	vector<float> individualRelavance = calculateIndividualRelavance(detailedFitness, weights);
+	//seeInside(fitnessTotals, "FitnessTotals");
+	//seeInside(weights, "weights");
+	//seeInside(individualRelavance, "individualRelavance");
 	return getDiversityValues(individualRelavance);
 }
 
