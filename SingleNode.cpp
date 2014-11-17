@@ -351,13 +351,13 @@ vector<float> calculateFitnessWeights(vector<float> fitnessTotals) {
 		total += fitnessTotals[i];
 	}
 	for (int i = 0; i < fitnessTotals.size(); ++i) {
-		float temp = total / fitnessTotals[i];
-		/*if (isnanf(temp*0.0) != 0){// != 0) { //  Debug: infinite values are returned if the denominator is 0
+		if (fitnessTotals[i] != 0.0) weights[i] = total / fitnessTotals[i];
+		else weights[i] = 0.0;  // what value should we ascribe to a test instance when nobody gets it right?
+		/*if (isnanf((total / fitnessTotals[i])*0.0) != 0){// != 0) { //  Debug: infinite values are returned if the denominator is 0
 			cout << endl << "Found inf number at i:" << i << " and " <<  total << " / " << fitnessTotals[i] << endl;
 			seeInside(fitnessTotals, "Fitness Totals that ended the game:");
 			exit(-1);
 		}*/
-		weights[i] = temp;
 	}
 	return weights;
 }
