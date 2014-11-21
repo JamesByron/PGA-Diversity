@@ -620,7 +620,7 @@ int main(int argc, char * argv[])
 	    	//	  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3], PhenotypeDiv, FitnessDiv[3]);
       }
       else if ((WHEN_PRINT_DATA > WHEN_FULL_TEST) && (((gen+1) % WHEN_FULL_TEST) == 0)) {
-    	  fprintf(logFile1, "\n\t\t\t\t\t\t\t\t\t\t\t\t"); // make sure the full test sets line up
+    	  fprintf(logFile1, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t"); // make sure the full test sets line up
       }
 
       if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
