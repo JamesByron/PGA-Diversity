@@ -187,13 +187,13 @@ void seeInside(vector<float> input, string leadStr) {
  * Computes the variance of the fitness of the individuals in the entire population with the given test set.
  * Returned vector is <best, worst, average, variance>
  */
-vector<float> getFitnessDiversity(vector<TestInstance2> testInstances, char classification, int startIsland, int endIsland) {
+vector<float> getFitnessDiversity(int startIsland, int endIsland) {
 	if ((startIsland < 0) || (endIsland > NUM_ISLANDS)) { cout << "Error in getFitnessDiversity; island index out of range " << startIsland << ", " << endIsland << endl; exit(-1); }
 	int counter = 0;
 	float worst = 1000.0;
 	float mean, x, delta, var, best = 0.0;
 	for (int i = startIsland; i < endIsland; ++i) {
-		islands[i].a_pop->updatePopulationFitness(testInstances, classification);
+		//islands[i].a_pop->updatePopulationFitness(testInstances, classification);
 		for (int j = 0; j < POP_SIZE; ++j) {
 			++counter;
 			x = islands[i].getIndividual(j).getFitness();
@@ -604,8 +604,11 @@ int main(int argc, char * argv[])
 		  mostFitIsland = island;
 		}
 	      vector<float> HamDiv = i.a_pop->getInternalHammingDiversity();
-	      vector<float> FitDiv = getFitnessDiversity(tsVector, WHICH_CLASSIFY, island, (island+1));
+	      vector<float> FitDiv = getFitnessDiversity(island, (island+1));
 	      vector<float> PhenDiv = getPhenotypeDiversity(tsVector, WHICH_CLASSIFY, island, (island+1));
+	      //vector<float> FitDiv = getFitnessDiversity(tsVector, WHICH_CLASSIFY, island, (island+1));
+
+
 	      fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
 		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
 	      //fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
@@ -614,7 +617,8 @@ int main(int argc, char * argv[])
 	}
       if( (gen+1) % WHEN_PRINT_DATA == 0 ) {
     	  vector<float> HamDiv = getHammingDiversityForAllNodes();
-    	  vector<float> FitDiv = getFitnessDiversity(tsVector, WHICH_CLASSIFY, 0, NUM_ISLANDS);
+    	  //vector<float> FitDiv = getFitnessDiversity(tsVector, WHICH_CLASSIFY, 0, NUM_ISLANDS);
+    	  vector<float> FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
     	  vector<float> PhenDiv = getPhenotypeDiversity(tsVector, WHICH_CLASSIFY, 0, NUM_ISLANDS);  // we use the training set untel it's time to use the full test set
     	  fprintf(logFile1, "\n%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
     	  	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
@@ -640,7 +644,8 @@ int main(int argc, char * argv[])
 		  mostFitIsland = island;
 		}
 	      vector<float> HamDiv = i.a_pop->getInternalHammingDiversity();
-	      vector<float> FitDiv = getFitnessDiversity(all_tests, WHICH_CLASSIFY, island, (island+1));
+	      vector<float> FitDiv = getFitnessDiversity(island, (island+1));
+	      //vector<float> FitDiv = getFitnessDiversity(all_tests, WHICH_CLASSIFY, island, (island+1));
 	      vector<float> PhenDiv = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY, island, (island+1));
 	      fprintf(logFile2, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
 	      	    	  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
@@ -649,7 +654,8 @@ int main(int argc, char * argv[])
 	      //i.a_pop->getBestIndividual().dumpConfMat(logFile2);
 	    }
 	   vector<float> HamDiv = getHammingDiversityForAllNodes();
- 	   vector<float> FitDiv = getFitnessDiversity(all_tests, WHICH_CLASSIFY, 0, NUM_ISLANDS);
+ 	   vector<float> FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
+ 	   //vector<float> FitDiv = getFitnessDiversity(all_tests, WHICH_CLASSIFY, 0, NUM_ISLANDS);
  	   vector<float> PhenDiv = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY, 0, NUM_ISLANDS);
 	   fprintf(logFile1, "\t\t%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
 		   mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
