@@ -219,9 +219,9 @@ vector<float> getFitnessDiversity(vector<TestInstance2> testInstances, char clas
 
 /*
  * Computes the max, min, average, and variance of the numbers in the given vector.
- * Returned vector is <best, worst, average, variance>
+ * Returned vector is <best, worst, average, variance, number of test instances that have 0 weight>
  */
-vector<float> getDiversityValues(vector<float> values) {
+vector<float> getDiversityValues(vector<float> values, int numZeros) {
 	int counter = 0;
 	float worst = 1000.0;
 	float mean, x, delta, var, best = 0.0;
@@ -234,11 +234,12 @@ vector<float> getDiversityValues(vector<float> values) {
 		mean = mean + (delta / (float)counter);
 		var = var + (delta * (x - mean));
 	}
-	vector<float> output (4);
+	vector<float> output (5);
 	output[0] = best;
 	output[1] = worst;
 	output[2] = mean; //the accuracy of mean is probably sufficient
 	output[3] = var / (float)counter; // counter = POP_SIZE * NUM_ISLANDS
+	output[4] = numZeros;
 	return output;
 }
 
@@ -397,11 +398,12 @@ vector<float> getPhenotypeDiversity(vector<TestInstance2> testInstances, char cl
 	vector<float> weights =  calculateFitnessWeights(fitnessTotals);
 	//weights = scaleToTotal(weights, 1.0); // Scales the weights such that their total equals the scale
 	//weights = scaleToLimit(weights, 1.0); // Scale the weights so that their max is the given limit and the other values are scaled accordingly.
+	int numZeros = 0;
+	for (int i = 0; i < weights.size(); ++i) {
+		if (weights[i] == 0.0) numZeros++;  // checks to see how many test instances have 0 weight.
+	}
 	vector<float> individualRelavance = calculateIndividualRelavance(detailedFitness, weights);
-	//seeInside(fitnessTotals, "FitnessTotals");
-	//seeInside(weights, "weights");
-	//seeInside(individualRelavance, "individualRelavance");
-	return getDiversityValues(individualRelavance);
+	return getDiversityValues(individualRelavance, numZeros);
 }
 
 vector<TestInstance2> getTIVector(TestSet set, int num) {
@@ -574,8 +576,8 @@ int main(int argc, char * argv[])
 
   cout << "Counting generations: ";
   // Alternate log file arrangement:
-  fprintf(logFile1, "Log file for Overall Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEVALUATED OVER ALL TESTS\nMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\t\tMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance");
-  fprintf(logFile2, "Log file for Island Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tFull Testset\nMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\t\tMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\n");
+  fprintf(logFile1, "Log file for Overall Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEVALUATED OVER ALL TESTS\nMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\t\tMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight");
+  fprintf(logFile2, "Log file for Island Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tFull Testset\nMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\t\tMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\n");
 
   for(int gen=0; gen < MAX_GENERATIONS; gen++)
     {
@@ -604,8 +606,8 @@ int main(int argc, char * argv[])
 	      vector<float> HamDiv = i.a_pop->getInternalHammingDiversity();
 	      vector<float> FitDiv = getFitnessDiversity(tsVector, WHICH_CLASSIFY, island, (island+1));
 	      vector<float> PhenDiv = getPhenotypeDiversity(tsVector, WHICH_CLASSIFY, island, (island+1));
-	      fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
-		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3]);
+	      fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
+		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
 	      //fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
 	      //    i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	    }
@@ -614,13 +616,13 @@ int main(int argc, char * argv[])
     	  vector<float> HamDiv = getHammingDiversityForAllNodes();
     	  vector<float> FitDiv = getFitnessDiversity(tsVector, WHICH_CLASSIFY, 0, NUM_ISLANDS);
     	  vector<float> PhenDiv = getPhenotypeDiversity(tsVector, WHICH_CLASSIFY, 0, NUM_ISLANDS);  // we use the training set untel it's time to use the full test set
-    	  fprintf(logFile1, "\n%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f",
-    	  	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3]);
+    	  fprintf(logFile1, "\n%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
+    	  	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
     	  //fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. Phenotype: %f Fitness Div: %f ---->\n",
 	    	//	  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3], PhenotypeDiv, FitnessDiv[3]);
       }
       else if ((WHEN_PRINT_DATA > WHEN_FULL_TEST) && (((gen+1) % WHEN_FULL_TEST) == 0)) {
-    	  fprintf(logFile1, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t"); // make sure the full test sets line up
+    	  fprintf(logFile1, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"); // make sure the full test sets line up
       }
 
       if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
@@ -640,8 +642,8 @@ int main(int argc, char * argv[])
 	      vector<float> HamDiv = i.a_pop->getInternalHammingDiversity();
 	      vector<float> FitDiv = getFitnessDiversity(all_tests, WHICH_CLASSIFY, island, (island+1));
 	      vector<float> PhenDiv = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY, island, (island+1));
-	      fprintf(logFile2, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n",
-	      	    	  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3]);
+	      fprintf(logFile2, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
+	      	    	  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
 	      //fprintf(logFile2, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
 	    	//  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	      //i.a_pop->getBestIndividual().dumpConfMat(logFile2);
@@ -649,8 +651,8 @@ int main(int argc, char * argv[])
 	   vector<float> HamDiv = getHammingDiversityForAllNodes();
  	   vector<float> FitDiv = getFitnessDiversity(all_tests, WHICH_CLASSIFY, 0, NUM_ISLANDS);
  	   vector<float> PhenDiv = getPhenotypeDiversity(all_tests, WHICH_CLASSIFY, 0, NUM_ISLANDS);
-	   fprintf(logFile1, "\t\t%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f",
-		   mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3]);
+	   fprintf(logFile1, "\t\t%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
+		   mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
 	   //fprintf(logFile1, "<---- Most Fit EVALUATED OVER ALL TESTS: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. ---->",
 	   //		   mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	}
