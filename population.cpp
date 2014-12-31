@@ -256,26 +256,36 @@ void Population::populationAccuracy(char WHICH_CLASSIFY)
 	stdev = sqrt(stdev);
 }
 
+void Population::updatePopulationRelavance(vector<float> relavance, vector<int> priority) {
+	relavanceVec = relavance;
+	priorityRank = priority;
+}
+
 // select individuals for . . . .
 
-void Population::selectToSurvive(int n)
+void Population::selectToSurvive(int n, bool useDiversity)
 // Select individuals to survive to next population
 {
 	static Individual2 tmpI;
 	int selectedIndividual;
 	int availablepop = POP_SIZE;
+	vector<float> relavance = relavanceVec;
+	vector<int> priority = priorityRank;
 	for (int i=0; i < n; i++)
 	{
 		//printf("Node %d: selecting individual to survive %d\n", myrank, i);
-		selectedIndividual = selectIndividual(availablepop);
+		if (!useDiversity) selectedIndividual = selectIndividual(availablepop);
+		else selectedIndividual = relavanceSelect(&relavance, &priority);
 		//printf("Node %d: selected individual %d\n", myrank, selectedIndividual);
 		if( !mypop[selectedIndividual].isSelected() )
 		{
 			newpop[newpop_count++] = mypop[selectedIndividual];
 			mypop[selectedIndividual].select();
-			tmpI = mypop[availablepop-1];
-			mypop[--availablepop] = mypop[selectedIndividual];
-			mypop[selectedIndividual] = tmpI;
+			if (!useDiversity) {
+				tmpI = mypop[availablepop-1];
+				mypop[--availablepop] = mypop[selectedIndividual];
+				mypop[selectedIndividual] = tmpI;
+			}
 		} else {
 			printf("Node %d: FAILED TO SELECT AN UNSELECTED INDIVIDUAL! (try %d of %d)\n", myrank, i, n); exit(3);
 		}
@@ -420,9 +430,22 @@ int Population::selectIndividual(int availablepop)
 	switch (WHICH_SELECT) {
 	case 1: return tournamentSelect(availablepop); break;
 	case 2: return altSelectIndividual(); break;
+	//case 3: return relavanceSelect(); break;
 	}
 }
 
+int Population::relavanceSelect(vector<float>* relavance, vector<int>* priority) {
+	float threshold = 0;//(float)rand() / (float)RAND_MAX;
+	int temp = -1;
+	for (int i = 0; i < (*priority).size(); ++i) {
+		if ((*relavance)[(*priority)[i]] >= threshold) {
+			temp = (*priority)[i];
+			(*relavance)[(*priority)[i]] = -1.0; // we don't want to use this one again
+			break;
+		}
+	}
+	return temp;
+}
 
 int Population::tournamentSelect(int availablepop)
 // tournament selection with replacement for tournament participants -- best of tournament candidates selected
