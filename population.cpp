@@ -275,7 +275,7 @@ void Population::selectToSurvive(int n, bool useDiversity)
 	{
 		//printf("Node %d: selecting individual to survive %d\n", myrank, i);
 		if (!useDiversity) selectedIndividual = selectIndividual(availablepop);
-		else selectedIndividual = relavanceSelect(&relavance, &priority);
+		else selectedIndividual = relavanceSelect(&relavance, &priority, false);
 		//printf("Node %d: selected individual %d\n", myrank, selectedIndividual);
 		if( !mypop[selectedIndividual].isSelected() )
 		{
@@ -434,16 +434,18 @@ int Population::selectIndividual(int availablepop)
 	}
 }
 
-int Population::relavanceSelect(vector<float>* relavance, vector<int>* priority) {
-	float threshold = 0;//(float)rand() / (float)RAND_MAX;
+int Population::relavanceSelect(vector<float>* relavance, vector<int>* priority, bool useRandom) {
+	float threshold = 0.0;
 	int temp = -1;
 	for (int i = 0; i < (*priority).size(); ++i) {
+		if (useRandom) threshold = (float)rand() / (float)RAND_MAX;
 		if ((*relavance)[(*priority)[i]] >= threshold) {
 			temp = (*priority)[i];
 			(*relavance)[(*priority)[i]] = -1.0; // we don't want to use this one again
 			break;
 		}
 	}
+	if (temp == -1) {cout << "reiterating diversity selection" << endl; return relavanceSelect(relavance, priority, useRandom);}
 	return temp;
 }
 

@@ -49,7 +49,7 @@ private:
   int tournamentSelect(int availablepop);
   int altSelectIndividual();
   int selectWeakIndividual();
-  int relavanceSelect(vector<float>* relavance, vector<int>* priority);
+  int relavanceSelect(vector<float>* relavance, vector<int>* priority, bool useRandom);
   // variables
   int POP_SIZE;
   vector<vector<int> > HAMMING_DIST;
