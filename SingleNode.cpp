@@ -53,10 +53,10 @@ SingleNode::SingleNode()
 
 }
 
-void SingleNode::doOneGeneration(int thisgen, bool useDiversity, vector<float>* islandRelavance, vector<int>* islandRankings)
+void SingleNode::doOneGeneration(int thisgen, vector<float>* islandRelavance)
   // do the stuff for one generation
 {
-  a_pop->updatePopulationRelavance(*islandRelavance, *islandRankings);
+  a_pop->updatePopulationRelavance(*islandRelavance);
   float randmigrate;
   srand( time(NULL) );
   randmigrate = ((float)rand())/RAND_MAX; 
@@ -67,7 +67,7 @@ void SingleNode::doOneGeneration(int thisgen, bool useDiversity, vector<float>* 
   
   // survive
   //printf("Node %d: a_pop->selectToSurvive(%d)\n", myrank, ((int)(POP_SIZE*PROB_REMAIN)));
-  a_pop->selectToSurvive((int)(POP_SIZE*PROB_REMAIN), useDiversity);
+  a_pop->selectToSurvive((int)(POP_SIZE*PROB_REMAIN));
 
   // receive
   //printf("Node %d: receiveMigrantStrings()\n", myrank);
@@ -617,7 +617,7 @@ int main(int argc, char * argv[])
 	  i = islands[island];
 
 	  //printf("...........OK, try this generation(%d)\n", gen);
-	  i.doOneGeneration(gen, useDiversity, &islandRelavance[island], &islandRankings[island]);
+	  i.doOneGeneration(gen, &islandRelavance[island]);
 	  //printf("Node %d: ran generation %d\n", island, gen);
 
 	  if( (gen+1) % WHEN_PRINT_DATA == 0 )

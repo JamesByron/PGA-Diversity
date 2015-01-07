@@ -256,36 +256,34 @@ void Population::populationAccuracy(char WHICH_CLASSIFY)
 	stdev = sqrt(stdev);
 }
 
-void Population::updatePopulationRelavance(vector<float> relavance, vector<int> priority) {
+void Population::updatePopulationRelavance(vector<float> relavance) {
 	relavanceVec = relavance;
-	priorityRank = priority;
 }
 
 // select individuals for . . . .
 
-void Population::selectToSurvive(int n, bool useDiversity)
+void Population::selectToSurvive(int n)
 // Select individuals to survive to next population
 {
 	static Individual2 tmpI;
+	float tempR;
 	int selectedIndividual;
 	int availablepop = POP_SIZE;
-	vector<float> relavance = relavanceVec;
-	vector<int> priority = priorityRank;
 	for (int i=0; i < n; i++)
 	{
 		//printf("Node %d: selecting individual to survive %d\n", myrank, i);
-		if (!useDiversity) selectedIndividual = selectIndividual(availablepop);
-		else selectedIndividual = relavanceSelect(&relavance, &priority, false);
+		selectedIndividual = selectIndividual(availablepop);
 		//printf("Node %d: selected individual %d\n", myrank, selectedIndividual);
 		if( !mypop[selectedIndividual].isSelected() )
 		{
 			newpop[newpop_count++] = mypop[selectedIndividual];
 			mypop[selectedIndividual].select();
-			if (!useDiversity) {
-				tmpI = mypop[availablepop-1];
-				mypop[--availablepop] = mypop[selectedIndividual];
-				mypop[selectedIndividual] = tmpI;
-			}
+			tmpI = mypop[availablepop-1];
+			tempR = relavanceVec[availablepop-1];
+			relavanceVec[availablepop-1] = relavanceVec[selectedIndividual];
+			relavanceVec[selectedIndividual] = tempR;
+			mypop[--availablepop] = mypop[selectedIndividual];
+			mypop[selectedIndividual] = tmpI;
 		} else {
 			printf("Node %d: FAILED TO SELECT AN UNSELECTED INDIVIDUAL! (try %d of %d)\n", myrank, i, n); exit(3);
 		}
@@ -430,23 +428,23 @@ int Population::selectIndividual(int availablepop)
 	switch (WHICH_SELECT) {
 	case 1: return tournamentSelect(availablepop); break;
 	case 2: return altSelectIndividual(); break;
-	//case 3: return relavanceSelect(); break;
+	case 3: return relavanceTournamentSelect(availablepop); break;
 	}
 }
 
-int Population::relavanceSelect(vector<float>* relavance, vector<int>* priority, bool useRandom) {
-	float threshold = 0.0;
-	int temp = -1;
-	for (int i = 0; i < (*priority).size(); ++i) {
-		if (useRandom) threshold = (float)rand() / (float)RAND_MAX;
-		if ((*relavance)[(*priority)[i]] >= threshold) {
-			temp = (*priority)[i];
-			(*relavance)[(*priority)[i]] = -1.0; // we don't want to use this one again
-			break;
+int Population::relavanceTournamentSelect(int availablepop) {
+	float bestFit;
+	int bestIndex, candidate;
+	bestIndex = rand() % availablepop;
+	bestFit = relavanceVec[bestIndex];
+	for (int i=1; i < TOURNAMENT_SIZE; i++) {
+		candidate = rand() % availablepop;
+		if (relavanceVec[candidate] > bestFit) {
+			bestIndex = candidate;
+			bestFit = relavanceVec[candidate];
 		}
 	}
-	if (temp == -1) {cout << "reiterating diversity selection" << endl; return relavanceSelect(relavance, priority, useRandom);}
-	return temp;
+	return bestIndex;
 }
 
 int Population::tournamentSelect(int availablepop)

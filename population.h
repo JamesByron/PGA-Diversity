@@ -23,9 +23,9 @@ public:
   void updatePopulationFitness(char WHICH_FITNESS);
   void updatePopulationFitness(vector<TestInstance2> allti, char WHICH_CLASSIFY);
   void populationAccuracy(char WHICH_CLASSIFY);
-  void updatePopulationRelavance(vector<float> relavance, vector<int> priority);
+  void updatePopulationRelavance(vector<float> relavance);
   // select individuals for . . . .
-  void selectToSurvive(int n, bool useDiversity);
+  void selectToSurvive(int n);
   void selectRandToMigrate(Individual2 * migrants, int num_migrants);
   void selectStrongToMigrate(Individual2 * migrants, int num_migrants);
   void selectWeakToMigrate(Individual2 * migrants, int num_migrants);
@@ -49,7 +49,7 @@ private:
   int tournamentSelect(int availablepop);
   int altSelectIndividual();
   int selectWeakIndividual();
-  int relavanceSelect(vector<float>* relavance, vector<int>* priority, bool useRandom);
+  int relavanceTournamentSelect(int availablepop);
   // variables
   int POP_SIZE;
   vector<vector<int> > HAMMING_DIST;
@@ -71,5 +71,4 @@ private:
   Individual2 * mypop;
   Individual2 * newpop;
   vector<float> relavanceVec;
-  vector<int> priorityRank;
 };

@@ -15,7 +15,7 @@ class SingleNode
   //~Island() {};
   //void addToCustoms(vector<Individual2> v);
   //void addToCustoms(Individual2 * v, int n);
-  void doOneGeneration(int thisgen, bool useDiversity, vector<float>* islandRelavance, vector<int>* islandRankings);
+  void doOneGeneration(int thisgen, vector<float>* islandRelavance);
   int sendMigrants();
   //  void NetFitnessAssessment(vector<TestInstance2> allti);
   // public variables
