@@ -19,11 +19,6 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
 	myTestSet = ts;
 	POP_SIZE = popsize;
 
-	HAMMING_DIST.resize(POP_SIZE);
-	for (int i = 0; i < POP_SIZE; ++i) {
-		HAMMING_DIST[i].resize(POP_SIZE);
-	}
-
 	//printf("Population: starting constructor\n");
 	//set the default values
 	generation = 0;
@@ -143,6 +138,7 @@ int Population::calculateHammingPair(string a, string b) {
 	return HamDiff;
 }
 
+/*
 // Stores the hamming distance in a 2-dimensional vector
 void Population::updateInternalHammingDist() {
 	for (int i = 0; i < POP_SIZE; ++i) {
@@ -152,20 +148,7 @@ void Population::updateInternalHammingDist() {
 			HAMMING_DIST[i][j] = calculateHammingPair(iString, jString);
 		}
 	}
-}
-
-/*
-string Population::getHammingString() { // This is not final code!
-	string output = "";
-	for (int i = 0; i < POP_SIZE; ++i) {
-		for (int j = 0; j < POP_SIZE; ++j) {
-			//output += to_string(HEMMING_DIST[i][j]) += " "; it no workie...yet
-		}
-		output += "\n";
-	}
-	return output;
-}
- */
+}*/
 
 // update fitness of all individuals
 
@@ -256,8 +239,10 @@ void Population::populationAccuracy(char WHICH_CLASSIFY)
 	stdev = sqrt(stdev);
 }
 
-void Population::updatePopulationRelavance(vector<float> relavance) {
-	relavanceVec = relavance;
+void Population::updatePopulationRelavance(vector<float>* relavance) {
+	for (int i = 0; i < POP_SIZE; ++i) {
+		mypop[i].updateDiversityRelavance((*relavance)[i]);
+	}
 }
 
 // select individuals for . . . .
@@ -266,7 +251,6 @@ void Population::selectToSurvive(int n)
 // Select individuals to survive to next population
 {
 	static Individual2 tmpI;
-	float tempR;
 	int selectedIndividual;
 	int availablepop = POP_SIZE;
 	for (int i=0; i < n; i++)
@@ -279,9 +263,6 @@ void Population::selectToSurvive(int n)
 			newpop[newpop_count++] = mypop[selectedIndividual];
 			mypop[selectedIndividual].select();
 			tmpI = mypop[availablepop-1];
-			tempR = relavanceVec[availablepop-1];
-			relavanceVec[availablepop-1] = relavanceVec[selectedIndividual];
-			relavanceVec[selectedIndividual] = tempR;
 			mypop[--availablepop] = mypop[selectedIndividual];
 			mypop[selectedIndividual] = tmpI;
 		} else {
@@ -295,6 +276,8 @@ void Population::selectRandToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs randomly selected individuals (without replacement) into the migrants array
 // ??? and sets their selected flag in the base population
 {
+	cout << endl << "Random migration for " << num_migrants << " migrants." << endl;
+	cout.flush();
 	int i;
 	for(int n = 0; n < num_migrants; n++)
 	{
@@ -433,15 +416,14 @@ int Population::selectIndividual(int availablepop)
 }
 
 int Population::relavanceTournamentSelect(int availablepop) {
-	float bestFit;
 	int bestIndex, candidate;
 	bestIndex = rand() % availablepop;
-	bestFit = relavanceVec[bestIndex];
+	float bestFit = mypop[bestIndex].getDiversityRelavance();
 	for (int i=1; i < TOURNAMENT_SIZE; i++) {
 		candidate = rand() % availablepop;
-		if (relavanceVec[candidate] > bestFit) {
+		if (mypop[candidate].getDiversityRelavance() > bestFit) {
 			bestIndex = candidate;
-			bestFit = relavanceVec[candidate];
+			bestFit = mypop[candidate].getDiversityRelavance();
 		}
 	}
 	return bestIndex;

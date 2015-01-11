@@ -56,10 +56,10 @@ SingleNode::SingleNode()
 void SingleNode::doOneGeneration(int thisgen, vector<float>* islandRelavance)
   // do the stuff for one generation
 {
-  a_pop->updatePopulationRelavance(*islandRelavance);
+  a_pop->updatePopulationRelavance(islandRelavance);
   float randmigrate;
-  srand( time(NULL) );
-  randmigrate = ((float)rand())/RAND_MAX; 
+//  srand( time(NULL) ); doing this every generation and for each island creates a bug
+  randmigrate = (float)rand()/RAND_MAX;
   // send
   //printf("Node %d: sendMigrantStrings()\n", myrank);
   if (WHICH_MIGRATION != 'n' &&  (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ )
@@ -469,6 +469,7 @@ int main(int argc, char * argv[])
    argv[15] (optional) depth of testinstance selecion (-1:draw, 0:zero, 1:one,...,16:sixteen)
   */
 {
+  srand( time(NULL) );
   int WHEN_PRINT_DATA = 1;
   int INIT_SEED;
   vector<TestInstance2> all_tests;  // vector of random samples from test instances
@@ -602,7 +603,6 @@ int main(int argc, char * argv[])
   vector<float> HamDiv;
   vector<float> FitDiv;
   vector<float> PhenDiv;
-  bool useDiversity = false;
   for(int gen=0; gen < MAX_GENERATIONS; gen++)
     {
       cout << gen << " ";
@@ -639,7 +639,6 @@ int main(int argc, char * argv[])
 	      //    i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
 	    }
 	}
-      useDiversity = true;
       if( (gen+1) % WHEN_PRINT_DATA == 0 ) {
     	  HamDiv = getHammingDiversityForAllNodes();
     	  //vector<float> FitDiv = getFitnessDiversity(tsVector, WHICH_CLASSIFY, 0, NUM_ISLANDS);
@@ -653,8 +652,8 @@ int main(int argc, char * argv[])
       else if ((WHEN_PRINT_DATA > WHEN_FULL_TEST) && (((gen+1) % WHEN_FULL_TEST) == 0)) {
     	  fprintf(logFile1, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"); // make sure the full test sets line up
       }
-
-      if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
+      // enable the following line to disable recomputing diversity each generation.
+      //if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
       
       if (((gen+1) % WHEN_FULL_TEST) == 0) // need the +1 because population's gen-count has been updated during doOneGen
 	{

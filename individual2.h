@@ -50,6 +50,8 @@ public:
   void dumpConfMat(FILE *lf);
   void sortNums(int * cpts, int j);
   void resetConfMat();
+  void updateDiversityRelavance(float relavance);
+  float getDiversityRelavance() {return myDiversityRelavance; }
 private:
   void auxBreedNCross(Individual2 * kids, Individual2 ind, int crossThisTime);
   void countFeats(signed char * featcounts, TestInstance2 ti);
@@ -63,4 +65,5 @@ private:
   float accuracy;
   float confMat[RULE_CASES][RULE_CASES];
   unsigned char rule[RULE_CASES*NUM_FEATURES];
+  float myDiversityRelavance;
 };

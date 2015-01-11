@@ -13,7 +13,6 @@ class Population
 public:
   Population(int n, int nprocs, TestSet ts, int popsize);
   // accessors
-  string getHammingString();
   int getGeneration() { return generation; }
   float getPopulationMaxFitness() { return maxFitness; }
   float getPopulationAvgFitness() { return totalFitness/POP_SIZE; }
@@ -23,7 +22,7 @@ public:
   void updatePopulationFitness(char WHICH_FITNESS);
   void updatePopulationFitness(vector<TestInstance2> allti, char WHICH_CLASSIFY);
   void populationAccuracy(char WHICH_CLASSIFY);
-  void updatePopulationRelavance(vector<float> relavance);
+  void updatePopulationRelavance(vector<float>* relavance);
   // select individuals for . . . .
   void selectToSurvive(int n);
   void selectRandToMigrate(Individual2 * migrants, int num_migrants);
@@ -43,7 +42,7 @@ public:
 private:
   // functions
   int calculateHammingPair(string a, string b);
-  void updateInternalHammingDist();
+  //void updateInternalHammingDist();
   void unselectAll();
   int selectIndividual(int availablepop);
   int tournamentSelect(int availablepop);
@@ -52,7 +51,7 @@ private:
   int relavanceTournamentSelect(int availablepop);
   // variables
   int POP_SIZE;
-  vector<vector<int> > HAMMING_DIST;
+  //vector<vector<int> > HAMMING_DIST;
   TestSet myTestSet;
   int generation;
   float avgFitness;
@@ -70,5 +69,5 @@ private:
   Individual2 * b2;
   Individual2 * mypop;
   Individual2 * newpop;
-  vector<float> relavanceVec;
+  //vector<float> relavanceVec;
 };

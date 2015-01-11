@@ -9,6 +9,7 @@ using namespace std;
 Individual2::Individual2()
 {
   selected = false;
+  myDiversityRelavance = (float)rand() / (float)RAND_MAX; //just to make sure that relavance is not null.
 }
 
 Individual2::Individual2(int rl)
@@ -24,6 +25,7 @@ Individual2::Individual2(int rl)
     }
   setRule(s);
   selected = false;
+  myDiversityRelavance = (float)rand() / (float)RAND_MAX; //just to make sure that relavance is not null.
 }
 
 Individual2::Individual2(string str)
@@ -32,6 +34,7 @@ Individual2::Individual2(string str)
   if (str.length() != RULE_LEN) printf("w-ERROR: incorrect length of %d to Individual2(string) constructor\n", (int)str.length());
   setRule(str);
   selected = false;
+  myDiversityRelavance = (float)rand() / (float)RAND_MAX; //just to make sure that relavance is not null.
 }
 
 
@@ -128,6 +131,10 @@ int Individual2::classify(TestInstance2 ti)
   confMat[correctclass][i]++;
   //printf("Leaving classify\n");
   return (correctclass == i-1); 
+}
+
+void Individual2::updateDiversityRelavance(float relavance) {
+	myDiversityRelavance = relavance;
 }
 
 void Individual2::updateFitness(TestSet ts, char WHICH_FITNESS)
