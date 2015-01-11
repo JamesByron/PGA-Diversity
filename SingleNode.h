@@ -22,6 +22,7 @@ class SingleNode
   Population * a_pop;
   Individual2 * customs;
   Individual2 getIndividual(int index);
+  void addIslandBitTotal(float * totals);
   // int compareIndividualToPopulation(Individual2 input);
  private:
   bool selectIndividual(int ind);

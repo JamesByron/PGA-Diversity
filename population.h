@@ -39,6 +39,7 @@ public:
   vector<float> getInternalHammingDiversity();
   //vector<float> getExternalPopulationDiversity(Individual2 input);
   vector<int> calculateHammingForAll(Individual2 input);
+  void addPopulationBitTotal(float * totals);
 private:
   // functions
   int calculateHammingPair(string a, string b);

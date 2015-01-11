@@ -138,17 +138,15 @@ int Population::calculateHammingPair(string a, string b) {
 	return HamDiff;
 }
 
-/*
-// Stores the hamming distance in a 2-dimensional vector
-void Population::updateInternalHammingDist() {
+void Population::addPopulationBitTotal(float * totals) {
+	string tempString;
 	for (int i = 0; i < POP_SIZE; ++i) {
-		string iString = mypop[i].getStringRule();
-		for (int j = i+1; j < POP_SIZE; ++j) {
-			string jString = mypop[j].getStringRule();
-			HAMMING_DIST[i][j] = calculateHammingPair(iString, jString);
+		tempString = mypop[i].getStringRule();
+		for (int j = 0; j < tempString.size(); ++j) {
+			if (tempString[j] == '1') totals[j] += 1;
 		}
 	}
-}*/
+}
 
 // update fitness of all individuals
 

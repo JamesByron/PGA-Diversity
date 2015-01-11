@@ -93,6 +93,10 @@ Individual2 SingleNode::getIndividual(int index) {
 	return a_pop->getIndividual(index);
 }
 
+void SingleNode::addIslandBitTotal(float * totals) {
+	a_pop->addPopulationBitTotal(totals);
+}
+
 int SingleNode::sendMigrants()
 {
   Individual2 * migrants = new Individual2[NUM_IMMIGRANTS];
@@ -181,6 +185,38 @@ void seeInside(vector<float> input, string leadStr) {
 	cout << endl;
 	cout.flush();
 	if (bad) {cout << endl << endl << "Found nan!" << endl; cout.flush(); exit(-1);}
+}
+
+void computeHammingBitTotals(float * bitTotals) {
+	for (int i = 0; i < NUM_ISLANDS; ++i) {
+		islands[i].addIslandBitTotal(bitTotals);
+	}
+	int totalIndividuals = NUM_ISLANDS*POP_SIZE;
+	for (int i = 0; i < totalIndividuals; ++i) {
+		bitTotals[i] /= (float)totalIndividuals;
+	}
+}
+
+
+vector<float> getHammingRelavance() {
+	float bitTotals[NUM_FEATURES*RULE_CASES*8] = {0.0};
+	computeHammingBitTotals(bitTotals);
+	int totalIndividuals = NUM_ISLANDS*POP_SIZE;
+	int currentIndividual;
+	float dTotal;
+	vector<float> diversity (totalIndividuals);
+	for (int i = 0; i < NUM_ISLANDS; ++i) {
+		for (int j = 0; j < POP_SIZE; ++j) {
+			currentIndividual = i*NUM_ISLANDS + j*POP_SIZE;
+			diversity[currentIndividual] = 0;
+			string genome = islands[i].getIndividual(j).getStringRule();
+			dTotal = 0.0;
+			for (int k = 0; k < genome.length(); ++k) {
+				diversity[currentIndividual] += abs((float)genome[k] - bitTotals[k]);
+			}
+		}
+	}
+	return diversity;
 }
 
 /*
