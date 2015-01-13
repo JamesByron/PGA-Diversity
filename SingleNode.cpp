@@ -289,7 +289,6 @@ vector< vector<float> > calculatePhenotypeFitnessDetail(vector<TestInstance2> te
 	SingleNode tempIsland;
 	Individual2 tempIndividual;
 	vector< vector<float> > diversetableH ((endIsland-startIsland)*POP_SIZE, vector<float>(testInstances.size())); // for hi-fi classification
-	//vector< vector< vector<int> > > diversetableL (NUM_ISLANDS, vector< vector<int> >(POP_SIZE, vector<int>(testInstances.size())));  // for low-fi classification, but we need to return something else
 	for (int i = startIsland; i < endIsland; ++i) {
 		tempIsland = islands[i];
 		for (int j = 0; j < POP_SIZE; ++j) {
