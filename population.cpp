@@ -274,8 +274,6 @@ void Population::selectRandToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs randomly selected individuals (without replacement) into the migrants array
 // ??? and sets their selected flag in the base population
 {
-	//cout << endl << "Random migration for " << num_migrants << " migrants." << endl;
-	//cout.flush();
 	int i;
 	for(int n = 0; n < num_migrants; n++)
 	{
@@ -410,6 +408,7 @@ int Population::selectIndividual(int availablepop)
 	case 1: return tournamentSelect(availablepop); break;
 	case 2: return altSelectIndividual(); break;
 	case 3: return relavanceTournamentSelect(availablepop); break;
+	case 4: return relavanceTournamentSelect(availablepop); break;
 	}
 }
 
@@ -417,11 +416,13 @@ int Population::relavanceTournamentSelect(int availablepop) {
 	int bestIndex, candidate;
 	bestIndex = rand() % availablepop;
 	float bestFit = mypop[bestIndex].getDiversityRelavance();
+	//cout << " BI: " << bestIndex << " V: " << bestFit << endl;
 	for (int i=1; i < TOURNAMENT_SIZE; i++) {
 		candidate = rand() % availablepop;
 		if (mypop[candidate].getDiversityRelavance() > bestFit) {
 			bestIndex = candidate;
 			bestFit = mypop[candidate].getDiversityRelavance();
+			//cout << " BI: " << bestIndex << " V: " << bestFit << endl;
 		}
 	}
 	return bestIndex;
