@@ -35,60 +35,63 @@ SingleNode * islands;
 
 SingleNode::SingleNode(int r, TestSet ts)
 {
-  myrank = r;
-  //  printf("SingleNode: construct an instance of a single-node\n");
-  //set the default values
+	myrank = r;
+	//  printf("SingleNode: construct an instance of a single-node\n");
+	//set the default values
 
-  //  printf("SingleNode: about to create a population\n");
-  a_pop = new Population(r, NUM_ISLANDS, ts, POP_SIZE);
-  //  printf("SingleNode: have population and now update that pop's fitness\n");
-  a_pop->updatePopulationFitness(WHICH_FITNESS);
+	//  printf("SingleNode: about to create a population\n");
+	a_pop = new Population(r, NUM_ISLANDS, ts, POP_SIZE);
+	//  printf("SingleNode: have population and now update that pop's fitness\n");
+	a_pop->updatePopulationFitness(WHICH_FITNESS);
 
-  customs = new Individual2[NUM_IMMIGRANTS];
+	customs = new Individual2[NUM_IMMIGRANTS];
 }
 
 SingleNode::SingleNode()
-  // Default constructor with empty test-set
+// Default constructor with empty test-set
 {
 
 }
 
-void SingleNode::doOneGeneration(int thisgen, vector<float>* islandRelavance)
-  // do the stuff for one generation
+void SingleNode::doOneGeneration(int thisgen)
+// do the stuff for one generation
 {
-  a_pop->updatePopulationRelavance(islandRelavance);
-  float randmigrate;
-//  srand( time(NULL) ); doing this every generation and for each island creates a bug
-  randmigrate = (float)rand()/RAND_MAX;
-  // send
-  //printf("Node %d: sendMigrantStrings()\n", myrank);
-  if (WHICH_MIGRATION != 'n' &&  (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ )
-    sendMigrants();
-  
-  // survive
-  //printf("Node %d: a_pop->selectToSurvive(%d)\n", myrank, ((int)(POP_SIZE*PROB_REMAIN)));
-  a_pop->selectToSurvive((int)(POP_SIZE*PROB_REMAIN));
+	float randmigrate;
+	//  srand( time(NULL) ); doing this every generation and for each island creates a bug
+	randmigrate = (float)rand()/RAND_MAX;
+	// send
+	//printf("Node %d: sendMigrantStrings()\n", myrank);
+	if (WHICH_MIGRATION != 'n' &&  (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ )
+		sendMigrants();
 
-  // receive
-  //printf("Node %d: receiveMigrantStrings()\n", myrank);
-  // ignore when only one island, but need to receive migrants (unless sendMigrants takes care of it)
-  if (WHICH_MIGRATION != 'n' && (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ )
-    a_pop->processImmigrants(islands[myrank].customs, NUM_IMMIGRANTS);
+	// survive
+	//printf("Node %d: a_pop->selectToSurvive(%d)\n", myrank, ((int)(POP_SIZE*PROB_REMAIN)));
+	a_pop->selectToSurvive((int)(POP_SIZE*PROB_REMAIN));
 
-  // breed
-  //printf("Node %d: a_pop->generateOffspring(%d)\n", myrank,(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + NUM_IMMIGRANTS)));
-  a_pop->generateOffspring(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + ((WHICH_MIGRATION != 'n' && (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ ) ? NUM_IMMIGRANTS : 0)));
-  //a_pop->generateOffspring(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + NUM_IMMIGRANTS));
+	// receive
+	//printf("Node %d: receiveMigrantStrings()\n", myrank);
+	// ignore when only one island, but need to receive migrants (unless sendMigrants takes care of it)
+	if (WHICH_MIGRATION != 'n' && (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ )
+		a_pop->processImmigrants(islands[myrank].customs, NUM_IMMIGRANTS);
 
-  // switch to next gen
-  //printf("Node %d: a_pop->nextGeneration()\n", myrank);
-  a_pop->nextGeneration(PROB_MUTATE);
+	// breed
+	//printf("Node %d: a_pop->generateOffspring(%d)\n", myrank,(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + NUM_IMMIGRANTS)));
+	a_pop->generateOffspring(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + ((WHICH_MIGRATION != 'n' && (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ ) ? NUM_IMMIGRANTS : 0)));
+	//a_pop->generateOffspring(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + NUM_IMMIGRANTS));
 
-  // update population fitness
-  //printf("Node %d: a_pop-updatePopulationFitness()\n", myrank);
-  a_pop->updatePopulationFitness(WHICH_FITNESS);
+	// switch to next gen
+	//printf("Node %d: a_pop->nextGeneration()\n", myrank);
+	a_pop->nextGeneration(PROB_MUTATE);
+
+	// update population fitness
+	//printf("Node %d: a_pop-updatePopulationFitness()\n", myrank);
+	a_pop->updatePopulationFitness(WHICH_FITNESS);
 }
-  
+
+void SingleNode::updateNodeRelavance(vector<float>* islandRelavance) {
+	a_pop->updatePopulationRelavance(islandRelavance);
+}
+
 Individual2 SingleNode::getIndividual(int index) {
 	return a_pop->getIndividual(index);
 }
@@ -99,76 +102,76 @@ void SingleNode::addIslandBitTotal(float * totals) {
 
 int SingleNode::sendMigrants()
 {
-  Individual2 * migrants = new Individual2[NUM_IMMIGRANTS];
-  switch (WHICH_MIGRATION)
-    {
-    case 'r': a_pop->selectRandToMigrate(migrants, NUM_IMMIGRANTS); break;
-    case 's': a_pop->selectStrongToMigrate(migrants, NUM_IMMIGRANTS); break;
-    case 'w': a_pop->selectWeakToMigrate(migrants, NUM_IMMIGRANTS); break;
-    case 'f': // fake migrants -- generate random individuals on receiving end
-    case 'n': break;
-    }
+	Individual2 * migrants = new Individual2[NUM_IMMIGRANTS];
+	switch (WHICH_MIGRATION)
+	{
+	case 'r': a_pop->selectRandToMigrate(migrants, NUM_IMMIGRANTS); break;
+	case 's': a_pop->selectStrongToMigrate(migrants, NUM_IMMIGRANTS); break;
+	case 'w': a_pop->selectWeakToMigrate(migrants, NUM_IMMIGRANTS); break;
+	case 'f': // fake migrants -- generate random individuals on receiving end
+	case 'n': break;
+	}
 
-  for(int i=0; i < NUM_IMMIGRANTS; i++)
-  {
-    islands[(myrank+(1+(i%NUM_NEIGHBORS)))%NUM_ISLANDS].customs[i] = migrants[i];
-  }
+	for(int i=0; i < NUM_IMMIGRANTS; i++)
+	{
+		islands[(myrank+(1+(i%NUM_NEIGHBORS)))%NUM_ISLANDS].customs[i] = migrants[i];
+	}
 
-  delete [] migrants;
-  return NUM_IMMIGRANTS;
+	delete [] migrants;
+	return NUM_IMMIGRANTS;
 }
 
 // compares every individual to every other individual in all the nodes.
 // This operation is very expensive.
 vector<float> getPairwiseHammingDiversityForAllNodes() {
-  int TOTAL_POP = POP_SIZE * NUM_ISLANDS;
-  int bestDiversity = 0;
-  int worstDiversity = 1000; // Start with a high number.
-  vector<int> tempV;
-  Individual2 currentIndividual;
-  SingleNode currentNode;
-  vector< vector<int> > diversetable (TOTAL_POP, vector<int>(TOTAL_POP));
-  for (int i = 0; i < NUM_ISLANDS; ++i) {
-    currentNode = islands[i];
-    for (int j = 0; j < POP_SIZE; ++j) {
-      currentIndividual = currentNode.getIndividual(j);
-      for (int k = i; k < NUM_ISLANDS; ++k) {
-	tempV = islands[k].a_pop->calculateHammingForAll(currentIndividual);
-	// now add these to the table
-	for (int x=0; x < POP_SIZE; x++){
-	  diversetable[i*POP_SIZE+j][k*POP_SIZE+x] = tempV[x];
-	  diversetable[k*POP_SIZE+x][i*POP_SIZE+j] = tempV[x];
+	int TOTAL_POP = POP_SIZE * NUM_ISLANDS;
+	int bestDiversity = 0;
+	int worstDiversity = 1000; // Start with a high number.
+	vector<int> tempV;
+	Individual2 currentIndividual;
+	SingleNode currentNode;
+	vector< vector<int> > diversetable (TOTAL_POP, vector<int>(TOTAL_POP));
+	for (int i = 0; i < NUM_ISLANDS; ++i) {
+		currentNode = islands[i];
+		for (int j = 0; j < POP_SIZE; ++j) {
+			currentIndividual = currentNode.getIndividual(j);
+			for (int k = i; k < NUM_ISLANDS; ++k) {
+				tempV = islands[k].a_pop->calculateHammingForAll(currentIndividual);
+				// now add these to the table
+				for (int x=0; x < POP_SIZE; x++){
+					diversetable[i*POP_SIZE+j][k*POP_SIZE+x] = tempV[x];
+					diversetable[k*POP_SIZE+x][i*POP_SIZE+j] = tempV[x];
+				}
+			}
+		}
 	}
-      }
-    }
-  }
 
-  // go back and compute each individual's average hamming distance distance
-  vector<int> individs (POP_SIZE * NUM_ISLANDS);
-  int ptotal = 0;
-  for (int i=0; i < POP_SIZE*NUM_ISLANDS; i++){
-    for (int j=0; j < POP_SIZE*NUM_ISLANDS; j++){
-      individs[i] += diversetable[i][j];
-      ptotal += diversetable[i][j];
-      //if ((0 == diversetable[i][j]) && (i != j)) cout << "i:" << i << " j:" << j << endl; // Which of the individuals are identical
-      if (bestDiversity < diversetable[i][j]) bestDiversity  = diversetable[i][j];
-      else if ((worstDiversity > diversetable[i][j]) && (i != j)) worstDiversity = diversetable[i][j];
-    }
-    individs[i] /= POP_SIZE*NUM_ISLANDS - 1;
-  }
+	// go back and compute each individual's average hamming distance distance
+	vector<int> individs (POP_SIZE * NUM_ISLANDS);
+	int ptotal = 0;
+	for (int i=0; i < POP_SIZE*NUM_ISLANDS; i++){
+		for (int j=0; j < POP_SIZE*NUM_ISLANDS; j++){
+			individs[i] += diversetable[i][j];
+			ptotal += diversetable[i][j];
+			//if ((0 == diversetable[i][j]) && (i != j)) cout << "i:" << i << " j:" << j << endl; // Which of the individuals are identical
+			if (bestDiversity < diversetable[i][j]) bestDiversity  = diversetable[i][j];
+			else if ((worstDiversity > diversetable[i][j]) && (i != j)) worstDiversity = diversetable[i][j];
+		}
+		individs[i] /= POP_SIZE*NUM_ISLANDS - 1;
+	}
 
-  //calculate the variance
-  float varianceTotal = 0.0;
-  float average = (float) ptotal / (float) (POP_SIZE*NUM_ISLANDS * (POP_SIZE*NUM_ISLANDS - 1));
-  for (int i = 0; i < POP_SIZE*NUM_ISLANDS; ++i) {
-    varianceTotal += powf(((float) individs[i]/(POP_SIZE*NUM_ISLANDS) - average), 2.0);
-  }
-  vector<float> output (4);
-  output[0] = (float) bestDiversity;
-  output[1] = (float) worstDiversity;
-  output[2] = average;
-  output[3] = varianceTotal / ((float) POP_SIZE*NUM_ISLANDS);
-  return output;
+	//calculate the variance
+	float varianceTotal = 0.0;
+	float average = (float) ptotal / (float) (POP_SIZE*NUM_ISLANDS * (POP_SIZE*NUM_ISLANDS - 1));
+	for (int i = 0; i < POP_SIZE*NUM_ISLANDS; ++i) {
+		varianceTotal += powf(((float) individs[i]/(POP_SIZE*NUM_ISLANDS) - average), 2.0);
+	}
+	vector<float> output (4);
+	output[0] = (float) bestDiversity;
+	output[1] = (float) worstDiversity;
+	output[2] = average;
+	output[3] = varianceTotal / ((float) POP_SIZE*NUM_ISLANDS);
+	return output;
 }
 
 // for debugging purposes
@@ -288,7 +291,7 @@ vector< vector<float> > calculatePhenotypeFitnessDetail(vector<TestInstance2> te
 	if ((startIsland < 0) || (endIsland > NUM_ISLANDS)) { cout << "Error in calculateFitnessDetail; island index out of range " << startIsland << ", " << endIsland << endl; cout.flush(); exit(-1); }
 	SingleNode tempIsland;
 	Individual2 tempIndividual;
-	vector< vector<float> > diversetableH ((endIsland-startIsland)*POP_SIZE, vector<float>(testInstances.size())); // for hi-fi classification
+	vector< vector<float> > diversetableH ((endIsland-startIsland)*POP_SIZE, vector<float>(testInstances.size()));
 	for (int i = startIsland; i < endIsland; ++i) {
 		tempIsland = islands[i];
 		for (int j = 0; j < POP_SIZE; ++j) {
@@ -432,7 +435,7 @@ void getRelavanceByIsland(vector<float>* detail, vector <vector<float> >* island
 /**
  * This wrapper function constructs the phenotype diversity of the population.
  */
-vector<float> getPhenotypeRelavance(vector<TestInstance2> testInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelavance, float relavanceWeight) {//, vector <vector<int> >* storeRankings) {
+vector<float> getPhenotypeRelavance(vector<TestInstance2> testInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelavance, float relavanceWeight) {
 	vector< vector<float> > detailedFitness = calculatePhenotypeFitnessDetail(testInstances, WHICH_CLASSIFY, startIsland, endIsland);  // this stores data in the array and returns detailed results also
 	vector<float> fitnessTotals = calculatePhenotypeFitnessTotals(detailedFitness, testInstances.size());
 	//vector<int> rankings =  calculateFitnessRankings(fitnessTotals);
@@ -471,22 +474,22 @@ vector<TestInstance2> getTIVector(TestSet set, int num) {
 }
 
 void usage(){
-  printf("Arguments to Singlenode version of GAchess executable:\n");
-  printf(" 1.  test instance data file\n");
-  printf(" 2.  logfile tag\n");
-  printf(" 3.  migration strategy (r/s/w/f/n)\n");
-  printf(" 4.  migration threshold\n"); //"interval\n"); 
-  printf(" 5.  num migrants per island\n");
-  printf(" 6.  number of islands\n");
-  printf(" 7.  num neighbors (must be less than the number of islands)\n"); 
-  printf(" 8.  size of population (on each island)\n");
-  printf(" 9.  num test cases to sample\n");
-  printf(" 10. number of generations to simulate\n");
-  printf(" 11. which fitness function to use (h/l)\n");
-  printf(" 12. which classification function to use on full testset (h/l)\n");
-  printf(" 13. (optional) mutation probability that given individual will have single-point mutation\n");
-  printf(" 14. (optional) initial seed to select sample of test instances\n");
-  printf(" 15. (optional) which class of test instances to use (only with 18 or fewer islands)\n");
+	printf("Arguments to Singlenode version of GAchess executable:\n");
+	printf(" 1.  test instance data file\n");
+	printf(" 2.  logfile tag\n");
+	printf(" 3.  migration strategy (r/s/w/f/n)\n");
+	printf(" 4.  migration threshold\n"); //"interval\n");
+	printf(" 5.  num migrants per island\n");
+	printf(" 6.  number of islands\n");
+	printf(" 7.  num neighbors (must be less than the number of islands)\n");
+	printf(" 8.  size of population (on each island)\n");
+	printf(" 9.  num test cases to sample\n");
+	printf(" 10. number of generations to simulate\n");
+	printf(" 11. which fitness function to use (h/l)\n");
+	printf(" 12. which classification function to use on full testset (h/l)\n");
+	printf(" 13. (optional) mutation probability that given individual will have single-point mutation\n");
+	printf(" 14. (optional) initial seed to select sample of test instances\n");
+	printf(" 15. (optional) which class of test instances to use (only with 18 or fewer islands)\n");
 }
 
 int main(int argc, char * argv[])
@@ -506,240 +509,218 @@ int main(int argc, char * argv[])
    argv[13] (optional) mutation probability that given individual will have single-point mutation
    argv[14] (optional) initial seed to use to select sample of test instances
    argv[15] (optional) depth of testinstance selecion (-1:draw, 0:zero, 1:one,...,16:sixteen)
-  */
+ */
 {
-  srand( time(NULL) );
-  int WHEN_PRINT_DATA = 1;
-  int INIT_SEED;
-  vector<TestInstance2> all_tests;
+	srand( time(NULL) );
+	int WHEN_PRINT_DATA = 1;
+	int INIT_SEED;
+	vector<TestInstance2> all_tests;
 
-  //printf("SingleNode: Ready to start.\n");
+	//printf("SingleNode: Ready to start.\n");
 
-  if (argc < 13) { usage(); exit(-1); }
+	if (argc < 13) { usage(); exit(-1); }
 
-  time_t start, end;
-  start = time(NULL);
+	time_t start, end;
+	start = time(NULL);
 
-  // read filename from which to get test instances
-  string filename = argv[1];
+	// read filename from which to get test instances
+	string filename = argv[1];
 
-  WHICH_MIGRATION = argv[3][0];
-  WHEN_MIGRATE = atof(argv[4]);//atoi(argv[4]);
-  NUM_MIGRANTS_PER_ISLAND = atoi(argv[5]);
-  NUM_ISLANDS = atoi(argv[6]);
-  // do not need to check limit on number of islands in SingleNode
-  islands = new SingleNode[NUM_ISLANDS];
-  NUM_NEIGHBORS = atoi(argv[7]);
-  if (NUM_NEIGHBORS >= NUM_ISLANDS) { printf("Max number of neighbors is one less than number of islands\n"); usage(); exit(-1); }
-  if ((WHICH_MIGRATION == 'n') && (NUM_NEIGHBORS != 0)) { usage(); exit(-1); }
-  POP_SIZE = atoi(argv[8]);
-  if (PROB_REMAIN * POP_SIZE < NUM_NEIGHBORS * NUM_MIGRANTS_PER_ISLAND) {printf("too many migrants per neighbor for given population size\n"); usage(); exit(-1); }
-  NUM_IMMIGRANTS = NUM_MIGRANTS_PER_ISLAND * NUM_NEIGHBORS;
-  NUM_TEST_CASES_TO_USE = atoi(argv[9]);  
-  MAX_GENERATIONS = atoi(argv[10]);
-  WHICH_FITNESS = argv[11][0];
-  WHICH_CLASSIFY = argv[12][0];
-  if (argc >= 14)
-    PROB_MUTATE = (int)(RAND_MAX * atof(argv[13])); 
-  else
-    PROB_MUTATE = (int)(RAND_MAX * 1.0/POP_SIZE); // default: one individual in population has one bit flipped
-  if (argc >= 15)
-    INIT_SEED = atoi(argv[14]);
-  else
-    INIT_SEED = time(NULL) + 93108;
-  //printf("Seed value: %d\n", INIT_SEED);
-  //  DEPTH_OF_TEST_INSTANCES = atoi(argv[11]);
- 
-  //printf("SingleNode: about to open test instance file\n");
-  //get test instances from file
-  ifstream file;
-  //cout << "l196" << endl;
-  file.open(filename.c_str());
-  string line;
-  while(!file.eof())
-    {
-	  //cout << "l201" << endl;
-      getline(file, line);
-      if (line != "")
+	WHICH_MIGRATION = argv[3][0];
+	WHEN_MIGRATE = atof(argv[4]);//atoi(argv[4]);
+	NUM_MIGRANTS_PER_ISLAND = atoi(argv[5]);
+	NUM_ISLANDS = atoi(argv[6]);
+	// do not need to check limit on number of islands in SingleNode
+	islands = new SingleNode[NUM_ISLANDS];
+	NUM_NEIGHBORS = atoi(argv[7]);
+	if (NUM_NEIGHBORS >= NUM_ISLANDS) { printf("Max number of neighbors is one less than number of islands\n"); usage(); exit(-1); }
+	if ((WHICH_MIGRATION == 'n') && (NUM_NEIGHBORS != 0)) { usage(); exit(-1); }
+	POP_SIZE = atoi(argv[8]);
+	if (PROB_REMAIN * POP_SIZE < NUM_NEIGHBORS * NUM_MIGRANTS_PER_ISLAND) {printf("too many migrants per neighbor for given population size\n"); usage(); exit(-1); }
+	NUM_IMMIGRANTS = NUM_MIGRANTS_PER_ISLAND * NUM_NEIGHBORS;
+	NUM_TEST_CASES_TO_USE = atoi(argv[9]);
+	MAX_GENERATIONS = atoi(argv[10]);
+	WHICH_FITNESS = argv[11][0];
+	WHICH_CLASSIFY = argv[12][0];
+	if (argc >= 14)
+		PROB_MUTATE = (int)(RAND_MAX * atof(argv[13]));
+	else
+		PROB_MUTATE = (int)(RAND_MAX * 1.0/POP_SIZE); // default: one individual in population has one bit flipped
+	if (argc >= 15)
+		INIT_SEED = atoi(argv[14]);
+	else
+		INIT_SEED = time(NULL) + 93108;
+	//printf("Seed value: %d\n", INIT_SEED);
+	//  DEPTH_OF_TEST_INSTANCES = atoi(argv[11]);
+
+	//printf("SingleNode: about to open test instance file\n");
+	//get test instances from file
+	ifstream file;
+	//cout << "l196" << endl;
+	file.open(filename.c_str());
+	string line;
+	while(!file.eof())
 	{
-	  TestInstance2 ti = TestInstance2(line);
-	  all_tests.push_back(ti);
-	}
-    }
-  //cout << "l209" << endl;
-  if (argc == 15 && NUM_ISLANDS > 18)
-    { printf("Invalid combination of depth and number of islands\n"); usage(); exit(-1); }
-
-  //initialize all islands
-  //printf("Initializing the islands (and populations, etc.)\n");
-  TestSet ts;
-  //cout << "l214" << endl;
-  if (argc > 15) 
-    {
-      printf("Not yet supporting stratified islands with split training/test sets\n"); exit(-1);
-      for(int j=0; j<NUM_ISLANDS; j++)
-	{
-	  ts = TestSet(all_tests, NUM_TEST_CASES_TO_USE, j-1);
-	  islands[j] = SingleNode(j, ts);
-	}
-    }
-  else
-    {
-      // printf("Creating the TestSet from the total testinstances in the file\n");
-      ts = TestSet(all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
-      //printf("Finished creating the Testset\n");
-      for(int j=0; j<NUM_ISLANDS; j++)
-	{
-	  islands[j] = SingleNode(j, ts);
-	}
-    }
-  vector<TestInstance2> tsVector = getTIVector(ts, NUM_TEST_CASES_TO_USE);
-  //initialize the logFile
-  string s, outFile1, outFile2;
-  stringstream out;
-
-  bool depthdivision;
-  if (argc == 15)
-    {depthdivision = true;}
-  else 
-    {depthdivision = false;}
-  
-  outFile1 += "log/sim.overall.";
-  outFile2 += "log/sim.islands.";
-
-  out << "rep-" << argv[2] << WHICH_FITNESS << "fifit-" << WHICH_CLASSIFY << "ficlsfy-" \
-      << WHICH_MIGRATION << "ms" \
-      << WHEN_MIGRATE << "mi" \
-      << NUM_MIGRANTS_PER_ISLAND << "mn" \
-      << NUM_ISLANDS << "i" \
-      << NUM_NEIGHBORS << "n" \
-      << POP_SIZE << "p" \
-      << NUM_TEST_CASES_TO_USE << "ti" \
-      << MAX_GENERATIONS << "g" << ".prn";  // use a file extension that can be opened as a spreadsheet
-  s = out.str();
-  outFile1 += s;
-  outFile2 += s;
-
-  remove(outFile1.c_str());
-  logFile1 = fopen(outFile1.c_str(), "w");
-  remove(outFile2.c_str());
-    logFile2 = fopen(outFile2.c_str(), "w");
-
-  //run the generations
-  //printf("Starting run with %d neighbors, %d migrants per island, %c migration strategy\n", NUM_NEIGHBORS, NUM_MIGRANTS_PER_ISLAND, WHICH_MIGRATION);
-  SingleNode i;
-  float mostFit=0;
-  int mostFitIsland=-1;
-
-  cout << "Counting generations: ";
-  // Alternate log file arrangement:
-  fprintf(logFile1, "Log file for Overall Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEVALUATED OVER ALL TESTS\nMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\t\tMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight");
-  fprintf(logFile2, "Log file for Island Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tFull Testset\nMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\t\tMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\n");
-  // allocating memory
-  vector <vector<float> > islandRelavance (NUM_ISLANDS, vector<float> (POP_SIZE));
-  if (WHICH_SELECT != 4) getPhenotypeRelavance(tsVector, 0, NUM_ISLANDS, true, &islandRelavance, RELAVANCE_WEIGHT);
-  else getHammingRelavance(&islandRelavance, true, RELAVANCE_WEIGHT);// do this so that islandRelavance can be passed into SingleNode at the first generation
-  vector<float> HamDiv;
-  vector<float> FitDiv;
-  vector<float> PhenDiv;
-  for(int gen=0; gen < MAX_GENERATIONS; gen++)
-    {
-      cout << gen << " ";
-      cout.flush();
-      //printf("Starting generation %d\n", gen);
-      mostFit = 0.0;
-      // later, we'll add a loop over the islands that are being simulated on this one node
-      for(int island=0; island < NUM_ISLANDS; island++)
-	{
-	  //printf("Island %d: about to try one generation\n",island);
-	  // ***** Instead of i, try directly accessing islands[island].method(...) below, to check for speed up??
-	  i = islands[island];
-
-	  //printf("...........OK, try this generation(%d)\n", gen);
-	  i.doOneGeneration(gen, &islandRelavance[island]);
-	  //printf("Node %d: ran generation %d\n", island, gen);
-
-	  if( (gen+1) % WHEN_PRINT_DATA == 0 )
-	    {
-	      if(i.a_pop->getPopulationMaxFitness() > mostFit)
+		//cout << "l201" << endl;
+		getline(file, line);
+		if (line != "")
 		{
-		  mostFit = i.a_pop->getPopulationMaxFitness();
-		  mostFitIsland = island;
+			TestInstance2 ti = TestInstance2(line);
+			all_tests.push_back(ti);
 		}
-	      //HamDiv = i.a_pop->getInternalHammingDiversity();
-	      //FitDiv = getFitnessDiversity(island, (island+1));
-	      //PhenDiv = getPhenotypeRelavance(tsVector, island, (island+1), false, &islandRelavance, relavanceWeight);
-
-//	      fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
-//		      i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
-	      //fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
-	      //    i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
-	    }
 	}
-      for (int i = 0; i < NUM_ISLANDS; ++i) {
-    	  //islands[i].updateIslandRelavance(...);
-      }
-      if( (gen+1) % WHEN_PRINT_DATA == 0 ) {
-    	  HamDiv = getPairwiseHammingDiversityForAllNodes();
-    	  FitDiv = getHammingRelavance(&islandRelavance, true, RELAVANCE_WEIGHT);
-    	  //FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
-    	  PhenDiv = getPhenotypeRelavance(tsVector, 0, NUM_ISLANDS, true, &islandRelavance, RELAVANCE_WEIGHT);  // we use the training set untel it's time to use the full test set
-    	  //if (!usePhenotypeRelavance) HamDiv = getHammingRelavance(&islandRelavance, relavanceWeight);
-    	  //else HamDiv = getPairwiseHammingDiversityForAllNodes();
-    	  fprintf(logFile1, "\n%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
-    	  	    		  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
-    	  //fprintf(logFile, "<---- Most Fit: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. Phenotype: %f Fitness Div: %f ---->\n",
-	    	//	  mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3], PhenotypeDiv, FitnessDiv[3]);
-      }
-      else if ((WHEN_PRINT_DATA > WHEN_FULL_TEST) && (((gen+1) % WHEN_FULL_TEST) == 0)) {
-    	  fprintf(logFile1, "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"); // make sure the full test sets line up
-      }
-      // enable the following line to disable recomputing diversity each generation.
-      //if( (gen+1) > WHEN_PRINT_DATA * 100) WHEN_PRINT_DATA *= 10;
-      
-      if (((gen+1) % WHEN_FULL_TEST) == 0) // need the +1 because population's gen-count has been updated during doOneGen
+	//cout << "l209" << endl;
+	if (argc == 15 && NUM_ISLANDS > 18)
+	{ printf("Invalid combination of depth and number of islands\n"); usage(); exit(-1); }
+
+	//initialize all islands
+	//printf("Initializing the islands (and populations, etc.)\n");
+	TestSet ts;
+	//cout << "l214" << endl;
+	if (argc > 15)
 	{
-	  mostFit = 0;
-	  int scopevariable = 0;
-	  for(int island=0; island < NUM_ISLANDS; island++)
-	    {
-	      i = islands[island];
-	      i.a_pop->updatePopulationFitness(all_tests,WHICH_CLASSIFY);
-	      if(i.a_pop->getPopulationMaxFitness() > mostFit)
+		printf("Not yet supporting stratified islands with split training/test sets\n"); exit(-1);
+		for(int j=0; j<NUM_ISLANDS; j++)
 		{
-		  mostFit = i.a_pop->getPopulationMaxFitness();
-		  mostFitIsland = island;
+			ts = TestSet(all_tests, NUM_TEST_CASES_TO_USE, j-1);
+			islands[j] = SingleNode(j, ts);
 		}
-	      HamDiv = i.a_pop->getInternalHammingDiversity();
-	      FitDiv = getFitnessDiversity(island, (island+1));
-	      PhenDiv = getPhenotypeRelavance(all_tests, island, (island+1), false, &islandRelavance, RELAVANCE_WEIGHT);
-	      fprintf(logFile2, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
-	      	    	  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
-	      //fprintf(logFile2, "Full Testset: Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f\n",
-	    	//  i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
-	      //i.a_pop->getBestIndividual().dumpConfMat(logFile2);
-	    }
-	   //HamDiv = getPairwiseHammingDiversityForAllNodes();
- 	   //FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
- 	   //PhenDiv = getPhenotypeRelavance(all_tests, 0, NUM_ISLANDS, false, &islandRelavance, relavanceWeight);
-	   fprintf(logFile1, "\t\t%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
-		   mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
-	   //fprintf(logFile1, "<---- Most Fit EVALUATED OVER ALL TESTS: %f on island %i at generation %i. Overall Max Diversity: %i Min Diversity: %i Average Diversity: %f Diversity Variance: %f. ---->",
-	   //		   mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) diversity[0], (int) diversity[1], diversity[2], diversity[3]);
-	   scopevariable = 5;
-	   for (int x = 0; x < NUM_ISLANDS; ++x) {
-		   islands[x].a_pop->updatePopulationFitness(WHICH_CLASSIFY); //reset the fitness levels in the islands before returning to training set
-	   }
+	}
+	else
+	{
+		// printf("Creating the TestSet from the total testinstances in the file\n");
+		ts = TestSet(all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
+		//printf("Finished creating the Testset\n");
+		for(int j=0; j<NUM_ISLANDS; j++)
+		{
+			islands[j] = SingleNode(j, ts);
+		}
+	}
+	vector<TestInstance2> tsVector = getTIVector(ts, NUM_TEST_CASES_TO_USE);
+	//initialize the logFile
+	string s, outFile1, outFile2;
+	stringstream out;
+
+	bool depthdivision;
+	if (argc == 15)
+	{depthdivision = true;}
+	else
+	{depthdivision = false;}
+
+	outFile1 += "log/sim.overall.";
+	outFile2 += "log/sim.islands.";
+
+	out << "rep-" << argv[2] << WHICH_FITNESS << "fifit-" << WHICH_CLASSIFY << "ficlsfy-" \
+			<< WHICH_MIGRATION << "ms" \
+			<< WHEN_MIGRATE << "mi" \
+			<< NUM_MIGRANTS_PER_ISLAND << "mn" \
+			<< NUM_ISLANDS << "i" \
+			<< NUM_NEIGHBORS << "n" \
+			<< POP_SIZE << "p" \
+			<< NUM_TEST_CASES_TO_USE << "ti" \
+			<< MAX_GENERATIONS << "g" << ".prn";  // use a file extension that can be opened as a spreadsheet
+	s = out.str();
+	outFile1 += s;
+	outFile2 += s;
+
+	remove(outFile1.c_str());
+	logFile1 = fopen(outFile1.c_str(), "w");
+	remove(outFile2.c_str());
+	logFile2 = fopen(outFile2.c_str(), "w");
+
+	//run the generations
+	//printf("Starting run with %d neighbors, %d migrants per island, %c migration strategy\n", NUM_NEIGHBORS, NUM_MIGRANTS_PER_ISLAND, WHICH_MIGRATION);
+	SingleNode i;
+	float mostFit=0;
+	int mostFitIsland=-1;
+
+	// Alternate log file arrangement:
+	fprintf(logFile1, "Log file for Overall Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEVALUATED OVER ALL TESTS\nMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\tMax Hamming-Estimated Diversity\tMin Hamming-Estimated Diversity\tAverage Hamming-Estimated Diversity\tHamming-Estimated Diversity Variance\t\tMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight");
+	fprintf(logFile2, "Log file for Island Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tFull Testset\nMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\t\tMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\n");
+	// allocating memory
+	switch (WHICH_SELECT) {
+		case 1: cout << "Using Tournament Fitness Selection" << endl; break;
+		case 2: cout << "Using Alt Fitness Selection" << endl; break;
+		case 3: cout << "Using Phenotype Relavance Selection" << endl; break;
+		case 4: cout << "Using Hamming-Estimated Relavance Selection" << endl; break;
+	}
+	static vector <vector<float> > islandRelavance (NUM_ISLANDS, vector<float> (POP_SIZE));
+	static vector<float> HamDiv = getPairwiseHammingDiversityForAllNodes();
+	static vector<float> FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
+	static vector<float> PhenDiv = getPhenotypeRelavance(tsVector, 0, NUM_ISLANDS, true, &islandRelavance, RELAVANCE_WEIGHT);
+	static vector<float> HamRel = getHammingRelavance(&islandRelavance, true, RELAVANCE_WEIGHT);
+	for (int node = 0; node < NUM_ISLANDS; ++node) {
+		islands[node].updateNodeRelavance(&islandRelavance[node]);  // update the relavance at the first generation
+	}
+	fprintf(logFile1, "\nSTARTING POINT\t\ti\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%f\t%f\t%f\t%f",
+			(int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
+	cout << "Counting generations: ";
+	for(int gen=0; gen < MAX_GENERATIONS; gen++)
+	{
+		cout << gen << " ";
+		cout.flush();
+		mostFit = 0.0;
+		for(int island=0; island < NUM_ISLANDS; island++) {
+			i = islands[island];
+			i.doOneGeneration(gen);
+			if ( (gen+1) % WHEN_PRINT_DATA == 0 ) {
+				if (i.a_pop->getPopulationMaxFitness() > mostFit) {
+					mostFit = i.a_pop->getPopulationMaxFitness();
+					mostFitIsland = island;
+				}
+				HamDiv = i.a_pop->getInternalHammingDiversity();
+				FitDiv = getFitnessDiversity(island, (island+1));
+				PhenDiv = getPhenotypeRelavance(tsVector, island, (island+1), false, &islandRelavance, RELAVANCE_WEIGHT);
+				fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
+						i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
+				//fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f\t\t\t\t\n",
+				//    i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev());
+			}
+		}
+		HamDiv = getPairwiseHammingDiversityForAllNodes();
+		FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
+		PhenDiv = getPhenotypeRelavance(tsVector, 0, NUM_ISLANDS, true, &islandRelavance, RELAVANCE_WEIGHT);  // we use the training set untel it's time to use the full test set
+		HamRel = getHammingRelavance(&islandRelavance, true, RELAVANCE_WEIGHT);
+		fprintf(logFile1, "\n%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%f\t%f\t%f\t%f",
+				mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
+		for (int node = 0; node < NUM_ISLANDS; ++node) {
+			islands[node].updateNodeRelavance(&islandRelavance[node]);
+		}
+		if (((gen+1) % WHEN_FULL_TEST) == 0) {// need the +1 because population's gen-count has been updated during doOneGen
+			mostFit = 0;
+			for(int island=0; island < NUM_ISLANDS; island++)
+			{
+				i = islands[island];
+				i.a_pop->updatePopulationFitness(all_tests,WHICH_CLASSIFY);
+				if(i.a_pop->getPopulationMaxFitness() > mostFit)
+				{
+					mostFit = i.a_pop->getPopulationMaxFitness();
+					mostFitIsland = island;
+				}
+				HamDiv = i.a_pop->getInternalHammingDiversity();
+				FitDiv = getFitnessDiversity(island, (island+1));
+				PhenDiv = getPhenotypeRelavance(all_tests, island, (island+1), false, &islandRelavance, RELAVANCE_WEIGHT);
+				fprintf(logFile2, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
+						i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
+				//i.a_pop->getBestIndividual().dumpConfMat(logFile2);
+			}
+			//HamDiv = getPairwiseHammingDiversityForAllNodes();
+			//FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
+			PhenDiv = getPhenotypeRelavance(all_tests, 0, NUM_ISLANDS, false, &islandRelavance, RELAVANCE_WEIGHT);
+			fprintf(logFile1, "\t\t%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
+					mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
+			for (int x = 0; x < NUM_ISLANDS; ++x) {
+				islands[x].a_pop->updatePopulationFitness(WHICH_CLASSIFY); //reset the fitness levels in the islands before returning to training set
+			}
+		}
+		//if ( gen+1 > WHEN_FULL_TEST * 10 ) WHEN_FULL_TEST *= 10;
 	}
 
-      if ( gen+1 > WHEN_FULL_TEST * 10 ) WHEN_FULL_TEST *= 10;
-    }
-
-  // print end time
-  end = time(NULL);
-  fprintf(logFile1, "\n\nElapsed time %f seconds or %f minutes", difftime(end, start), difftime(end, start)/60.0 );
-  fprintf(logFile2, "\n\nElapsed time %f seconds or %f minutes", difftime(end, start), difftime(end, start)/60.0 );
-  fclose(logFile1);
-  fclose(logFile2);
-  return 0;
+	// print end time
+	end = time(NULL);
+	fprintf(logFile1, "\n\nElapsed time %f seconds or %f minutes", difftime(end, start), difftime(end, start)/60.0 );
+	fprintf(logFile2, "\n\nElapsed time %f seconds or %f minutes", difftime(end, start), difftime(end, start)/60.0 );
+	fclose(logFile1);
+	fclose(logFile2);
+	return 0;
 }

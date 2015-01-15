@@ -15,7 +15,7 @@ class SingleNode
   //~Island() {};
   //void addToCustoms(vector<Individual2> v);
   //void addToCustoms(Individual2 * v, int n);
-  void doOneGeneration(int thisgen, vector<float>* islandRelavance);
+  void doOneGeneration(int thisgen);
   int sendMigrants();
   //  void NetFitnessAssessment(vector<TestInstance2> allti);
   // public variables
@@ -23,6 +23,7 @@ class SingleNode
   Individual2 * customs;
   Individual2 getIndividual(int index);
   void addIslandBitTotal(float * totals);
+  void updateNodeRelavance(vector<float>* islandRelavance);
   // int compareIndividualToPopulation(Individual2 input);
  private:
   bool selectIndividual(int ind);
