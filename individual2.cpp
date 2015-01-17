@@ -254,8 +254,20 @@ void Individual2::setRandomRule()
 string Individual2::getStringRule()
 {
   string s("");
-  for (int i=0; i < RULE_CASES*NUM_FEATURES; i++)
+  for (int i=0; i < RULE_CASES*NUM_FEATURES; i++) {
     s += byteToString(rule[i]);
+  }
+  // check that it's right
+  /*resetIntRule();
+  for (int x = 0; x < s.size(); ++x) {
+	  if ((s[x] == '1') && (1 != intRule[x])) {
+		  cout << "there is a problem at " << x << " where s " << s[x] << " and rule " << intRule[x] << endl; cout.flush(); exit(-1);
+	  }
+	  else if ((s[x] == '0') && (0 != intRule[x])) {
+		  cout << "there is a problem at " << x << " where s " << s[x] << " and rule " << intRule[x] << endl; cout.flush(); exit(-1);
+	  }
+  }
+  cout << "good!" << endl;*/
   return s;
 }
 
@@ -400,6 +412,20 @@ string Individual2::byteToString(unsigned char c)
       mask >>= 1;
     }
   return s;
+}
+
+void Individual2::resetIntRule() {
+	static unsigned char mask;
+	for (int i = 0; i < NUM_FEATURES*RULE_CASES; ++i) {
+		mask = 128;
+		for (int j = 0; j < 8; ++j) {
+			if (rule[i] & mask) {
+				intRule[(i*8)+j] = 1;
+			}
+			else intRule[(i*8)+j] = 0;
+			mask >>= 1;
+		}
+	}
 }
 
 void Individual2::resetConfMat()
