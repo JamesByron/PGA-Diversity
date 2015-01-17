@@ -253,6 +253,7 @@ void Individual2::setRandomRule()
 
 string Individual2::getStringRule()
 {
+	exit(-1);
   string s("");
   for (int i=0; i < RULE_CASES*NUM_FEATURES; i++) {
     s += byteToString(rule[i]);

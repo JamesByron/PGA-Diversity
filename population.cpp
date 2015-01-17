@@ -37,8 +37,8 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
 	//printf("Population: finished constructor\n");
 }
 
-Individual2 Population::getIndividual(int index) {
-	return mypop[index];
+Individual2* Population::getIndividual(int index) {
+	return &mypop[index];
 }
 
 /*
@@ -73,28 +73,31 @@ vector<int> Population::getExternalPopulationDiversity(Individual2 input){
 */
 
 // computes the hamming distance between the input individual and each individual in this population
-vector<int> Population::calculateHammingForAll(Individual2 input){
-	string inputString = input.getStringRule();
+vector<int> Population::calculateHammingForAll(Individual2* input){
+	unsigned int * inputRule = (*input).getIntRule();
+	unsigned int * compareRule;
 	vector<int> hamming (POP_SIZE);
 	for (int i = 0; i < POP_SIZE; ++i) {
-		string compareString = mypop[i].getStringRule();
-		hamming[i] = calculateHammingPair(inputString, compareString);
+		compareRule = mypop[i].getIntRule();
+		hamming[i] = calculateHammingPair(inputRule, compareRule);
 	}
 	return hamming;
 }
 
 //  computes the hamming diversity within this population
 vector<float> Population::getInternalHammingDiversity(){
+	unsigned int * iRule;
+	unsigned int * jRule;
 	int best = 0;
 	int worst = 1000;
 	int total = 0;
 	vector< vector<int> > diversetable (POP_SIZE, vector<int>(POP_SIZE));
 	// Get the best, worst, and total hamming distances. Also get the denominator for calculating the average.
 	for (int i = 0; i < POP_SIZE; ++i) {
-	  string iString = mypop[i].getStringRule();
+	  iRule = mypop[i].getIntRule();
 	  for (int j = i+1; j < POP_SIZE; ++j) {
-	    string jString = mypop[j].getStringRule();
-	    int temp = calculateHammingPair(iString, jString);
+	    jRule = mypop[j].getIntRule();
+	    int temp = calculateHammingPair(iRule, jRule);
 	    diversetable[i][j] = temp;
 	    diversetable[j][i] = temp;
 	    best = max(best, temp);
@@ -129,22 +132,27 @@ vector<float> Population::getInternalHammingDiversity(){
 }
 
 // Calculates the hamming distance for a pair of strings
-int Population::calculateHammingPair(string a, string b) {
+int Population::calculateHammingPair(unsigned int * a, unsigned int * b) {
 	int HamDiff = 0;
-	if (a.length() != b.length()) return -1;	// complain
-	for (int i = 0; i < a.length(); ++i) {
+	for (int i = 0; i < genomeLength; ++i) {
 		if (a[i] != b[i]) ++HamDiff;
 	}
 	return HamDiff;
 }
 
 void Population::addPopulationBitTotal(float * totals) {
-	string tempString;
+	unsigned int * tempRule;
 	for (int i = 0; i < POP_SIZE; ++i) {
-		tempString = mypop[i].getStringRule();
-		for (int j = 0; j < tempString.size(); ++j) {
-			if (tempString[j] == '1') totals[j] += 1;
+		tempRule = mypop[i].getIntRule();
+		for (int j = 0; j < genomeLength; ++j) {
+			totals[j] += tempRule[j];
 		}
+	}
+}
+
+void Population::updatePopulationIntRules() {
+	for (int i = 0; i < POP_SIZE; ++i) {
+		mypop[i].resetIntRule();
 	}
 }
 

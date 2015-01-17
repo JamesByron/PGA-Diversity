@@ -21,10 +21,10 @@ class SingleNode
   // public variables
   Population * a_pop;
   Individual2 * customs;
-  Individual2 getIndividual(int index);
+  Individual2* getIndividual(int index);
   void addIslandBitTotal(float * totals);
   void updateNodeRelavance(vector<float>* islandRelavance);
-  // int compareIndividualToPopulation(Individual2 input);
+  void updateNodeIntRules();
  private:
   bool selectIndividual(int ind);
   int myrank;

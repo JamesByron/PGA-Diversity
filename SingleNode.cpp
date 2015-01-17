@@ -30,6 +30,7 @@ char WHICH_FITNESS;
 char WHICH_CLASSIFY;
 int PROB_MUTATE; // an int < RAND_MAX representing probability a single individual will get "hit"
 int WHEN_FULL_TEST = 100;
+int genomeLength = NUM_FEATURES*RULE_CASES*8;
 
 SingleNode * islands;
 
@@ -41,6 +42,7 @@ SingleNode::SingleNode(int r, TestSet ts)
 
 	//  printf("SingleNode: about to create a population\n");
 	a_pop = new Population(r, NUM_ISLANDS, ts, POP_SIZE);
+	a_pop->updatePopulationIntRules();
 	//  printf("SingleNode: have population and now update that pop's fitness\n");
 	a_pop->updatePopulationFitness(WHICH_FITNESS);
 
@@ -82,17 +84,19 @@ void SingleNode::doOneGeneration(int thisgen)
 	// switch to next gen
 	//printf("Node %d: a_pop->nextGeneration()\n", myrank);
 	a_pop->nextGeneration(PROB_MUTATE);
-
-	// update population fitness
-	//printf("Node %d: a_pop-updatePopulationFitness()\n", myrank);
+	a_pop->updatePopulationIntRules();
 	a_pop->updatePopulationFitness(WHICH_FITNESS);
+}
+
+void SingleNode::updateNodeIntRules() {
+	a_pop->updatePopulationIntRules();
 }
 
 void SingleNode::updateNodeRelavance(vector<float>* islandRelavance) {
 	a_pop->updatePopulationRelavance(islandRelavance);
 }
 
-Individual2 SingleNode::getIndividual(int index) {
+Individual2* SingleNode::getIndividual(int index) {
 	return a_pop->getIndividual(index);
 }
 
@@ -128,7 +132,7 @@ vector<float> getPairwiseHammingDiversityForAllNodes() {
 	int bestDiversity = 0;
 	int worstDiversity = 1000; // Start with a high number.
 	vector<int> tempV;
-	Individual2 currentIndividual;
+	Individual2* currentIndividual;
 	SingleNode currentNode;
 	vector< vector<int> > diversetable (TOTAL_POP, vector<int>(TOTAL_POP));
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
@@ -203,13 +207,13 @@ vector<float> getHammingRelavanceDetail() {
 	computeHammingBitTotals(bitTotals);
 	int currentIndividual;
 	vector<float> diversityStore (NUM_ISLANDS*POP_SIZE);
-	string genome;
+	unsigned int * genome;
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		for (int j = 0; j < POP_SIZE; ++j) {
 			currentIndividual = i*NUM_ISLANDS + j;
 			diversityStore[currentIndividual] = 0;
-			genome = islands[i].getIndividual(j).getStringRule();
-			for (int k = 0; k < genome.length(); ++k) {
+			genome = (*islands[i].getIndividual(j)).getIntRule();
+			for (int k = 0; k < genomeLength; ++k) {
 				diversityStore[currentIndividual] += abs((float)genome[k] - bitTotals[k]);
 			}
 		}
@@ -223,7 +227,7 @@ void combineRelavanceWithFitness(float weight, vector<float>* relavance) {
 	if ((*relavance).size() != (NUM_ISLANDS*POP_SIZE)) {cout << "combineRelavanceWithFitness: relavance vector is of an unexpected size." << endl; exit(-1);}
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		for (int j = 0; j < POP_SIZE; ++j) {
-			(*relavance)[(i*NUM_ISLANDS)+j] = ((*relavance)[(i*NUM_ISLANDS)+j]*weight) + (islands[i].getIndividual(j).getFitness()*inverseW);
+			(*relavance)[(i*NUM_ISLANDS)+j] = ((*relavance)[(i*NUM_ISLANDS)+j]*weight) + ((*islands[i].getIndividual(j)).getFitness()*inverseW);
 		}
 	}
 }
@@ -241,7 +245,7 @@ vector<float> getFitnessDiversity(int startIsland, int endIsland) {
 		//islands[i].a_pop->updatePopulationFitness(testInstances, classification);
 		for (int j = 0; j < POP_SIZE; ++j) {
 			++counter;
-			x = islands[i].getIndividual(j).getFitness();
+			x = (*islands[i].getIndividual(j)).getFitness();
 			if (x < worst) worst = x;
 			else if (x > best) best = x;
 			delta = x - mean;
@@ -263,7 +267,7 @@ vector<float> getFitnessDiversity(int startIsland, int endIsland) {
  */
 vector<float> getDiversityValues(vector<float> values, int numZeros) {
 	int counter = 0;
-	float worst = 1000.0;
+	float worst = INT_MAX;
 	float mean, x, delta, var, best = 0.0;
 	for (int i = 0; i < values.size(); ++i) {
 		++counter;
@@ -290,17 +294,17 @@ vector<float> getDiversityValues(vector<float> values, int numZeros) {
 vector< vector<float> > calculatePhenotypeFitnessDetail(vector<TestInstance2> testInstances, char classification, int startIsland, int endIsland) {
 	if ((startIsland < 0) || (endIsland > NUM_ISLANDS)) { cout << "Error in calculateFitnessDetail; island index out of range " << startIsland << ", " << endIsland << endl; cout.flush(); exit(-1); }
 	SingleNode tempIsland;
-	Individual2 tempIndividual;
+	Individual2* tempIndividual;
 	vector< vector<float> > diversetableH ((endIsland-startIsland)*POP_SIZE, vector<float>(testInstances.size()));
 	for (int i = startIsland; i < endIsland; ++i) {
 		tempIsland = islands[i];
 		for (int j = 0; j < POP_SIZE; ++j) {
 			tempIndividual = tempIsland.getIndividual(j);
-			tempIndividual.resetConfMat();
+			(*tempIndividual).resetConfMat();
 			for (int k = 0; k < testInstances.size(); ++k) {
 				switch (classification) {
-				case 'h': diversetableH[((i-startIsland)*POP_SIZE)+j][k] = tempIndividual.classiHiFi(testInstances[k]); break;
-				case 'l': diversetableH[((i-startIsland)*POP_SIZE)+j][k] = (float)tempIndividual.classify(testInstances[k]); break;
+				case 'h': diversetableH[((i-startIsland)*POP_SIZE)+j][k] = (*tempIndividual).classiHiFi(testInstances[k]); break;
+				case 'l': diversetableH[((i-startIsland)*POP_SIZE)+j][k] = (float)(*tempIndividual).classify(testInstances[k]); break;
 				}
 			}
 		}
@@ -591,9 +595,9 @@ int main(int argc, char * argv[])
 		// printf("Creating the TestSet from the total testinstances in the file\n");
 		ts = TestSet(all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
 		//printf("Finished creating the Testset\n");
-		for(int j=0; j<NUM_ISLANDS; j++)
-		{
+		for(int j=0; j<NUM_ISLANDS; j++) {
 			islands[j] = SingleNode(j, ts);
+			islands[j].updateNodeIntRules();
 		}
 	}
 	vector<TestInstance2> tsVector = getTIVector(ts, NUM_TEST_CASES_TO_USE);
@@ -668,11 +672,13 @@ int main(int argc, char * argv[])
 					mostFit = i.a_pop->getPopulationMaxFitness();
 					mostFitIsland = island;
 				}
-				//HamDiv = i.a_pop->getInternalHammingDiversity();
-				//FitDiv = getFitnessDiversity(island, (island+1));
-				//PhenDiv = getPhenotypeRelavance(tsVector, island, (island+1), false, &islandRelavance, RELAVANCE_WEIGHT);
-				//fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
-					//	i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
+				/*
+				HamDiv = i.a_pop->getInternalHammingDiversity();
+				FitDiv = getFitnessDiversity(island, (island+1));
+				PhenDiv = getPhenotypeRelavance(tsVector, island, (island+1), false, &islandRelavance, RELAVANCE_WEIGHT);
+				fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
+						i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
+				*/
 				fprintf(logFile2, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f\n",
 				    i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev());
 			}

@@ -35,14 +35,15 @@ public:
   void generateOffspring(int n);
   // switch to next generation
   void nextGeneration(int PROB_MUTATE);
-  Individual2 getIndividual(int index);
+  Individual2* getIndividual(int index);
   vector<float> getInternalHammingDiversity();
   //vector<float> getExternalPopulationDiversity(Individual2 input);
-  vector<int> calculateHammingForAll(Individual2 input);
+  vector<int> calculateHammingForAll(Individual2* input);
   void addPopulationBitTotal(float * totals);
+  void updatePopulationIntRules();
 private:
   // functions
-  int calculateHammingPair(string a, string b);
+  int calculateHammingPair(unsigned int * a, unsigned int * b);
   //void updateInternalHammingDist();
   void unselectAll();
   int selectIndividual(int availablepop);
@@ -63,6 +64,7 @@ private:
   int myrank;
   int numprocs;
   int newpop_count;
+  int genomeLength = NUM_FEATURES*RULE_CASES*8;
   Individual2 bestIndiv;
   //Individual2 b1[POP_SIZE];
   //Individual2 b2[POP_SIZE];

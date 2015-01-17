@@ -67,6 +67,6 @@ private:
   float accuracy;
   float confMat[RULE_CASES][RULE_CASES];
   unsigned char rule[RULE_CASES*NUM_FEATURES];
-  unsigned int intRule[RULE_CASES*NUM_FEATURES*8];
+  unsigned int intRule[RULE_CASES*NUM_FEATURES*8] = {0};
   float myDiversityRelavance;
 };
