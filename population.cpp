@@ -282,6 +282,7 @@ void Population::selectRandToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs randomly selected individuals (without replacement) into the migrants array
 // ??? and sets their selected flag in the base population
 {
+	//cout << "\nRandom migration" << endl;
 	int i;
 	for(int n = 0; n < num_migrants; n++)
 	{
@@ -413,6 +414,7 @@ void Population::unselectAll()
 int Population::selectIndividual(int availablepop)
 {
 	switch (WHICH_SELECT) {
+	case 0: return rand() % availablepop; // completely random selection with no bias either toward fitness or diversity
 	case 1: return tournamentSelect(availablepop); break;
 	case 2: return altSelectIndividual(); break;
 	case 3: return relavanceTournamentSelect(availablepop); break;

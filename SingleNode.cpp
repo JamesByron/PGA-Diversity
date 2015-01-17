@@ -14,7 +14,7 @@ FILE *logFile1; // for Generations data
 FILE *logFile2; // for Islands data
 // migration
 char WHICH_MIGRATION; // r: Random, s: Strong, w: Weak, n: None, f: Fake random migrant, . . .
-/*int*/float WHEN_MIGRATE;
+int WHEN_MIGRATE;
 int NUM_MIGRANTS_PER_ISLAND;
 int NUM_IMMIGRANTS;
 // topography
@@ -58,12 +58,8 @@ SingleNode::SingleNode()
 void SingleNode::doOneGeneration(int thisgen)
 // do the stuff for one generation
 {
-	float randmigrate;
-	//  srand( time(NULL) ); doing this every generation and for each island creates a bug
-	randmigrate = (float)rand()/RAND_MAX;
-	// send
 	//printf("Node %d: sendMigrantStrings()\n", myrank);
-	if (WHICH_MIGRATION != 'n' &&  (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ )
+	if (WHICH_MIGRATION != 'n' &&  !(thisgen % WHEN_MIGRATE) )
 		sendMigrants();
 
 	// survive
@@ -73,12 +69,12 @@ void SingleNode::doOneGeneration(int thisgen)
 	// receive
 	//printf("Node %d: receiveMigrantStrings()\n", myrank);
 	// ignore when only one island, but need to receive migrants (unless sendMigrants takes care of it)
-	if (WHICH_MIGRATION != 'n' && (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ )
+	if (WHICH_MIGRATION != 'n' && !(thisgen % WHEN_MIGRATE) )
 		a_pop->processImmigrants(islands[myrank].customs, NUM_IMMIGRANTS);
 
 	// breed
 	//printf("Node %d: a_pop->generateOffspring(%d)\n", myrank,(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + NUM_IMMIGRANTS)));
-	a_pop->generateOffspring(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + ((WHICH_MIGRATION != 'n' && (randmigrate > WHEN_MIGRATE)/*!(thisgen%WHEN_MIGRATE)*/ ) ? NUM_IMMIGRANTS : 0)));
+	a_pop->generateOffspring(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + ((WHICH_MIGRATION != 'n' && !(thisgen % WHEN_MIGRATE) ) ? NUM_IMMIGRANTS : 0)));
 	//a_pop->generateOffspring(POP_SIZE - (((int)(POP_SIZE*PROB_REMAIN)) + NUM_IMMIGRANTS));
 
 	// switch to next gen
@@ -531,7 +527,7 @@ int main(int argc, char * argv[])
 	string filename = argv[1];
 
 	WHICH_MIGRATION = argv[3][0];
-	WHEN_MIGRATE = atof(argv[4]);//atoi(argv[4]);
+	WHEN_MIGRATE = atoi(argv[4]);//atoi(argv[4]);
 	NUM_MIGRANTS_PER_ISLAND = atoi(argv[5]);
 	NUM_ISLANDS = atoi(argv[6]);
 	// do not need to check limit on number of islands in SingleNode
@@ -576,7 +572,7 @@ int main(int argc, char * argv[])
 	//cout << "l209" << endl;
 	if (argc == 15 && NUM_ISLANDS > 18)
 	{ printf("Invalid combination of depth and number of islands\n"); usage(); exit(-1); }
-
+	//begin loop here
 	//initialize all islands
 	//printf("Initializing the islands (and populations, etc.)\n");
 	TestSet ts;
@@ -642,11 +638,12 @@ int main(int argc, char * argv[])
 	fprintf(logFile1, "Log file for Overall Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEVALUATED OVER ALL TESTS\nMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\tMax Hamming-Estimated Diversity\tMin Hamming-Estimated Diversity\tAverage Hamming-Estimated Diversity\tHamming-Estimated Diversity Variance\t\tMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight");
 	fprintf(logFile2, "Log file for Island Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tFull Testset\nMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\t\tMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\n");
 	// allocating memory
-	switch (WHICH_SELECT) {
-		case 1: cout << "Using Tournament Fitness Selection" << endl; break;
-		case 2: cout << "Using Alt Fitness Selection" << endl; break;
-		case 3: cout << "Using Phenotype Relavance Selection" << endl; break;
-		case 4: cout << "Using Hamming-Estimated Relavance Selection" << endl; break;
+	switch (WHICH_SELECT)
+	{	case 0: cout << "Using random selection with no bias toward fitness or diversity." << endl; break;
+		case 1: cout << "Using tournament fitness selection." << endl; break;
+		case 2: cout << "Using alt fitness selection." << endl; break;
+		case 3: cout << "Using phenotype relavance selection.\nThe selection bias toward relavance is " << RELAVANCE_WEIGHT << "." << endl; break;
+		case 4: cout << "Using hamming-estimated relavance selection.\nThe selection bias toward relavance is " << RELAVANCE_WEIGHT << "." << endl; break;
 	}
 	static vector <vector<float> > islandRelavance (NUM_ISLANDS, vector<float> (POP_SIZE));
 	static vector<float> HamDiv = getPairwiseHammingDiversityForAllNodes();
