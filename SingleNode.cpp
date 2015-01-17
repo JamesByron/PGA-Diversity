@@ -668,13 +668,13 @@ int main(int argc, char * argv[])
 					mostFit = i.a_pop->getPopulationMaxFitness();
 					mostFitIsland = island;
 				}
-				HamDiv = i.a_pop->getInternalHammingDiversity();
-				FitDiv = getFitnessDiversity(island, (island+1));
-				PhenDiv = getPhenotypeRelavance(tsVector, island, (island+1), false, &islandRelavance, RELAVANCE_WEIGHT);
-				fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
-						i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
-				//fprintf(logFile, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f\t\t\t\t\n",
-				//    i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev());
+				//HamDiv = i.a_pop->getInternalHammingDiversity();
+				//FitDiv = getFitnessDiversity(island, (island+1));
+				//PhenDiv = getPhenotypeRelavance(tsVector, island, (island+1), false, &islandRelavance, RELAVANCE_WEIGHT);
+				//fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
+					//	i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
+				fprintf(logFile2, "Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f\n",
+				    i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev());
 			}
 		}
 		HamDiv = getPairwiseHammingDiversityForAllNodes();
@@ -697,15 +697,10 @@ int main(int argc, char * argv[])
 					mostFit = i.a_pop->getPopulationMaxFitness();
 					mostFitIsland = island;
 				}
-				HamDiv = i.a_pop->getInternalHammingDiversity();
-				FitDiv = getFitnessDiversity(island, (island+1));
-				PhenDiv = getPhenotypeRelavance(all_tests, island, (island+1), false, &islandRelavance, RELAVANCE_WEIGHT);
-				fprintf(logFile2, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
-						i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
+				fprintf(logFile2, "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t%f\t%f\t%i\t%i\t%f\n",
+						i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev());
 				//i.a_pop->getBestIndividual().dumpConfMat(logFile2);
 			}
-			//HamDiv = getPairwiseHammingDiversityForAllNodes();
-			//FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
 			PhenDiv = getPhenotypeRelavance(all_tests, 0, NUM_ISLANDS, false, &islandRelavance, RELAVANCE_WEIGHT);
 			fprintf(logFile1, "\t\t%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
 					mostFit, mostFitIsland, i.a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
