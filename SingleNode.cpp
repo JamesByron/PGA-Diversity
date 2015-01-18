@@ -30,7 +30,7 @@ char WHICH_FITNESS;
 char WHICH_CLASSIFY;
 int PROB_MUTATE; // an int < RAND_MAX representing probability a single individual will get "hit"
 int WHEN_FULL_TEST = 100;
-int genomeLength = NUM_FEATURES*RULE_CASES*8;
+// use RULE_LEN instead: int genomeLength = NUM_FEATURES*RULE_CASES*8;
 
 SingleNode * islands;
 
@@ -209,7 +209,7 @@ vector<float> getHammingRelavanceDetail() {
 			currentIndividual = i*NUM_ISLANDS + j;
 			diversityStore[currentIndividual] = 0;
 			genome = (*islands[i].getIndividual(j)).getIntRule();
-			for (int k = 0; k < genomeLength; ++k) {
+			for (int k = 0; k < RULE_LEN; ++k) {
 				diversityStore[currentIndividual] += abs((float)genome[k] - bitTotals[k]);
 			}
 		}
@@ -478,7 +478,7 @@ void usage(){
 	printf(" 1.  test instance data file\n");
 	printf(" 2.  logfile tag\n");
 	printf(" 3.  migration strategy (r/s/w/f/n)\n");
-	printf(" 4.  migration threshold\n"); //"interval\n");
+	printf(" 4.  migration interval\n"); 
 	printf(" 5.  num migrants per island\n");
 	printf(" 6.  number of islands\n");
 	printf(" 7.  num neighbors (must be less than the number of islands)\n");

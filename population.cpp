@@ -134,7 +134,7 @@ vector<float> Population::getInternalHammingDiversity(){
 // Calculates the hamming distance for a pair of strings
 int Population::calculateHammingPair(unsigned int * a, unsigned int * b) {
 	int HamDiff = 0;
-	for (int i = 0; i < genomeLength; ++i) {
+	for (int i = 0; i < RULE_LEN; ++i) {
 		if (a[i] != b[i]) ++HamDiff;
 	}
 	return HamDiff;
@@ -144,7 +144,7 @@ void Population::addPopulationBitTotal(float * totals) {
 	unsigned int * tempRule;
 	for (int i = 0; i < POP_SIZE; ++i) {
 		tempRule = mypop[i].getIntRule();
-		for (int j = 0; j < genomeLength; ++j) {
+		for (int j = 0; j < RULE_LEN; ++j) {
 			totals[j] += tempRule[j];
 		}
 	}
