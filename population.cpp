@@ -414,7 +414,7 @@ void Population::unselectAll()
 int Population::selectIndividual(int availablepop)
 {
 	switch (WHICH_SELECT) {
-	case 0: return rand() % availablepop; // completely random selection with no bias either toward fitness or diversity
+	case 0: return rand() % availablepop; break;// completely random selection with no bias either toward fitness or diversity
 	case 1: return tournamentSelect(availablepop); break;
 	case 2: return altSelectIndividual(); break;
 	case 3: return relavanceTournamentSelect(availablepop); break;
