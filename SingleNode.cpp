@@ -571,9 +571,9 @@ int main(int argc, char * argv[])
 	//cout << "l209" << endl;
 	if (argc == 15 && NUM_ISLANDS > 18)
 	{ printf("Invalid combination of depth and number of islands\n"); usage(); exit(-1); }
-	float currentWeight = RELAVANCE_WEIGHT;
-	while (currentWeight > 0 ) {//= 0) {
-		for (int cycle = 0; cycle < 10; cycle++) {
+	float currentWeight = RELAVANCE_START;
+	while (currentWeight >= RELAVANCE_END ) {
+		for (int cycle = 0; cycle < NUM_CYCLES; cycle++) {
 			start = time(NULL);
 			islands = new SingleNode[NUM_ISLANDS];
 			//initialize all islands
@@ -652,11 +652,11 @@ int main(int argc, char * argv[])
 			case 3: cout << "Using phenotype relavance selection.\nThe selection bias toward relavance is " << currentWeight << "." << endl; break;
 			case 4: cout << "Using hamming-estimated relavance selection.\nThe selection bias toward relavance is " << currentWeight << "." << endl; break;
 			}
-			static vector <vector<float> > islandRelavance (NUM_ISLANDS, vector<float> (POP_SIZE));
-			static vector<float> HamDiv = getPairwiseHammingDiversityForAllNodes();
-			static vector<float> FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
-			static vector<float> PhenDiv = getPhenotypeRelavance(&tsVector, 0, NUM_ISLANDS, true, &islandRelavance, currentWeight);
-			static vector<float> HamRel = getHammingRelavance(&islandRelavance, true, currentWeight);
+			vector <vector<float> > islandRelavance (NUM_ISLANDS, vector<float> (POP_SIZE));
+			vector<float> HamDiv = getPairwiseHammingDiversityForAllNodes();
+			vector<float> FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
+			vector<float> PhenDiv = getPhenotypeRelavance(&tsVector, 0, NUM_ISLANDS, true, &islandRelavance, currentWeight);
+			vector<float> HamRel = getHammingRelavance(&islandRelavance, true, currentWeight);
 			for (int node = 0; node < NUM_ISLANDS; ++node) {
 				islands[node].updateNodeRelavance(&islandRelavance[node]);  // update the relavance at the first generation
 			}
@@ -729,7 +729,7 @@ int main(int argc, char * argv[])
 			fclose(logFile1);
 			fclose(logFile2);
 		}
-		currentWeight -= 0.25;
+		currentWeight -= RELAVANCE_INCREMENT;
 	}
 	return 0;
 }
