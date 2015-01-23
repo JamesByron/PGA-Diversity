@@ -22,69 +22,68 @@ using namespace std;
 
  */
 
-TestSet::TestSet(vector<TestInstance2> allti, int num)
+TestSet::TestSet(vector<TestInstance2> * allti, int num)
 {
   //fulltiset = allti;
   NUM_TEST_CASES_TO_USE = num;
-  nTestInstances = allti.size() - num;
-  tset = new TestInstance2[num];
-  // if (num == allti.size())
+  nTestInstances = allti->size() - num;
+  train = new TestInstance2[num];
+  // if (num == allti->size())
   // tset = allti;
   srand(time(NULL)+17033);
   shuffle(allti);
   //srand(93108);
-  selectRandomTestInstances(tset, allti);
-  //printf("sample has %d Testinsances\n", tset.size());
+  selectRandomTestInstances(train, *allti);
 }
 
-TestSet::TestSet(vector<TestInstance2> allti, int num, int depth)
+TestSet::TestSet(vector<TestInstance2> * allti, int num, int depth)
 {
   NUM_TEST_CASES_TO_USE = num;
-  nTestInstances = allti.size() - num;
-  tset = new TestInstance2[num];
+  nTestInstances = allti->size() - num;
+  train = new TestInstance2[num];
 
   srand(time(NULL)+17033);
   //srand(93108);
   shuffle(allti);
 
   vector<TestInstance2> tempti;
-  for(int i=0; i < allti.size(); i++)
+  for(int i=0; i < allti->size(); i++)
     {
-      if (allti[i].getDepth() == depth)
-	tempti.push_back(allti[i]);
+      if ((*allti)[i].getDepth() == depth)
+	tempti.push_back((*allti)[i]);
     }
-  selectRandomTestInstances(tset, tempti);
+  selectRandomTestInstances(train, tempti);
   // ~vector (tempti);
 }
 
-TestSet::TestSet(int seed, vector<TestInstance2> allti, int num)
+TestSet::TestSet(int seed, vector<TestInstance2> * allti, int num)
 {
   NUM_TEST_CASES_TO_USE = num;
-  nTestInstances = allti.size() - num;
-  tset = new TestInstance2[num];
-  // if (num == allti.size())
+  nTestInstances = allti->size() - num;
+  train = new TestInstance2[num];
+  // if (num == allti->size())
   // tset = allti;
   srand(seed);
   shuffle(allti);
-  selectRandomTestInstances(tset, allti);
+  selectRandomTestInstances(train, *allti);
 }
 
-TestSet::TestSet(int seed, vector<TestInstance2> allti, int num, int depth)
+TestSet::TestSet(int seed, vector<TestInstance2> * allti, int num, int depth)
 {
   NUM_TEST_CASES_TO_USE = num;
-  nTestInstances = allti.size() - num;
-  tset = new TestInstance2[num];
+  nTestInstances = allti->size() - num;
+  train = new TestInstance2[num];
 
   srand(seed);
   shuffle(allti);
 
   vector<TestInstance2> tempti;
-  for(int i=0; i < allti.size(); i++)
+  for(int i=0; i < allti->size(); i++)
     {
-      if (allti[i].getDepth() == depth)
-	tempti.push_back(allti[i]);
+      if ((*allti)[i].getDepth() == depth)
+	tempti.push_back((*allti)[i]);
     }
-  selectRandomTestInstances(tset, tempti);
+  selectRandomTestInstances(train, tempti);
 
   //~vector(tempti);
 }
@@ -92,50 +91,46 @@ TestSet::TestSet(int seed, vector<TestInstance2> allti, int num, int depth)
 // constructors that creates two disjoint data sets for training and testing 
 // with respective sizes given by the value of the split (which must correspond to num)
 
-TestSet::TestSet(vector<TestInstance2> allti, int num, float split)
+TestSet::TestSet(vector<TestInstance2> * allti, int num, float split)
 {
   int i = 0;
-  if ( fabs(split - ((float) num)/allti.size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN TestSet CONSTRUCTOR\n"); exit(-1);}
+  if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN TestSet CONSTRUCTOR\n"); exit(-1);}
 
   NUM_TEST_CASES_TO_USE = num;
-  nTestInstances = allti.size() - num;
-  tset = new TestInstance2[num];
-  // if (num == allti.size())
-  // tset = allti;
+  nTestInstances = allti->size() - num;
+  train = new TestInstance2[num];
   srand(time(NULL)+17033);
   shuffle(allti);
   //srand(93108);
   // get the training split
-  train = new TestInstance2[num];
   for (int i=0; i < num; i++)
-    train[i]=allti[i];
+    train[i]=(*allti)[i];
   // continue with the testing split
-  test = new TestInstance2[allti.size() - num];
-  for (int k=0; k < allti.size() - num; k++)
-    test[k]=allti[i++];
-  //printf("sample has %d Testinsances\n", tset.size());
+  test = new TestInstance2[allti->size() - num];
+  for (int k=0; k < allti->size() - num; k++)
+    test[k]=(*allti)[i++];
 }
 
-TestSet::TestSet(int seed, vector<TestInstance2> allti, int num, float split)
+TestSet::TestSet(int seed, vector<TestInstance2> * allti, int num, float split)
 {
   int i = 0;
-  if ( fabs(split - ((float) num)/allti.size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN TestSet CONSTRUCTOR\n"); exit(-1);}
+  if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN TestSet CONSTRUCTOR\n"); exit(-1);}
 
   NUM_TEST_CASES_TO_USE = num;
-  nTestInstances = allti.size() - num;
-  tset = new TestInstance2[num];
-  // if (num == allti.size())
+  nTestInstances = allti->size() - num;
+  train = new TestInstance2[num];
+  // if (num == allti->size())
   // tset = allti;
   srand(seed);
   shuffle(allti);
   train = new TestInstance2[num];
   // get the training split
   for (i=0; i < num; i++)
-    train[i]=allti[i];
+    train[i]=(*allti)[i];
   // continue with the testing split
-  test = new TestInstance2[allti.size() - num];
-  for (int k=0; k < allti.size() - num; k++)
-    test[k]=allti[i++];
+  test = new TestInstance2[allti->size() - num];
+  for (int k=0; k < allti->size() - num; k++)
+    test[k]=(*allti)[i++];
 }
 
 
@@ -152,21 +147,20 @@ void TestSet::selectRandomTestInstances(TestInstance2 * ti, vector<TestInstance2
   {
     index = rand()%(tests.size());
     ti[i]=tests[index];
-    //tset.push_back(tests[index]);
   }
 }
 
-void TestSet::shuffle(vector<TestInstance2> a)
+void TestSet::shuffle(vector<TestInstance2> * a)
 {
   int r;
   TestInstance2 t;
   for (int n=0; n < 3; n++)
-    for (int i=0; i < a.size(); i++)
+    for (int i=0; i < a->size(); i++)
       {
-	r = rand() % a.size();
-	t = a[r];
-	a[r] = a[i];
-	a[i] = t;
+	r = rand() % a->size();
+	t = (*a)[r];
+	(*a)[r] = (*a)[i];
+	(*a)[i] = t;
       }
 }
       

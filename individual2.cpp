@@ -35,7 +35,7 @@ Individual2::Individual2(string str)
 }
 
 
-float Individual2::fitnessHiFi(TestInstance2 ti)
+float Individual2::fitnessHiFi(TestInstance2* ti)
 /** fine-grained fitness evaluation: looks at every feature of every classification rule (at a performance cost) accumulating
     the number of matched features for each rule.  Final fitness based on the distribution of values in some as-yet-undetermined manner.
 */
@@ -48,7 +48,7 @@ float Individual2::fitnessHiFi(TestInstance2 ti)
   countFeats(featcounts, ti);
 
   // now do something with the featcounts array
-  correctclass = ti.getDepth()+1;
+  correctclass = ti->getDepth()+1;
   correctmatched = featcounts[correctclass];
   bettermatched = 0; samematched = 0; mostmatched = 0; nummostmatched = 0;
   for(int i=0; i < RULE_CASES; i++)
@@ -66,7 +66,7 @@ float Individual2::fitnessHiFi(TestInstance2 ti)
   return result;
 }
 
-float Individual2::classiHiFi(TestInstance2 ti)
+float Individual2::classiHiFi(TestInstance2 * ti)
 /** fine-grained classification: looks at every feature of every classification rule (at a performance cost) accumulating
     the number of matched features for each rule.  Classification score: 0 if any rule has more features matching than the
     correct rule; 1.0 if the correct rule has the most features matching and no other rule has the same number; 1/n where
@@ -80,7 +80,7 @@ float Individual2::classiHiFi(TestInstance2 ti)
   countFeats(featcounts, ti);
 
   // now do something with the featcounts array
-  correctclass = ti.getDepth()+1;
+  correctclass = ti->getDepth()+1;
   correctmatched = featcounts[correctclass];
   samematched = 0; mostmatched = 0; nummostmatched = 0;
   for(int i=0; i < RULE_CASES; i++)
@@ -99,13 +99,13 @@ float Individual2::classiHiFi(TestInstance2 ti)
 }
 
 
-int Individual2::classify(TestInstance2 ti)
+int Individual2::classify(TestInstance2 * ti)
   /** Classify a single test instance as the first rule-case that completely matches all the features.
    */
 {
   //printf("Entering classify\n");
-  int correctclass = ti.getDepth()+1;
-  unsigned char * bin = ti.getBinary();
+  int correctclass = ti->getDepth()+1;
+  unsigned char * bin = ti->getBinary();
 
   bool match;
   int i;
@@ -134,7 +134,7 @@ void Individual2::updateDiversityRelavance(float relavance) {
 	myDiversityRelavance = relavance;
 }
 
-void Individual2::updateFitness(TestSet ts, char WHICH_FITNESS)
+void Individual2::updateFitness(TestSet* ts, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
    */
 {
@@ -143,12 +143,12 @@ void Individual2::updateFitness(TestSet ts, char WHICH_FITNESS)
   float testsofthistype;
   fitness = 0;
   resetConfMat();
-  for(int i=0; i < ts.NUM_TEST_CASES_TO_USE; i++)
+  for(int i=0; i < ts->NUM_TEST_CASES_TO_USE; i++)
   {
     switch (WHICH_FITNESS)
       {
-      case 'h': sum += fitnessHiFi(ts.getTI(i)); break;		// HiFi
-      case 'l': if(classify(ts.getTI(i))) sum++; break;	// LoFi
+      case 'h': sum += fitnessHiFi(ts->getTI(i)); break;		// HiFi
+      case 'l': if(classify(ts->getTI(i))) sum++; break;	// LoFi
       }
     //printf("On test case number %d\n", i);
     //printf("TC %d: inst: %s, classified as: %d, tc-binrep: %s\n", i, testSet[i].humanReadable().c_str(), classify(testSet[i]), testSet[i].getStringRep().c_str());
@@ -167,40 +167,40 @@ void Individual2::updateFitness(TestSet ts, char WHICH_FITNESS)
   //printf("Leaving updateFitness\n");
 }
 
-void Individual2::updateFitness(vector<TestInstance2> allti, char WHICH_CLASSIFY)
+void Individual2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASSIFY)
   /** compute the "fitness" of what is presumably the full testset.  Use the appropriate measure for computing accurracy.
    */
 {
   float sum = 0.0;
   resetConfMat();
-  for(int i=0; i < (int)allti.size(); i++)
+  for(int i=0; i < (int)allti->size(); i++)
   {
     switch (WHICH_CLASSIFY)
       {
-      case 'h': sum += classiHiFi(allti[i]); break;
-      case 'l': if(classify(allti[i])) sum++; break;
+      case 'h': sum += classiHiFi(&(*allti)[i]); break;
+      case 'l': if(classify(&(*allti)[i])) sum++; break;
       }
   }
 
-  fitness = sum / allti.size();
+  fitness = sum / allti->size();
 }
 
-void Individual2::findAccuracy(TestSet ts, char WHICH_CLASSIFY)
+void Individual2::findAccuracy(TestSet * ts, char WHICH_CLASSIFY)
   /** compute the "fitness" as measure of accuracy on the actual testset.  Use the appropriate measure for computing accurracy.
    */
 {
   float sum = 0.0;
   resetConfMat();
-  for(int i=0; i < ts.testSetSize(); i++)
+  for(int i=0; i < ts->testSetSize(); i++)
   {
     switch (WHICH_CLASSIFY)
       {
-      case 'h': sum += classiHiFi(ts.getTestI(i)); break;
-      case 'l': if(classify(ts.getTestI(i))) sum++; break;
+      case 'h': sum += classiHiFi(ts->getTestI(i)); break;
+      case 'l': if(classify(ts->getTestI(i))) sum++; break;
       }
   }
 
-  accuracy = sum / ts.testSetSize();
+  accuracy = sum / ts->testSetSize();
 }
 
 
@@ -351,14 +351,14 @@ void Individual2::auxBreedNCross(Individual2 * kids, Individual2 ind, int crossT
   //printf("Leaving auxBreedNCross\n");
 }
 
-void Individual2::countFeats(signed char * featcounts, TestInstance2 ti)
+void Individual2::countFeats(signed char * featcounts, TestInstance2 * ti)
   /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
 {
   float result = 0.0;
   unsigned char * bin;
   for (int i=0; i < RULE_CASES; i++)
     {
-      bin = ti.getBinary();
+      bin = ti->getBinary();
       featcounts[i] = 0;
       for (int feat=0; feat < NUM_FEATURES; feat++)
 	//if( (bin[feat] & rule[i*NUM_FEATURES+feat]) != 0 )

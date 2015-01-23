@@ -169,7 +169,7 @@ void Population::updatePopulationFitness(char WHICH_FITNESS)
 	for (int i = 0; i < POP_SIZE; i++)
 	{
 		// printf("updating individual %d\n", i);
-		mypop[i].updateFitness(myTestSet, WHICH_FITNESS);
+		mypop[i].updateFitness(&myTestSet, WHICH_FITNESS);
 		//printf("updated individual %d\n", i);
 		totalFitness += mypop[i].getFitness();
 		totalInverseFitness += 1 - mypop[i].getFitness();
@@ -189,7 +189,7 @@ void Population::updatePopulationFitness(char WHICH_FITNESS)
 	stdev = sqrt(stdev);
 }
 
-void Population::updatePopulationFitness(vector<TestInstance2> allti, char WHICH_CLASSIFY)
+void Population::updatePopulationFitness(vector<TestInstance2> * allti, char WHICH_CLASSIFY)
 {
 	maxFitness = 0.0;
 	totalFitness = 0.0;
@@ -198,7 +198,7 @@ void Population::updatePopulationFitness(vector<TestInstance2> allti, char WHICH
 	bestIndiv = mypop[0];
 	for (int i = 0; i < POP_SIZE; i++)
 	{
-		mypop[i].updateFitness(allti, WHICH_CLASSIFY);
+	        mypop[i].updateFitness(allti, WHICH_CLASSIFY);
 		totalFitness += mypop[i].getFitness();
 		totalInverseFitness += 1 - mypop[i].getFitness();
 		if(maxFitness < mypop[i].getFitness())
@@ -226,7 +226,7 @@ void Population::populationAccuracy(char WHICH_CLASSIFY)
 	bestIndiv = mypop[0];
 	for (int i = 0; i < POP_SIZE; i++)
 	{
-		mypop[i].findAccuracy(myTestSet, WHICH_CLASSIFY);
+		mypop[i].findAccuracy(&myTestSet, WHICH_CLASSIFY);
 		totalFitness += mypop[i].getFitness();
 		totalInverseFitness += 1 - mypop[i].getFitness();
 		if(maxFitness < mypop[i].getFitness())
