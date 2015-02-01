@@ -427,7 +427,7 @@ vector<float> calculateIndividualPhenotypeRelavance(vector< vector<float> >* det
 void getRelavanceByIsland(vector<float>* detail, vector <vector<float> >* islandRelavance) {
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		for (int j = 0; j < POP_SIZE; ++j) {
-			(*islandRelavance)[i][j] = (*detail)[(NUM_ISLANDS * i) + j];
+			(*islandRelavance)[i][j] = (*detail)[(POP_SIZE * i) + j];
 		}
 		//(*individualRankings)[i] = calculateRankings((*islandRelavance)[i], true);
 		//scaleToLimit(&(*islandRelavance)[i], 1.0);
