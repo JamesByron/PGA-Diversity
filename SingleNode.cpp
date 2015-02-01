@@ -193,7 +193,7 @@ void computeHammingBitTotals(float * bitTotals) {
 		islands[i].addIslandBitTotal(bitTotals);
 	}
 	int totalIndividuals = NUM_ISLANDS*POP_SIZE;
-	for (int i = 0; i < totalIndividuals; ++i) {
+	for (int i = 0; i < RULE_LEN; ++i) {
 		bitTotals[i] /= (float)totalIndividuals;
 	}
 }
