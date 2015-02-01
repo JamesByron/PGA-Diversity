@@ -10,6 +10,6 @@
 #define WHICH_SELECT 3 // tournament [1] default, fitness proportional [2], diversity guided tournament select [3]
 #define TOURNAMENT_SIZE 5
 #define RELAVANCE_START 1.0
-#define RELAVANCE_END 0.0
+#define RELAVANCE_END 0.25
 #define RELAVANCE_INCREMENT 0.25
 #define NUM_CYCLES 10

@@ -687,7 +687,7 @@ int main(int argc, char * argv[])
 		      islands[island].a_pop->getPopulationMaxFitness(), islands[island].a_pop->getPopulationAvgFitness(), islands[island].a_pop->getGeneration(), island, islands[island].a_pop->getStdev());
 	    }
 	  }
-	  HamDiv = getPairwiseHammingDiversityForAllNodes();
+	  //HamDiv = getPairwiseHammingDiversityForAllNodes();
 	  FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
 	  PhenDiv = getPhenotypeRelavance(&tsVector, 0, NUM_ISLANDS, true, &islandRelavance, currentWeight);  // we use the training set untel it's time to use the full test set
 	  HamRel = getHammingRelavance(&islandRelavance, true, currentWeight);
