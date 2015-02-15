@@ -415,6 +415,13 @@ string Individual2::byteToString(unsigned char c)
   return s;
 }
 
+/**
+ * At each generation, resetIntRule is called after completing recombination and selection for the population.
+ * When this is called, intRule is updated with the integer representations of the buts in the rule.  The intRule therefore
+ * contains egight times as many elements as the rule itself, but the values in the int rule mirror the bits in the rule so that we
+ * can add these values together to compute hamming distance.
+ * Possible future work includes eliminating the intRule and moving the bit shifting to the population.cpp wherever intRule is used.
+ */
 void Individual2::resetIntRule() {
 	static unsigned char mask;
 	for (int i = 0; i < NUM_FEATURES*RULE_CASES; ++i) {

@@ -195,6 +195,7 @@ void computeHammingBitTotals(float * bitTotals) {
 	int totalIndividuals = NUM_ISLANDS*POP_SIZE;
 	for (int i = 0; i < RULE_LEN; ++i) {
 		bitTotals[i] /= (float)totalIndividuals;
+		//if (bitTotals[i] > 1.0) exit(-1);
 	}
 }
 
@@ -446,7 +447,6 @@ void getRelavanceByIsland(vector<float>* detail, vector <vector<float> >* island
 vector<float> getPhenotypeRelavance(vector<TestInstance2>* testInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelavance, float relavanceWeight) {
 	vector< vector<float> > detailedFitness = calculatePhenotypeFitnessDetail(testInstances, WHICH_CLASSIFY, startIsland, endIsland);  // this stores data in the array and returns detailed results also
 	vector<float> fitnessTotals = calculatePhenotypeFitnessTotals(&detailedFitness, (*testInstances).size());
-	//vector<int> rankings =  calculateFitnessRankings(fitnessTotals);
 	vector<float> weights =  calculatePhenotypeFitnessWeights(&fitnessTotals);
 	int numZeros = 0;
 	for (int i = 0; i < weights.size(); ++i) {
@@ -460,9 +460,7 @@ vector<float> getPhenotypeRelavance(vector<TestInstance2>* testInstances, int st
 		// Therefore we use the number of test instances as the scale.
 		scaleProportionally(&individualRelavance, (*testInstances).size());
 		float max = 0.0;
-		for (int i = 0; i < individualRelavance.size(); ++i) {
-			if (individualRelavance[i] > max) max = individualRelavance[i];
-		}
+		for (int i = 0; i < individualRelavance.size(); ++i) { if (individualRelavance[i] > max) max = individualRelavance[i]; }
 		cout << "m: " << max << endl;
 		if (relavanceWeight < 1.0) combineRelavanceWithFitness(relavanceWeight, &individualRelavance);
 		getRelavanceByIsland(&individualRelavance, islandRelavance);
@@ -478,9 +476,7 @@ vector<float> getHammingRelavance(vector <vector<float> >* islandRelavance, bool
 		// Therefore we scale by the rule length.
 		scaleProportionally(&relavance, RULE_LEN);
 		float max = 0.0;
-		for (int i = 0; i < relavance.size(); ++i) {
-			if (relavance[i] > max) max = relavance[i];
-		}
+		for (int i = 0; i < relavance.size(); ++i) { if (relavance[i] > max) max = relavance[i]; }
 		cout << "m: " << max << endl;
 		if (relavanceWeight < 1.0) combineRelavanceWithFitness(relavanceWeight, &relavance);
 		getRelavanceByIsland(&relavance, islandRelavance);
