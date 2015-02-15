@@ -206,7 +206,7 @@ vector<float> getHammingRelavanceDetail() {
 	unsigned int * genome;
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		for (int j = 0; j < POP_SIZE; ++j) {
-			currentIndividual = i*NUM_ISLANDS + j;
+			currentIndividual = i*POP_SIZE + j;
 			diversityStore[currentIndividual] = 0;
 			genome = (*islands[i].getIndividual(j)).getIntRule();
 			for (int k = 0; k < RULE_LEN; ++k) {
@@ -223,7 +223,7 @@ void combineRelavanceWithFitness(float weight, vector<float>* relavance) {
 	//if ((*relavance).size() != (NUM_ISLANDS*POP_SIZE)) {cout << "combineRelavanceWithFitness: relavance vector is of an unexpected size." << endl; exit(-1);}
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		for (int j = 0; j < POP_SIZE; ++j) {
-			(*relavance)[(i*NUM_ISLANDS)+j] = ((*relavance)[(i*NUM_ISLANDS)+j]*weight) + ((*islands[i].getIndividual(j)).getFitness()*inverseW);
+			(*relavance)[(i*POP_SIZE)+j] = ((*relavance)[(i*POP_SIZE)+j]*weight) + ((*islands[i].getIndividual(j)).getFitness()*inverseW);
 		}
 	}
 }
@@ -383,6 +383,12 @@ void scaleToLimit(vector<float>* vec, float limit) {
 	}
 }
 
+void scaleProportionally(vector<float>* vec, float scale) {
+	for (int i = 0; i < (*vec).size(); ++i) {
+		(*vec)[i] /= scale;
+	}
+}
+
 /**
  * Returns a vector of weights where the largest number had the smallest total fitness in the given input vector of fitness totals.
  * Larger fitness values carry less weight and have smaller numbers in the output vector.
@@ -390,15 +396,17 @@ void scaleToLimit(vector<float>* vec, float limit) {
  */
 vector<float> calculatePhenotypeFitnessWeights(vector<float>* fitnessTotals) {
 	vector<float> weights ((*fitnessTotals).size());
+	/*
 	float total = 0.0;
 	for (int i = 0; i < (*fitnessTotals).size(); ++i) { // for every value, one at a time
 		weights[i] = 0;
 		total += (*fitnessTotals)[i];
 	}
-	total = sqrt(total);
+	total = sqrt(total);*/
 	for (int i = 0; i < (*fitnessTotals).size(); ++i) {
-		if ((*fitnessTotals)[i] != 0.0) weights[i] = total / (*fitnessTotals)[i];
-		else weights[i] = 0.0;  // what value should we ascribe to a test instance when nobody gets it right?
+		weights[i] = ((float)POP_SIZE - (*fitnessTotals)[i]) / (float)POP_SIZE;
+		//if ((*fitnessTotals)[i] != 0.0) weights[i] = total / (*fitnessTotals)[i];
+		//else weights[i] = 0.0;  // what value should we ascribe to a test instance when nobody gets it right?
 	}
 	return weights;
 }
@@ -417,7 +425,7 @@ vector<float> calculateIndividualPhenotypeRelavance(vector< vector<float> >* det
 	for (int i = 0; i < (*detailedFitness).size(); ++i) {
 		float individualValue = 0.0;
 		for (int j = 0; j < (*weights).size(); ++j) {
-			individualValue += (*detailedFitness)[i][j] * (*weights)[j]; // Sum the product of the individual's performance and the veight of each test instance.
+			individualValue += (*detailedFitness)[i][j] * (*weights)[j]; // Sum the product of the individual's performance and the weight of each test instance.
 		}
 		relavanceVec[i] = individualValue;
 	}
@@ -429,8 +437,6 @@ void getRelavanceByIsland(vector<float>* detail, vector <vector<float> >* island
 		for (int j = 0; j < POP_SIZE; ++j) {
 			(*islandRelavance)[i][j] = (*detail)[(POP_SIZE * i) + j];
 		}
-		//(*individualRankings)[i] = calculateRankings((*islandRelavance)[i], true);
-		//scaleToLimit(&(*islandRelavance)[i], 1.0);
 	}
 }
 
@@ -444,12 +450,20 @@ vector<float> getPhenotypeRelavance(vector<TestInstance2>* testInstances, int st
 	vector<float> weights =  calculatePhenotypeFitnessWeights(&fitnessTotals);
 	int numZeros = 0;
 	for (int i = 0; i < weights.size(); ++i) {
-		if (weights[i] == 0.0) numZeros++;  // checks to see how many test instances have 0 weight.
+		if (weights[i] == 1.0) numZeros++;  // checks to see how many test instances have 0 weight.
+		if ((weights[i] < 0) || (weights[i] > 1.0)) {cout << endl << "error in phenotype weights: invalid value: " << weights[i] << endl; exit(-1);}
 	}
 	vector<float> individualRelavance = calculateIndividualPhenotypeRelavance(&detailedFitness, &weights);
 	vector<float> pDiversity = getDiversityValues(&individualRelavance, numZeros);
 	if (isOverallDiversity && (WHICH_SELECT == 3)) {
-		scaleToLimit(&individualRelavance, 1.0);
+		// individualRelavance has values that have been accumulated over the number of test instances.
+		// Therefore we use the number of test instances as the scale.
+		scaleProportionally(&individualRelavance, (*testInstances).size());
+		float max = 0.0;
+		for (int i = 0; i < individualRelavance.size(); ++i) {
+			if (individualRelavance[i] > max) max = individualRelavance[i];
+		}
+		cout << "m: " << max << endl;
 		if (relavanceWeight < 1.0) combineRelavanceWithFitness(relavanceWeight, &individualRelavance);
 		getRelavanceByIsland(&individualRelavance, islandRelavance);
 	}
@@ -460,7 +474,14 @@ vector<float> getHammingRelavance(vector <vector<float> >* islandRelavance, bool
 	vector<float> relavance = getHammingRelavanceDetail();
 	vector<float> diversityValues = getDiversityValues(&relavance, 0);
 	if (isOverallDiversity && (WHICH_SELECT == 4)) {
-		scaleToLimit(&relavance, 1.0);
+		// relavance has values that have been accumulated over RULE_LEN.
+		// Therefore we scale by the rule length.
+		scaleProportionally(&relavance, RULE_LEN);
+		float max = 0.0;
+		for (int i = 0; i < relavance.size(); ++i) {
+			if (relavance[i] > max) max = relavance[i];
+		}
+		cout << "m: " << max << endl;
 		if (relavanceWeight < 1.0) combineRelavanceWithFitness(relavanceWeight, &relavance);
 		getRelavanceByIsland(&relavance, islandRelavance);
 	}
@@ -653,7 +674,7 @@ int main(int argc, char * argv[])
 	case 4: cout << "Using hamming-estimated relavance selection.\nThe selection bias toward relavance is " << currentWeight << "." << endl; break;
 	}
       vector <vector<float> > islandRelavance (NUM_ISLANDS, vector<float> (POP_SIZE));
-      vector<float> HamDiv = getPairwiseHammingDiversityForAllNodes();
+      vector<float> HamDiv (4, 0.0);//getPairwiseHammingDiversityForAllNodes();
       vector<float> FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
       vector<float> PhenDiv = getPhenotypeRelavance(&tsVector, 0, NUM_ISLANDS, true, &islandRelavance, currentWeight);
       vector<float> HamRel = getHammingRelavance(&islandRelavance, true, currentWeight);
