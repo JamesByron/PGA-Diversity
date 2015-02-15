@@ -459,9 +459,9 @@ vector<float> getPhenotypeRelavance(vector<TestInstance2>* testInstances, int st
 		// individualRelavance has values that have been accumulated over the number of test instances.
 		// Therefore we use the number of test instances as the scale.
 		scaleProportionally(&individualRelavance, (*testInstances).size());
-		float max = 0.0;
+		/*float max = 0.0;
 		for (int i = 0; i < individualRelavance.size(); ++i) { if (individualRelavance[i] > max) max = individualRelavance[i]; }
-		cout << "m: " << max << endl;
+		cout << "m: " << max << endl;*/
 		if (relavanceWeight < 1.0) combineRelavanceWithFitness(relavanceWeight, &individualRelavance);
 		getRelavanceByIsland(&individualRelavance, islandRelavance);
 	}
@@ -475,9 +475,9 @@ vector<float> getHammingRelavance(vector <vector<float> >* islandRelavance, bool
 		// relavance has values that have been accumulated over RULE_LEN.
 		// Therefore we scale by the rule length.
 		scaleProportionally(&relavance, RULE_LEN);
-		float max = 0.0;
+		/*float max = 0.0;
 		for (int i = 0; i < relavance.size(); ++i) { if (relavance[i] > max) max = relavance[i]; }
-		cout << "m: " << max << endl;
+		cout << "m: " << max << endl;*/
 		if (relavanceWeight < 1.0) combineRelavanceWithFitness(relavanceWeight, &relavance);
 		getRelavanceByIsland(&relavance, islandRelavance);
 	}
