@@ -23,7 +23,7 @@ class SingleNode
   Individual2 * customs;
   Individual2* getIndividual(int index);
   void addIslandBitTotal(float * totals);
-  void updateNodeRelavance(vector<float>* islandRelavance);
+  void updateNodeRelevance(vector<float>* islandRelevance);
   void updateNodeIntRules();
  private:
   bool selectIndividual(int ind);

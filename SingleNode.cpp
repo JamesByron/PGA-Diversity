@@ -88,8 +88,8 @@ void SingleNode::updateNodeIntRules() {
 	a_pop->updatePopulationIntRules();
 }
 
-void SingleNode::updateNodeRelavance(vector<float>* islandRelavance) {
-	a_pop->updatePopulationRelavance(islandRelavance);
+void SingleNode::updateNodeRelevance(vector<float>* islandRelevance) {
+	a_pop->updatePopulationRelevance(islandRelevance);
 }
 
 Individual2* SingleNode::getIndividual(int index) {
@@ -199,7 +199,7 @@ void computeHammingBitTotals(float * bitTotals) {
 	}
 }
 
-vector<float> getHammingRelavanceDetail() {
+vector<float> getHammingRelevanceDetail() {
 	float bitTotals[NUM_FEATURES*RULE_CASES*8] = {0.0};
 	computeHammingBitTotals(bitTotals);
 	int currentIndividual;
@@ -218,13 +218,13 @@ vector<float> getHammingRelavanceDetail() {
 	return diversityStore;
 }
 
-void combineRelavanceWithFitness(float weight, vector<float>* relavance) {
+void combineRelevanceWithFitness(float weight, vector<float>* relevance) {
 	float inverseW = 1-weight;
-	if ((weight > 1.0) || (weight < 0.0)) {cout << "combineRelavanceWithFitness: Weight must be between 0.0 and 1.0" << endl; exit(-1);}
-	//if ((*relavance).size() != (NUM_ISLANDS*POP_SIZE)) {cout << "combineRelavanceWithFitness: relavance vector is of an unexpected size." << endl; exit(-1);}
+	if ((weight > 1.0) || (weight < 0.0)) {cout << "combineRelevanceWithFitness: Weight must be between 0.0 and 1.0" << endl; exit(-1);}
+	//if ((*relevance).size() != (NUM_ISLANDS*POP_SIZE)) {cout << "combineRelevanceWithFitness: relevance vector is of an unexpected size." << endl; exit(-1);}
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		for (int j = 0; j < POP_SIZE; ++j) {
-			(*relavance)[(i*POP_SIZE)+j] = ((*relavance)[(i*POP_SIZE)+j]*weight) + ((*islands[i].getIndividual(j)).getFitness()*inverseW);
+			(*relevance)[(i*POP_SIZE)+j] = ((*relevance)[(i*POP_SIZE)+j]*weight) + ((*islands[i].getIndividual(j)).getFitness()*inverseW);
 		}
 	}
 }
@@ -413,14 +413,14 @@ vector<float> calculatePhenotypeFitnessWeights(vector<float>* fitnessTotals) {
 }
 
 /**
- * Returns a vector that represents the relavance of each individual.
+ * Returns a vector that represents the relevance of each individual.
  * Each individual's fitness on each test instance is multiplied by the weight associated with that test instance.
  * Returned vector is the same size as the input detaiedFitness vector or (islands * population-size).
  */
-vector<float> calculateIndividualPhenotypeRelavance(vector< vector<float> >* detailedFitness, vector<float>* weights) {
-	vector<float> relavanceVec ((*detailedFitness).size());
+vector<float> calculateIndividualPhenotypeRelevance(vector< vector<float> >* detailedFitness, vector<float>* weights) {
+	vector<float> relevanceVec ((*detailedFitness).size());
 	if ((*detailedFitness)[0].size() != (*weights).size()) { // check the inputs
-		cout << "Error at calculateIndividualRelavance: indiviual fitness vectors and fitness weights vector do not match" << endl;
+		cout << "Error at calculateIndividualRelevance: indiviual fitness vectors and fitness weights vector do not match" << endl;
 		exit(-1);
 	}
 	for (int i = 0; i < (*detailedFitness).size(); ++i) {
@@ -428,15 +428,15 @@ vector<float> calculateIndividualPhenotypeRelavance(vector< vector<float> >* det
 		for (int j = 0; j < (*weights).size(); ++j) {
 			individualValue += (*detailedFitness)[i][j] * (*weights)[j]; // Sum the product of the individual's performance and the weight of each test instance.
 		}
-		relavanceVec[i] = individualValue;
+		relevanceVec[i] = individualValue;
 	}
-	return relavanceVec;
+	return relevanceVec;
 }
 
-void getRelavanceByIsland(vector<float>* detail, vector <vector<float> >* islandRelavance) {
+void getRelevanceByIsland(vector<float>* detail, vector <vector<float> >* islandRelevance) {
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		for (int j = 0; j < POP_SIZE; ++j) {
-			(*islandRelavance)[i][j] = (*detail)[(POP_SIZE * i) + j];
+			(*islandRelevance)[i][j] = (*detail)[(POP_SIZE * i) + j];
 		}
 	}
 }
@@ -444,7 +444,7 @@ void getRelavanceByIsland(vector<float>* detail, vector <vector<float> >* island
 /**
  * This wrapper function constructs the phenotype diversity of the population.
  */
-vector<float> getPhenotypeRelavance(vector<TestInstance2>* testInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelavance, float relavanceWeight) {
+vector<float> getPhenotypeRelevance(vector<TestInstance2>* testInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelevance, float relevanceWeight) {
 	vector< vector<float> > detailedFitness = calculatePhenotypeFitnessDetail(testInstances, WHICH_CLASSIFY, startIsland, endIsland);  // this stores data in the array and returns detailed results also
 	vector<float> fitnessTotals = calculatePhenotypeFitnessTotals(&detailedFitness, (*testInstances).size());
 	vector<float> weights =  calculatePhenotypeFitnessWeights(&fitnessTotals);
@@ -453,33 +453,33 @@ vector<float> getPhenotypeRelavance(vector<TestInstance2>* testInstances, int st
 		if (weights[i] == 1.0) numZeros++;  // checks to see how many test instances have 0 weight.
 		if ((weights[i] < 0) || (weights[i] > 1.0)) {cout << endl << "error in phenotype weights: invalid value: " << weights[i] << endl; exit(-1);}
 	}
-	vector<float> individualRelavance = calculateIndividualPhenotypeRelavance(&detailedFitness, &weights);
-	vector<float> pDiversity = getDiversityValues(&individualRelavance, numZeros);
+	vector<float> individualRelevance = calculateIndividualPhenotypeRelevance(&detailedFitness, &weights);
+	vector<float> pDiversity = getDiversityValues(&individualRelevance, numZeros);
 	if (isOverallDiversity && (WHICH_SELECT == 3)) {
-		// individualRelavance has values that have been accumulated over the number of test instances.
+		// individualRelevance has values that have been accumulated over the number of test instances.
 		// Therefore we use the number of test instances as the scale.
-		scaleProportionally(&individualRelavance, (*testInstances).size());
+		scaleProportionally(&individualRelevance, (*testInstances).size());
 		/*float max = 0.0;
-		for (int i = 0; i < individualRelavance.size(); ++i) { if (individualRelavance[i] > max) max = individualRelavance[i]; }
+		for (int i = 0; i < individualRelevance.size(); ++i) { if (individualRelevance[i] > max) max = individualRelevance[i]; }
 		cout << "m: " << max << endl;*/
-		if (relavanceWeight < 1.0) combineRelavanceWithFitness(relavanceWeight, &individualRelavance);
-		getRelavanceByIsland(&individualRelavance, islandRelavance);
+		if (relevanceWeight < 1.0) combineRelevanceWithFitness(relevanceWeight, &individualRelevance);
+		getRelevanceByIsland(&individualRelevance, islandRelevance);
 	}
 	return pDiversity;
 }
 
-vector<float> getHammingRelavance(vector <vector<float> >* islandRelavance, bool isOverallDiversity, float relavanceWeight) {
-	vector<float> relavance = getHammingRelavanceDetail();
-	vector<float> diversityValues = getDiversityValues(&relavance, 0);
+vector<float> getHammingRelevance(vector <vector<float> >* islandRelevance, bool isOverallDiversity, float relevanceWeight) {
+	vector<float> relevance = getHammingRelevanceDetail();
+	vector<float> diversityValues = getDiversityValues(&relevance, 0);
 	if (isOverallDiversity && (WHICH_SELECT == 4)) {
-		// relavance has values that have been accumulated over RULE_LEN.
+		// relevance has values that have been accumulated over RULE_LEN.
 		// Therefore we scale by the rule length.
-		scaleProportionally(&relavance, RULE_LEN);
+		scaleProportionally(&relevance, RULE_LEN);
 		/*float max = 0.0;
-		for (int i = 0; i < relavance.size(); ++i) { if (relavance[i] > max) max = relavance[i]; }
+		for (int i = 0; i < relevance.size(); ++i) { if (relevance[i] > max) max = relevance[i]; }
 		cout << "m: " << max << endl;*/
-		if (relavanceWeight < 1.0) combineRelavanceWithFitness(relavanceWeight, &relavance);
-		getRelavanceByIsland(&relavance, islandRelavance);
+		if (relevanceWeight < 1.0) combineRelevanceWithFitness(relevanceWeight, &relevance);
+		getRelevanceByIsland(&relevance, islandRelevance);
 	}
 	return diversityValues;
 }
@@ -588,8 +588,8 @@ int main(int argc, char * argv[])
   //cout << "l209" << endl;
   if (argc == 15 && NUM_ISLANDS > 18)
     { printf("Invalid combination of depth and number of islands\n"); usage(); exit(-1); }
-  float currentWeight = (WHICH_SELECT < 3) ? RELAVANCE_END : RELAVANCE_START;
-  while (currentWeight >= RELAVANCE_END ) {
+  float currentWeight = (WHICH_SELECT < 3) ? RELEVANCE_END : RELEVANCE_START;
+  while (currentWeight >= RELEVANCE_END ) {
     for (int cycle = 0; cycle < NUM_CYCLES; cycle++) {
       start = time(NULL);
       islands = new SingleNode[NUM_ISLANDS];
@@ -640,7 +640,7 @@ int main(int argc, char * argv[])
 	   << POP_SIZE << "p" \
 	   << NUM_TEST_CASES_TO_USE << "ti" \
 	   << MAX_GENERATIONS << "g";
-      out2 << "selection-" << WHICH_SELECT << "_relavance-" << \
+      out2 << "selection-" << WHICH_SELECT << "_relevance-" << \
 	currentWeight << "_cycle-" << \
 	cycle << ".prn";
       s = out2.str();
@@ -666,20 +666,20 @@ int main(int argc, char * argv[])
 	{	case 0: cout << "Using random selection with no bias toward fitness or diversity." << endl; break;
 	case 1: cout << "Using tournament fitness selection." << endl; break;
 	case 2: cout << "Using alt fitness selection." << endl; break;
-	case 3: cout << "Using phenotype relavance selection.\nThe selection bias toward relavance is " << currentWeight << "." << endl; break;
-	case 4: cout << "Using hamming-estimated relavance selection.\nThe selection bias toward relavance is " << currentWeight << "." << endl; break;
+	case 3: cout << "Using phenotype relevance selection.\nThe selection bias toward relevance is " << currentWeight << "." << endl; break;
+	case 4: cout << "Using hamming-estimated relevance selection.\nThe selection bias toward relevance is " << currentWeight << "." << endl; break;
 	}
-      vector <vector<float> > islandRelavance (NUM_ISLANDS, vector<float> (POP_SIZE));
+      vector <vector<float> > islandRelevance (NUM_ISLANDS, vector<float> (POP_SIZE));
       vector<float> HamDiv (4, 0.0);//getPairwiseHammingDiversityForAllNodes();
       vector<float> FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
-      vector<float> PhenDiv = getPhenotypeRelavance(&tsVector, 0, NUM_ISLANDS, true, &islandRelavance, currentWeight);
-      vector<float> HamRel = getHammingRelavance(&islandRelavance, true, currentWeight);
+      vector<float> PhenDiv = getPhenotypeRelevance(&tsVector, 0, NUM_ISLANDS, true, &islandRelevance, currentWeight);
+      vector<float> HamRel = getHammingRelevance(&islandRelevance, true, currentWeight);
       for (int node = 0; node < NUM_ISLANDS; ++node) {
-	islands[node].updateNodeRelavance(&islandRelavance[node]);  // update the relavance at the first generation
+	islands[node].updateNodeRelevance(&islandRelevance[node]);  // update the relevance at the first generation
       }
       fprintf(logFile1, "\nSTARTING POINT\t\t\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%f\t%f\t%f\t%f",
 	      (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
-      cout << "Starting cycle " << cycle+1 << ". Using relavance weight of " << currentWeight << ".\nCounting generations: ";
+      cout << "Starting cycle " << cycle+1 << ". Using relevance weight of " << currentWeight << ".\nCounting generations: ";
       for(int gen=0; gen < MAX_GENERATIONS; gen++)
 	{
 	  cout << gen << " ";
@@ -696,7 +696,7 @@ int main(int argc, char * argv[])
 	      /*
 		HamDiv = i.a_pop->getInternalHammingDiversity();
 		FitDiv = getFitnessDiversity(island, (island+1));
-		PhenDiv = getPhenotypeRelavance(tsVector, island, (island+1), false, &islandRelavance, currentWeight);
+		PhenDiv = getPhenotypeRelevance(tsVector, island, (island+1), false, &islandRelevance, currentWeight);
 		fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
 		i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
 	      */
@@ -706,12 +706,12 @@ int main(int argc, char * argv[])
 	  }
 	  //HamDiv = getPairwiseHammingDiversityForAllNodes();
 	  FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
-	  PhenDiv = getPhenotypeRelavance(&tsVector, 0, NUM_ISLANDS, true, &islandRelavance, currentWeight);  // we use the training set untel it's time to use the full test set
-	  HamRel = getHammingRelavance(&islandRelavance, true, currentWeight);
+	  PhenDiv = getPhenotypeRelevance(&tsVector, 0, NUM_ISLANDS, true, &islandRelevance, currentWeight);  // we use the training set untel it's time to use the full test set
+	  HamRel = getHammingRelevance(&islandRelevance, true, currentWeight);
 	  fprintf(logFile1, "\n%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\t%f\t%f\t%f\t%f",
 		  mostFit, mostFitIsland, islands[0].a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
 	  for (int node = 0; node < NUM_ISLANDS; ++node) {
-	    islands[node].updateNodeRelavance(&islandRelavance[node]);
+	    islands[node].updateNodeRelevance(&islandRelevance[node]);
 	  }
 	  if (((gen+1) % WHEN_FULL_TEST) == 0) {// need the +1 because population's gen-count has been updated during doOneGen
 	    mostFit = 0;
@@ -728,7 +728,7 @@ int main(int argc, char * argv[])
 			islands[island].a_pop->getPopulationMaxFitness(), islands[island].a_pop->getPopulationAvgFitness(), islands[island].a_pop->getGeneration(), island, islands[island].a_pop->getStdev());
 		//i.a_pop->getBestIndividual().dumpConfMat(logFile2);
 	      }
-	    PhenDiv = getPhenotypeRelavance(&all_tests, 0, NUM_ISLANDS, false, &islandRelavance, currentWeight);
+	    PhenDiv = getPhenotypeRelevance(&all_tests, 0, NUM_ISLANDS, false, &islandRelevance, currentWeight);
 	    fprintf(logFile1, "\t\t%f\t%i\t%i\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i",
 		    mostFit, mostFitIsland, islands[0].a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
 	    for (int x = 0; x < NUM_ISLANDS; ++x) {
@@ -746,7 +746,7 @@ int main(int argc, char * argv[])
       fclose(logFile1);
       fclose(logFile2);
     }
-    currentWeight -= RELAVANCE_INCREMENT;
+    currentWeight -= RELEVANCE_INCREMENT;
   }
   return 0;
 }

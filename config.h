@@ -7,9 +7,9 @@
 #define MAX_NUM_CROSS_BREED 20
 #define PROB_REMAIN 0.2
 #define TAG 17
-#define WHICH_SELECT 3 // tournament [1] default, fitness proportional [2], diversity guided tournament select [3]
+#define WHICH_SELECT 4 // tournament [1] default, fitness proportional [2], diversity guided tournament select [3]
 #define TOURNAMENT_SIZE 5
-#define RELAVANCE_START 1.0
-#define RELAVANCE_END 0.25
-#define RELAVANCE_INCREMENT 0.25
+#define RELEVANCE_START 1.0
+#define RELEVANCE_END 0.25
+#define RELEVANCE_INCREMENT 0.25
 #define NUM_CYCLES 10

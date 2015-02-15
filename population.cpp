@@ -245,9 +245,9 @@ void Population::populationAccuracy(char WHICH_CLASSIFY)
 	stdev = sqrt(stdev);
 }
 
-void Population::updatePopulationRelavance(vector<float>* relavance) {
+void Population::updatePopulationRelevance(vector<float>* relevance) {
 	for (int i = 0; i < POP_SIZE; ++i) {
-		mypop[i].updateDiversityRelavance((*relavance)[i]);
+		mypop[i].updateDiversityRelevance((*relevance)[i]);
 	}
 }
 
@@ -417,21 +417,21 @@ int Population::selectIndividual(int availablepop)
 	case 0: return rand() % availablepop; break;// completely random selection with no bias either toward fitness or diversity
 	case 1: return tournamentSelect(availablepop); break;
 	case 2: return altSelectIndividual(); break;
-	case 3: return relavanceTournamentSelect(availablepop); break;
-	case 4: return relavanceTournamentSelect(availablepop); break;
+	case 3: return relevanceTournamentSelect(availablepop); break;
+	case 4: return relevanceTournamentSelect(availablepop); break;
 	}
 }
 
-int Population::relavanceTournamentSelect(int availablepop) {
+int Population::relevanceTournamentSelect(int availablepop) {
 	int bestIndex, candidate;
 	bestIndex = rand() % availablepop;
-	float bestFit = mypop[bestIndex].getDiversityRelavance();
+	float bestFit = mypop[bestIndex].getDiversityRelevance();
 	//cout << " BI: " << bestIndex << " V: " << bestFit << endl;
 	for (int i=1; i < TOURNAMENT_SIZE; i++) {
 		candidate = rand() % availablepop;
-		if (mypop[candidate].getDiversityRelavance() > bestFit) {
+		if (mypop[candidate].getDiversityRelevance() > bestFit) {
 			bestIndex = candidate;
-			bestFit = mypop[candidate].getDiversityRelavance();
+			bestFit = mypop[candidate].getDiversityRelevance();
 			//cout << " BI: " << bestIndex << " V: " << bestFit << endl;
 		}
 	}

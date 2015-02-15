@@ -130,8 +130,8 @@ int Individual2::classify(TestInstance2 * ti)
   return (correctclass == i-1); 
 }
 
-void Individual2::updateDiversityRelavance(float relavance) {
-	myDiversityRelavance = relavance;
+void Individual2::updateDiversityRelevance(float relevance) {
+	myDiversityRelevance = relevance;
 }
 
 void Individual2::updateFitness(TestSet* ts, char WHICH_FITNESS)
