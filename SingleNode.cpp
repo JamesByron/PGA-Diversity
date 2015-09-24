@@ -610,11 +610,10 @@ int main(int argc, char * argv[])
         s = out1.str();
         remove(outFile.c_str());
         logFile = fopen(outFile.c_str(), "w");
-
+  start = time(NULL);
   float currentWeight = (WHICH_SELECT < 3) ? RELEVANCE_END : RELEVANCE_START;
   while (currentWeight >= RELEVANCE_END ) {
     for (int cycle = 0; cycle < NUM_CYCLES; cycle++) {
-      start = time(NULL);
       islands = new SingleNode[NUM_ISLANDS];
       //initialize all islands
       //printf("Initializing the islands (and populations, etc.)\n");
