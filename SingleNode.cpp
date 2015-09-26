@@ -650,14 +650,9 @@ int main(int argc, char * argv[])
     fprintf(logFile, "STARTING POINT\nStarting relevance %f on cycle %i\n", currentWeight, cycle);
       //run the generations
       //printf("Starting run with %d neighbors, %d migrants per island, %c migration strategy\n", NUM_NEIGHBORS, NUM_MIGRANTS_PER_ISLAND, WHICH_MIGRATION);
-      //SingleNode i;
       float mostFit = 0.0;
       int mostFitIsland=-1;
 
-      // Alternate log file arrangement:
-      //fprintf(logFile1, "Log file for Overall Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tEVALUATED OVER ALL TESTS\nMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\tMax Hamming-Estimated Diversity\tMin Hamming-Estimated Diversity\tAverage Hamming-Estimated Diversity\tHamming-Estimated Diversity Variance\t\tMost Fit\ton island\tat generation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight");
-      //fprintf(logFile2, "Log file for Island Diversity\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tFull Testset\nMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\t\tMost Fit\tAverage Fitness\tof generation\ton island\tStandard Deviation\tMax Hamming Diversity\tMin Hamming Diversity\tAverage Hamming Diversity\tHamming Diversity Variance\tMax Fitness Diversity\tMin Fitness Diversity\tAverage Fitness Diversity\tFitness Diversity Variance\tMax Phenotype Diversity\tMin Phenotype Diversity\tAverage Phenotype Diversity\tPhenotype Diversity Variance\tTI with no weight\n");
-      // allocating memory
     switch (WHICH_SELECT) {
       case 0: cout << "Using random selection with no bias toward fitness or diversity." << endl; break;
 	  case 1: cout << "Using tournament fitness selection." << endl; break;
@@ -673,7 +668,7 @@ int main(int argc, char * argv[])
       for (int node = 0; node < NUM_ISLANDS; ++node) {
 	islands[node].updateNodeRelevance(&islandRelevance[node]);  // update the relevance at the first generation
       }
-     fprintf(logFile, "Overall Most Fit %f, on island %i, at generation %i, Max Hamming Diversity %i, Min Hamming Diversity %i, Average Hamming Diversity %f, Hamming Diversity Variance %f, Max Fitness Diversity %f, Min Fitness Diversity %f, Average Fitness Diversity %f, Fitness Diversity Variance %f, Max Phenotype Diversity %f, Min Phenotype Diversity %f, Average Phenotype Diversity %f, Phenotype Diversity Variance %f, TI with no weight %i, Max Hamming-Estimated Diversity %f, Min Hamming-Estimated Diversity %f, Average Hamming-Estimated Diversity %f, Hamming-Estimated Diversity Variance %f\n",
+     fprintf(logFile, "Overall Most Fit %f on island %i at generation %i Max Hamming Diversity %i Min Hamming Diversity %i Average Hamming Diversity %f Hamming Diversity Variance %f Max Fitness Diversity %f Min Fitness Diversity %f Average Fitness Diversity %f Fitness Diversity Variance %f Max Phenotype Diversity %f Min Phenotype Diversity %f Average Phenotype Diversity %f Phenotype Diversity Variance %f TI with no weight %i Max Hamming-Estimated Diversity %f Min Hamming-Estimated Diversity %f Average Hamming-Estimated Diversity %f Hamming-Estimated Diversity Variance %f\n",
 	      0.0, 0, 0, (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
       cout << "Starting cycle " << cycle+1 << ". Using relevance weight of " << currentWeight << ".\nCounting generations: ";
       for(int gen=0; gen < MAX_GENERATIONS; gen++)
@@ -682,7 +677,6 @@ int main(int argc, char * argv[])
 	  cout.flush();
 	  mostFit = 0.0;
 	  for(int island=0; island < NUM_ISLANDS; island++) {
-	    //i = islands[island];
 	    islands[island].doOneGeneration(gen);
 	    if ( (gen+1) % WHEN_PRINT_DATA == 0 ) {
 	      if (islands[island].a_pop->getPopulationMaxFitness() > mostFit) {
@@ -693,10 +687,8 @@ int main(int argc, char * argv[])
 		HamDiv = i.a_pop->getInternalHammingDiversity();
 		FitDiv = getFitnessDiversity(island, (island+1));
 		PhenDiv = getPhenotypeRelevance(tsVector, island, (island+1), false, &islandRelevance, currentWeight);
-		fprintf(logFile2, "%f\t%f\t%i\t%i\t%f\t%i\t%i\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%i\n",
-		i.a_pop->getPopulationMaxFitness(), i.a_pop->getPopulationAvgFitness(), i.a_pop->getGeneration(), island, i.a_pop->getStdev(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4]);
 	      */
-	      fprintf(logFile, "Island Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f\n",
+	      fprintf(logFile, "Island Most Fit %f Average Fitness %f of generation %i on island %i Standard Deviation %f\n",
 		      islands[island].a_pop->getPopulationMaxFitness(), islands[island].a_pop->getPopulationAvgFitness(), islands[island].a_pop->getGeneration(), island, islands[island].a_pop->getStdev());
 	    }
 	  }
@@ -704,7 +696,7 @@ int main(int argc, char * argv[])
 	  FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
 	  PhenDiv = getPhenotypeRelevance(&tsVector, 0, NUM_ISLANDS, true, &islandRelevance, currentWeight);  // we use the training set untel it's time to use the full test set
 	  HamRel = getHammingRelevance(&islandRelevance, true, currentWeight);
-	  fprintf(logFile, "Overall Most Fit %f, on island %i, at generation %i, Max Hamming Diversity %i, Min Hamming Diversity %i, Average Hamming Diversity %f, Hamming Diversity Variance %f, Max Fitness Diversity %f, Min Fitness Diversity %f, Average Fitness Diversity %f, Fitness Diversity Variance %f, Max Phenotype Diversity %f, Min Phenotype Diversity %f, Average Phenotype Diversity %f, Phenotype Diversity Variance %f, TI with no weight %i, Max Hamming-Estimated Diversity %f, Min Hamming-Estimated Diversity %f, Average Hamming-Estimated Diversity %f, Hamming-Estimated Diversity Variance %f\n",
+	  fprintf(logFile, "Overall Most Fit %f on island %i at generation %i Max Hamming Diversity %i Min Hamming Diversity %i Average Hamming Diversity %f Hamming Diversity Variance %f Max Fitness Diversity %f Min Fitness Diversity %f Average Fitness Diversity %f Fitness Diversity Variance %f Max Phenotype Diversity %f Min Phenotype Diversity %f Average Phenotype Diversity %f Phenotype Diversity Variance %f TI with no weight %i Max Hamming-Estimated Diversity %f Min Hamming-Estimated Diversity %f Average Hamming-Estimated Diversity %f Hamming-Estimated Diversity Variance %f\n",
 			  mostFit, mostFitIsland, islands[0].a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
 	  for (int node = 0; node < NUM_ISLANDS; ++node) {
 	    islands[node].updateNodeRelevance(&islandRelevance[node]);
@@ -719,12 +711,12 @@ int main(int argc, char * argv[])
 		    mostFit = islands[island].a_pop->getPopulationMaxFitness();
 		    mostFitIsland = island;
 		  }
-		fprintf(logFile, "FULL TEST SET Island Most Fit: %f Average Fitness: %f of generation %i on island %i Standard Deviation: %f\n",
+		fprintf(logFile, "FULL TEST SET Island Most Fit %f Average Fitness %f of generation %i on island %i Standard Deviation %f\n",
 			islands[island].a_pop->getPopulationMaxFitness(), islands[island].a_pop->getPopulationAvgFitness(), islands[island].a_pop->getGeneration(), island, islands[island].a_pop->getStdev());
-		//i.a_pop->getBestIndividual().dumpConfMat(logFile2);
+		//i.a_pop->getBestIndividual().dumpConfMat(logFile);
 	      }
 	    PhenDiv = getPhenotypeRelevance(&all_tests, 0, NUM_ISLANDS, false, &islandRelevance, currentWeight);
-	    fprintf(logFile, "FULL TEST SET Overall Most Fit %f, on island %i, at generation %i, Max Hamming Diversity %i, Min Hamming Diversity %i, Average Hamming Diversity %f, Hamming Diversity Variance %f, Max Fitness Diversity %f, Min Fitness Diversity %f, Average Fitness Diversity %f, Fitness Diversity Variance %f, Max Phenotype Diversity %f, Min Phenotype Diversity %f, Average Phenotype Diversity %f, Phenotype Diversity Variance %f, TI with no weight %i, Max Hamming-Estimated Diversity %f, Min Hamming-Estimated Diversity %f, Average Hamming-Estimated Diversity %f, Hamming-Estimated Diversity Variance %f\n",
+	    fprintf(logFile, "FULL TEST SET Overall Most Fit %f on island %i at generation %i Max Hamming Diversity %i Min Hamming Diversity %i Average Hamming Diversity %f Hamming Diversity Variance %f Max Fitness Diversity %f Min Fitness Diversity %f Average Fitness Diversity %f Fitness Diversity Variance %f Max Phenotype Diversity %f Min Phenotype Diversity %f Average Phenotype Diversity %f Phenotype Diversity Variance %f TI with no weight %i Max Hamming-Estimated Diversity %f Min Hamming-Estimated Diversity %f Average Hamming-Estimated Diversity %f Hamming-Estimated Diversity Variance %f\n",
 		    mostFit, mostFitIsland, islands[0].a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
 	    for (int x = 0; x < NUM_ISLANDS; ++x) {
 	      islands[x].a_pop->updatePopulationFitness(WHICH_CLASSIFY); //reset the fitness levels in the islands before returning to training set
