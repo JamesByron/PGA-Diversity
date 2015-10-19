@@ -286,6 +286,28 @@ void TestInstance2::findAccuracy(TestSet * ts, char WHICH_CLASSIFY)
   accuracy = sum / ts->testSetSize();
 }
 
+void TestInstance2::resetConfMat()
+  // reset the confusion matrix
+{
+  for(int i=0; i < RULE_CASES; i++)
+    for(int j=0; j < RULE_CASES; j++)
+      confMat[i][j]=0;
+}
+    
+void TestInstance2::dumpConfMat(FILE *lf)
+  /** Print out this individual's confusion matrix as most recently populated
+   */
+{
+  for(int i=0; i < RULE_CASES ; i++)
+    {
+      fprintf(lf, "ConfMat %3d: %8.2f", i, confMat[i][0]);
+      for(int j=1; j < RULE_CASES; j++)
+  fprintf(lf, ", %8.2f", confMat[i][j]);
+      fprintf(lf, "\n");
+    }
+}
+
+
 string TestInstance2::intToBinary(int i)
 // i is in the range [1,8]
 // return an 8-digit string of 0s with a 1 in the i'th position from the right
@@ -348,4 +370,22 @@ int TestInstance2::hibyte(int i)
     return i-8;
   else
     return 0;
+}
+
+void TestInstance2::countFeats(signed char * featcounts, TestInstance2 * ti)
+  /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
+{
+  float result = 0.0;
+  unsigned char * bin;
+  for (int i=0; i < RULE_CASES; i++)
+    {
+      bin = ti->getBinary();
+      featcounts[i] = 0;
+      for (int feat=0; feat < NUM_FEATURES; feat++)
+  //if( (bin[feat] & rule[i*NUM_FEATURES+feat]) != 0 )
+  if( ((bin[feat] & rule[i*NUM_FEATURES+feat]) != 0) || (!rule[i*NUM_FEATURES+feat] && !bin[feat]) )
+    {
+      featcounts[i]++;
+    }
+    }
 }

@@ -351,8 +351,8 @@ void Individual2::auxBreedNCross(Individual2 * kids, Individual2 ind, int crossT
   //printf("Leaving auxBreedNCross\n");
 }
 
-void Individual2::countFeats(signed char * featcounts, TestInstance2 * ti)
-  /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
+/*void Individual2::countFeats(signed char * featcounts, TestInstance2 * ti)
+  /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. *//*
 {
   float result = 0.0;
   unsigned char * bin;
@@ -368,6 +368,7 @@ void Individual2::countFeats(signed char * featcounts, TestInstance2 * ti)
 	  }
     }
 }
+*/
 
 unsigned char Individual2::toUChar(string s)
 {
@@ -436,6 +437,7 @@ void Individual2::resetIntRule() {
 	}
 }
 
+/*
 void Individual2::resetConfMat()
   // reset the confusion matrix
 {
@@ -446,7 +448,7 @@ void Individual2::resetConfMat()
     
 void Individual2::dumpConfMat(FILE *lf)
   /** Print out this individual's confusion matrix as most recently populated
-   */
+   *//*
 {
   for(int i=0; i < RULE_CASES ; i++)
     {
@@ -456,7 +458,7 @@ void Individual2::dumpConfMat(FILE *lf)
       fprintf(lf, "\n");
     }
 }
-
+*/
 
 void Individual2::sortNums(int * cpts, int j)
 // sort the j crossover points 

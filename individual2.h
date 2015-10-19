@@ -48,15 +48,15 @@ public:
   bool isSelected() { return selected;}
   void select() { selected = true; }
   void unselect() { selected = false;}
-  void dumpConfMat(FILE *lf);
+  //void dumpConfMat(FILE *lf);
   void sortNums(int * cpts, int j);
-  void resetConfMat();
+  //void resetConfMat();
   void updateDiversityRelevance(float relevance);
   float getDiversityRelevance() {return myDiversityRelevance; }
   void resetIntRule();
 private:
   void auxBreedNCross(Individual2 * kids, Individual2 ind, int crossThisTime);
-  void countFeats(signed char * featcounts, TestInstance2 * ti);
+  //void countFeats(signed char * featcounts, TestInstance2 * ti);
   unsigned char toUChar(string s);
   void splitbytes(unsigned char * n1, unsigned char * n2, unsigned char r1, unsigned char r2, int split);
   string byteToString(unsigned char c);
@@ -65,8 +65,8 @@ private:
   bool selected;
   float fitness;
   float accuracy;
-  float confMat[RULE_CASES][RULE_CASES];
-  unsigned char rule[RULE_CASES*NUM_FEATURES];
+  //float confMat[RULE_CASES][RULE_CASES];
+  //unsigned char rule[RULE_CASES*NUM_FEATURES];
   unsigned int intRule[RULE_CASES*NUM_FEATURES*8]; //  = {0};
   float myDiversityRelevance;
 };
