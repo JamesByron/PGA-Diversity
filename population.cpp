@@ -218,7 +218,7 @@ void Population::updatePopulationFitness(vector<TestInstance2> * allti, char WHI
 }
 
 // determine fitness as measure of accuracy over the actual holdout test set
-void Population::populationAccuracy(char WHICH_CLASSIFY)
+/*void Population::populationAccuracy(char WHICH_CLASSIFY)
 {
 	maxFitness = 0.0;
 	totalFitness = 0.0;
@@ -243,7 +243,7 @@ void Population::populationAccuracy(char WHICH_CLASSIFY)
 		stdev += diff * diff/(POP_SIZE - 1);
 	}
 	stdev = sqrt(stdev);
-}
+}*/
 
 void Population::updatePopulationRelevance(vector<float>* relevance) {
 	for (int i = 0; i < POP_SIZE; ++i) {

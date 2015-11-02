@@ -34,11 +34,11 @@ Individual2::Individual2(string str)
   selected = false;
 }
 
-/*
+
 float Individual2::fitnessHiFi(TestInstance2* ti)
 /** fine-grained fitness evaluation: looks at every feature of every classification rule (at a performance cost) accumulating
     the number of matched features for each rule.  Final fitness based on the distribution of values in some as-yet-undetermined manner.
-*//*
+*/
 {
   int correctclass, correctmatched, bettermatched, samematched, mostmatched, nummostmatched;
   float result = 0.0;
@@ -71,7 +71,7 @@ float Individual2::classiHiFi(TestInstance2 * ti)
     the number of matched features for each rule.  Classification score: 0 if any rule has more features matching than the
     correct rule; 1.0 if the correct rule has the most features matching and no other rule has the same number; 1/n where
     n is the number of max-matching rules -- one of which is the correct rule.
-*//*
+*/
 {
   int correctclass, correctmatched, samematched, mostmatched, nummostmatched;
   unsigned char * bin;
@@ -101,7 +101,7 @@ float Individual2::classiHiFi(TestInstance2 * ti)
 
 int Individual2::classify(TestInstance2 * ti)
   /** Classify a single test instance as the first rule-case that completely matches all the features.
-   *//*
+   */
 {
   //printf("Entering classify\n");
   int correctclass = ti->getDepth()+1;
@@ -120,7 +120,7 @@ int Individual2::classify(TestInstance2 * ti)
 	      break;
 	    }
 	}
-      if (match){ /* printf("Leaving classify\n");*//* confMat[correctclass][i]++; return (correctclass == i-1);} //classification
+      if (match){ /* printf("Leaving classify\n");*/ confMat[correctclass][i]++; return (correctclass == i-1);} //classification
       
     }
   // Catch-all case
@@ -129,14 +129,14 @@ int Individual2::classify(TestInstance2 * ti)
   //printf("Leaving classify\n");
   return (correctclass == i-1); 
 }
-*/
+
 void Individual2::updateDiversityRelevance(float relevance) {
 	myDiversityRelevance = relevance;
 }
-/*
+
 void Individual2::updateFitness(TestSet* ts, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
-   *//*
+   */
 {
   //printf("Entering updatFitness\n");
   float sum = 0.0;
@@ -167,7 +167,7 @@ void Individual2::updateFitness(TestSet* ts, char WHICH_FITNESS)
   //printf("Leaving updateFitness\n");
 }
 
-void Individual2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASSIFY)
+/*void Individual2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASSIFY)
   /** compute the "fitness" of what is presumably the full testset.  Use the appropriate measure for computing accurracy.
    *//*
 {
@@ -183,9 +183,9 @@ void Individual2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASSIF
   }
 
   fitness = sum / allti->size();
-}
+}*/
 
-void Individual2::findAccuracy(TestSet * ts, char WHICH_CLASSIFY)
+/*void Individual2::findAccuracy(TestSet * ts, char WHICH_CLASSIFY)
   /** compute the "fitness" as measure of accuracy on the actual testset.  Use the appropriate measure for computing accurracy.
    *//*
 {
@@ -201,8 +201,7 @@ void Individual2::findAccuracy(TestSet * ts, char WHICH_CLASSIFY)
   }
 
   accuracy = sum / ts->testSetSize();
-}
-*/
+}*/
 
 void Individual2::breedNCross(Individual2 * kids, Individual2 ind)
 {
@@ -259,7 +258,7 @@ string Individual2::getStringRule()
     s += byteToString(rule[i]);
   }
   // check that it's right
-  /*resetIntRule();
+  resetIntRule();
   for (int x = 0; x < s.size(); ++x) {
 	  if ((s[x] == '1') && (1 != intRule[x])) {
 		  cout << "there is a problem at " << x << " where s " << s[x] << " and rule " << intRule[x] << endl; cout.flush(); exit(-1);
@@ -268,7 +267,7 @@ string Individual2::getStringRule()
 		  cout << "there is a problem at " << x << " where s " << s[x] << " and rule " << intRule[x] << endl; cout.flush(); exit(-1);
 	  }
   }
-  cout << "good!" << endl;*/
+  cout << "good!" << endl;
   return s;
 }
 
@@ -351,8 +350,8 @@ void Individual2::auxBreedNCross(Individual2 * kids, Individual2 ind, int crossT
   //printf("Leaving auxBreedNCross\n");
 }
 
-/*void Individual2::countFeats(signed char * featcounts, TestInstance2 * ti)
-  /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. *//*
+void Individual2::countFeats(signed char * featcounts, TestInstance2 * ti)
+  /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
 {
   float result = 0.0;
   unsigned char * bin;
@@ -368,7 +367,6 @@ void Individual2::auxBreedNCross(Individual2 * kids, Individual2 ind, int crossT
 	  }
     }
 }
-*/
 
 unsigned char Individual2::toUChar(string s)
 {
@@ -437,7 +435,6 @@ void Individual2::resetIntRule() {
 	}
 }
 
-/*
 void Individual2::resetConfMat()
   // reset the confusion matrix
 {
@@ -448,7 +445,7 @@ void Individual2::resetConfMat()
     
 void Individual2::dumpConfMat(FILE *lf)
   /** Print out this individual's confusion matrix as most recently populated
-   *//*
+   */
 {
   for(int i=0; i < RULE_CASES ; i++)
     {
@@ -458,7 +455,7 @@ void Individual2::dumpConfMat(FILE *lf)
       fprintf(lf, "\n");
     }
 }
-*/
+
 
 void Individual2::sortNums(int * cpts, int j)
 // sort the j crossover points 

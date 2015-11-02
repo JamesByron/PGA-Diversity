@@ -121,11 +121,11 @@ string TestInstance2::getStringRep()
 }
 
 
-
+/*
 float TestInstance2::fitnessHiFi(TestInstance2* ti)
 /** fine-grained fitness evaluation: looks at every feature of every classification rule (at a performance cost) accumulating
     the number of matched features for each rule.  Final fitness based on the distribution of values in some as-yet-undetermined manner.
-*/
+*//*
 {
   int correctclass, correctmatched, bettermatched, samematched, mostmatched, nummostmatched;
   float result = 0.0;
@@ -158,7 +158,7 @@ float TestInstance2::classiHiFi(TestInstance2* ti)
     the number of matched features for each rule.  Classification score: 0 if any rule has more features matching than the
     correct rule; 1.0 if the correct rule has the most features matching and no other rule has the same number; 1/n where
     n is the number of max-matching rules -- one of which is the correct rule.
-*/
+*//*
 {
   int correctclass, correctmatched, samematched, mostmatched, nummostmatched;
   unsigned char * bin;
@@ -186,9 +186,9 @@ float TestInstance2::classiHiFi(TestInstance2* ti)
 }
 
 
-int TestInstance2::classify(TestInstance2* ti)
+int TestInstance2::classify(TestInstance2* ti, unsigned char* rule)
   /** Classify a single test instance as the first rule-case that completely matches all the features.
-   */
+   *//*
 {
   //printf("Entering classify\n");
   int correctclass = ti->getDepth()+1;
@@ -207,7 +207,8 @@ int TestInstance2::classify(TestInstance2* ti)
         break;
       }
   }
-      if (match){ /* printf("Leaving classify\n");*/ confMat[correctclass][i]++; return (correctclass == i-1);} //classification
+      if (match){ /* printf("Leaving classify\n");*/
+/*confMat[correctclass][i]++; return (correctclass == i-1);} //classification
       
     }
   // Catch-all case
@@ -217,9 +218,10 @@ int TestInstance2::classify(TestInstance2* ti)
   return (correctclass == i-1); 
 }
 
+/*
 void TestInstance2::updateFitness(TestSet* ts, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
-   */
+   *//*
 {
   //printf("Entering updatFitness\n");
   float sum = 0.0;
@@ -249,10 +251,11 @@ void TestInstance2::updateFitness(TestSet* ts, char WHICH_FITNESS)
   //fitness = sum / ts.NUM_TEST_CASES_TO_USE;
   //printf("Leaving updateFitness\n");
 }
+*//*
 
 void TestInstance2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASSIFY)
   /** compute the "fitness" of what is presumably the full testset.  Use the appropriate measure for computing accurracy.
-   */
+   *//*
 {
   float sum = 0.0;
   resetConfMat();
@@ -261,7 +264,7 @@ void TestInstance2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASS
     switch (WHICH_CLASSIFY)
       {
       case 'h': sum += classiHiFi(&(*allti)[i]); break;
-      case 'l': if(classify(&(*allti)[i])) sum++; break;
+      case 'l': if(classify(&(*allti)[i]), ) sum++; break;
       }
   }
 
@@ -270,7 +273,7 @@ void TestInstance2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASS
 
 void TestInstance2::findAccuracy(TestSet * ts, char WHICH_CLASSIFY)
   /** compute the "fitness" as measure of accuracy on the actual testset.  Use the appropriate measure for computing accurracy.
-   */
+   *//*
 {
   float sum = 0.0;
   resetConfMat();
@@ -296,7 +299,7 @@ void TestInstance2::resetConfMat()
     
 void TestInstance2::dumpConfMat(FILE *lf)
   /** Print out this individual's confusion matrix as most recently populated
-   */
+   *//*
 {
   for(int i=0; i < RULE_CASES ; i++)
     {
@@ -305,7 +308,7 @@ void TestInstance2::dumpConfMat(FILE *lf)
   fprintf(lf, ", %8.2f", confMat[i][j]);
       fprintf(lf, "\n");
     }
-}
+}*/
 
 
 string TestInstance2::intToBinary(int i)
@@ -371,10 +374,10 @@ int TestInstance2::hibyte(int i)
   else
     return 0;
 }
-
+/*
 void TestInstance2::countFeats(signed char * featcounts, TestInstance2 * ti)
   /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
-{
+/*{
   float result = 0.0;
   unsigned char * bin;
   for (int i=0; i < RULE_CASES; i++)
@@ -388,4 +391,4 @@ void TestInstance2::countFeats(signed char * featcounts, TestInstance2 * ti)
       featcounts[i]++;
     }
     }
-}
+}*/

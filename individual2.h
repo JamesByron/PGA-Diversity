@@ -20,19 +20,19 @@ public:
   Individual2(string str);
   Individual2(int i);
   // classify a single test case
-  //float fitnessHiFi(TestInstance2* ti);
-  //float classiHiFi(TestInstance2* ti);
-  //int classify(TestInstance2* ti);
+  float fitnessHiFi(TestInstance2* ti);
+  float classiHiFi(TestInstance2* ti);
+  int classify(TestInstance2* ti);
   // updateFitnees with respect to all test cases
-  //void updateFitness(TestSet* ts, char WHICH_FITNESS);
+  void updateFitness(TestSet* ts, char WHICH_FITNESS);
   //  void updateFitness(TestInstance2 * v);
-  //void updateFitness(vector<TestInstance2>* v, char WHICH_CLASSIFY);
+  void updateFitness(vector<TestInstance2>* v, char WHICH_CLASSIFY);
   //  void updateFitness(TestInstance2 * v, int rank, int numnodes);
   //void updateFitness(TestInstance2 testsplit[], int ntests, char WHICH_CLASSIFY);
   float getFitness() { return fitness; }
   // Testing
   //void findAccuracy(TestSet * ts, char WHICH_CLASSIFY);
-  float getAccuracy() { return accuracy; }
+  //float getAccuracy() { return accuracy; }
   void breedNCross(Individual2 * kids, Individual2 ind);
   // single-point crossover reproduction
   void breed1Cross(Individual2 * kids, Individual2 ind);
@@ -48,15 +48,15 @@ public:
   bool isSelected() { return selected;}
   void select() { selected = true; }
   void unselect() { selected = false;}
-  //void dumpConfMat(FILE *lf);
+  void dumpConfMat(FILE *lf);
   void sortNums(int * cpts, int j);
-  //void resetConfMat();
+  void resetConfMat();
   void updateDiversityRelevance(float relevance);
   float getDiversityRelevance() {return myDiversityRelevance; }
   void resetIntRule();
 private:
   void auxBreedNCross(Individual2 * kids, Individual2 ind, int crossThisTime);
-  //void countFeats(signed char * featcounts, TestInstance2 * ti);
+  void countFeats(signed char * featcounts, TestInstance2 * ti);
   unsigned char toUChar(string s);
   void splitbytes(unsigned char * n1, unsigned char * n2, unsigned char r1, unsigned char r2, int split);
   string byteToString(unsigned char c);
@@ -64,9 +64,9 @@ private:
   //void sortNums(int * cpts, int j);
   bool selected;
   float fitness;
-  float accuracy;
-  //float confMat[RULE_CASES][RULE_CASES];
-  //unsigned char rule[RULE_CASES*NUM_FEATURES];
+  //float accuracy;
+  float confMat[RULE_CASES][RULE_CASES];
+  unsigned char rule[RULE_CASES*NUM_FEATURES];
   unsigned int intRule[RULE_CASES*NUM_FEATURES*8]; //  = {0};
   float myDiversityRelevance;
 };

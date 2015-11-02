@@ -21,7 +21,7 @@ public:
   // update fitness of all individuals
   void updatePopulationFitness(char WHICH_FITNESS);
   void updatePopulationFitness(vector<TestInstance2> * allti, char WHICH_CLASSIFY);
-  void populationAccuracy(char WHICH_CLASSIFY);
+  //void populationAccuracy(char WHICH_CLASSIFY);
   void updatePopulationRelevance(vector<float>* relevance);
   // select individuals for . . . .
   void selectToSurvive(int n);
