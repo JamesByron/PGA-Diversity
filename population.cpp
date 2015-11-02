@@ -245,20 +245,20 @@ void Population::updatePopulationFitness(char WHICH_FITNESS)
 	stdev = sqrt(stdev);
 }*/
 
-void Population::updateFitness(TestSet* ts, char WHICH_FITNESS)
+void Population::updateFitness(TestSet* ts, Individual2* individual, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
    */
 {
   //printf("Entering updatFitness\n");
   float sum = 0.0;
   float testsofthistype;
-  fitness = 0;
-  resetConfMat();
+  individual->setFitness(0.0);
+  individual->resetConfMat();
   for(int i=0; i < ts->NUM_TEST_CASES_TO_USE; i++)
   {
     switch (WHICH_FITNESS)
       {
-      case 'h': sum += fitnessHiFi(ts->getTI(i)); break;		// HiFi
+      case 'h': sum += ts->getTI(i)->fitnessHiFi(individual); break;		// HiFi
       case 'l': if(classify(ts->getTI(i))) sum++; break;	// LoFi
       }
     //printf("On test case number %d\n", i);

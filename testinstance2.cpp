@@ -120,8 +120,25 @@ string TestInstance2::getStringRep()
   return s;
 }
 
+void TestInstance2::countFeats(signed char * featcounts, Individual2 * ind)
+/** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
+{
+	float result = 0.0;
+	unsigned char * bin;
+	for (int i=0; i < RULE_CASES; i++)
+	{
+		bin = getBinary();
+		featcounts[i] = 0;
+		for (int feat=0; feat < NUM_FEATURES; feat++)
+			//if( (bin[feat] & rule[i*NUM_FEATURES+feat]) != 0 )
+			if( ((bin[feat] & ind->rule[i*NUM_FEATURES+feat]) != 0) || (!ind->rule[i*NUM_FEATURES+feat] && !bin[feat]) )
+			{
+				featcounts[i]++;
+			}
+	}
+}
 
-float TestInstance2::fitnessHiFi(TestInstance2* ti)
+float TestInstance2::fitnessHiFi(Individual2* individual)
 /** fine-grained fitness evaluation: looks at every feature of every classification rule (at a performance cost) accumulating
     the number of matched features for each rule.  Final fitness based on the distribution of values in some as-yet-undetermined manner.
 */
@@ -131,10 +148,10 @@ float TestInstance2::fitnessHiFi(TestInstance2* ti)
   unsigned char * bin;
   signed char featcounts[RULE_CASES];
 
-  countFeats(featcounts, ti);
+  countFeats(featcounts, individual);
 
   // now do something with the featcounts array
-  correctclass = ti->getDepth()+1;
+  correctclass = getDepth()+1;
   correctmatched = featcounts[correctclass];
   bettermatched = 0; samematched = 0; mostmatched = 0; nummostmatched = 0;
   for(int i=0; i < RULE_CASES; i++)
@@ -146,7 +163,7 @@ float TestInstance2::fitnessHiFi(TestInstance2* ti)
     }
   // update the confusion matrix
   for (int i=0; i < RULE_CASES; i++)
-    if ( featcounts[i] == mostmatched) confMat[correctclass][i] += 1.0/nummostmatched;
+    if ( featcounts[i] == mostmatched) individual->confMat[correctclass][i] += 1.0/nummostmatched;
   result = (((float) correctmatched)/NUM_FEATURES) * (1.0 / samematched) * (1.0 / (1 + bettermatched));
   //printf("fitnessHiFi: matched total of %d features with %d on correct rule, resulting in score: %f\n", matchedfeats, correctmatched, result);
   return result;

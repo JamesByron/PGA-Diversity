@@ -1,5 +1,3 @@
-#include "testinstance2.h"
-#include "testset.h"
 #include "individual2.h"
 #include <stdio.h>
 #include <iostream>
@@ -255,23 +253,6 @@ void Individual2::auxBreedNCross(Individual2 * kids, Individual2 ind, int crossT
   //printf("Leaving auxBreedNCross\n");
 }
 
-void Individual2::countFeats(signed char * featcounts, TestInstance2 * ti)
-  /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
-{
-  float result = 0.0;
-  unsigned char * bin;
-  for (int i=0; i < RULE_CASES; i++)
-    {
-      bin = ti->getBinary();
-      featcounts[i] = 0;
-      for (int feat=0; feat < NUM_FEATURES; feat++)
-	//if( (bin[feat] & rule[i*NUM_FEATURES+feat]) != 0 )
-	if( ((bin[feat] & rule[i*NUM_FEATURES+feat]) != 0) || (!rule[i*NUM_FEATURES+feat] && !bin[feat]) )
-	  {
-	    featcounts[i]++;
-	  }
-    }
-}
 
 unsigned char Individual2::toUChar(string s)
 {

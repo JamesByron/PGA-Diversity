@@ -17,20 +17,8 @@ public:
   unsigned char * getBinary() { return binary; };
   int getDepth() const { return depth; };
   string getStringRep();
-  int classify(TestInstance2* ti);
-  float fitnessHiFi(TestInstance2* ti);
-  // classify a single test case
-  //float fitnessHiFi(TestInstance2* ti); // from individual
-  //float classiHiFi(TestInstance2* ti); // from individual
-  //int classify(TestInstance2* ti, unsigned char* rule); // from individual
-  // updateFitnees with respect to all test cases
-  // void updateFitness(TestSet* ts, char WHICH_FITNESS); // from individual
-  // void updateFitness(TestInstance2 * v);
-  //void updateFitness(vector<TestInstance2>* v, char WHICH_CLASSIFY); // from individual
-  // void updateFitness(TestInstance2 * v, int rank, int numnodes);
-  //void updateFitness(TestInstance2 testsplit[], int ntests, char WHICH_CLASSIFY); // from individual
-  //void resetConfMat();  // from individual
-  //void dumpConfMat(FILE *lf); // from individual
+  int classify(Individual2* individual);
+  float fitnessHiFi(Individual2* individual);
 private:
   int charDifference(char c, char d) { return (c-d)+1; };
   string intToBinary(int i);
@@ -39,7 +27,7 @@ private:
   int distToNearEdge(int rnk, int fl);
   int lowbyte(int i);
   int hibyte(int i);
-  //void countFeats(signed char * featcounts, TestInstance2 * ti); // from individual
+  void countFeats(signed char * featcounts, Individual2 * ind);
   unsigned char binary[NUM_FEATURES];
   string datasetForm;
   int whiteKingFile;
