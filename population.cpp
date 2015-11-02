@@ -189,7 +189,7 @@ void Population::updatePopulationFitness(char WHICH_FITNESS)
 	stdev = sqrt(stdev);
 }
 
-void Population::updatePopulationFitness(vector<TestInstance2> * allti, char WHICH_CLASSIFY)
+/*void Population::updatePopulationFitness(vector<TestInstance2> * allti, char WHICH_CLASSIFY)
 {
 	maxFitness = 0.0;
 	totalFitness = 0.0;
@@ -215,7 +215,7 @@ void Population::updatePopulationFitness(vector<TestInstance2> * allti, char WHI
 		stdev += diff * diff/(POP_SIZE - 1);
 	}
 	stdev = sqrt(stdev);
-}
+}*/
 
 // determine fitness as measure of accuracy over the actual holdout test set
 /*void Population::populationAccuracy(char WHICH_CLASSIFY)
@@ -244,6 +244,39 @@ void Population::updatePopulationFitness(vector<TestInstance2> * allti, char WHI
 	}
 	stdev = sqrt(stdev);
 }*/
+
+void Population::updateFitness(TestSet* ts, char WHICH_FITNESS)
+  /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
+   */
+{
+  //printf("Entering updatFitness\n");
+  float sum = 0.0;
+  float testsofthistype;
+  fitness = 0;
+  resetConfMat();
+  for(int i=0; i < ts->NUM_TEST_CASES_TO_USE; i++)
+  {
+    switch (WHICH_FITNESS)
+      {
+      case 'h': sum += fitnessHiFi(ts->getTI(i)); break;		// HiFi
+      case 'l': if(classify(ts->getTI(i))) sum++; break;	// LoFi
+      }
+    //printf("On test case number %d\n", i);
+    //printf("TC %d: inst: %s, classified as: %d, tc-binrep: %s\n", i, testSet[i].humanReadable().c_str(), classify(testSet[i]), testSet[i].getStringRep().c_str());
+  }
+  // alternate fitness computation based on the confusion matrix
+  for(int i=0; i < RULE_CASES; i++)
+    {
+      testsofthistype = 0;
+      for (int j=0; j < RULE_CASES; j++)
+	testsofthistype += confMat[i][j];
+      fitness += ((testsofthistype == 0) ? 0 : confMat[i][i]/testsofthistype);
+    }
+  fitness = fitness/RULE_CASES;
+
+  //fitness = sum / ts.NUM_TEST_CASES_TO_USE;
+  //printf("Leaving updateFitness\n");
+}
 
 void Population::updatePopulationRelevance(vector<float>* relevance) {
 	for (int i = 0; i < POP_SIZE; ++i) {

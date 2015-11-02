@@ -17,7 +17,8 @@ public:
   unsigned char * getBinary() { return binary; };
   int getDepth() const { return depth; };
   string getStringRep();
-
+  int classify(TestInstance2* ti);
+  float fitnessHiFi(TestInstance2* ti);
   // classify a single test case
   //float fitnessHiFi(TestInstance2* ti); // from individual
   //float classiHiFi(TestInstance2* ti); // from individual

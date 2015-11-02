@@ -19,16 +19,8 @@ public:
   Individual2();
   Individual2(string str);
   Individual2(int i);
-  // classify a single test case
-  float fitnessHiFi(TestInstance2* ti);
-  float classiHiFi(TestInstance2* ti);
-  int classify(TestInstance2* ti);
-  // updateFitnees with respect to all test cases
-  void updateFitness(TestSet* ts, char WHICH_FITNESS);
-  //  void updateFitness(TestInstance2 * v);
-  void updateFitness(vector<TestInstance2>* v, char WHICH_CLASSIFY);
-  //  void updateFitness(TestInstance2 * v, int rank, int numnodes);
-  //void updateFitness(TestInstance2 testsplit[], int ntests, char WHICH_CLASSIFY);
+  //float classiHiFi(TestInstance2* ti);
+
   float getFitness() { return fitness; }
   // Testing
   //void findAccuracy(TestSet * ts, char WHICH_CLASSIFY);
