@@ -131,8 +131,9 @@ float TestInstance2::fitnessHiFi(TestInstance2* ti)
   float result = 0.0;
   unsigned char * bin;
   signed char featcounts[RULE_CASES];
+  Individual2 indiv;
 
-  countFeats(featcounts, ti);
+  indiv.countFeats(featcounts, ti);
 
   // now do something with the featcounts array
   correctclass = ti->getDepth()+1;
