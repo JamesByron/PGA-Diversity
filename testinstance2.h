@@ -23,7 +23,7 @@ public:
   float classiHiFi(TestInstance2* ti);
   int classify(TestInstance2* ti);
   // updateFitnees with respect to all test cases
-  //void updateFitness(TestSet* ts, char WHICH_FITNESS);
+  void updateFitness(TestSet* ts, char WHICH_FITNESS);
   // void updateFitness(TestInstance2 * v);
   void updateFitness(vector<TestInstance2>* v, char WHICH_CLASSIFY);
   // void updateFitness(TestInstance2 * v, int rank, int numnodes);
