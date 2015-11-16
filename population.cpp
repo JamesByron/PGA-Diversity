@@ -1,6 +1,5 @@
 #include "testinstance2.h"
 #include "testset.h"
-#include "individual2.h"
 #include "population.h"
 
 
@@ -169,7 +168,7 @@ void Population::updatePopulationFitness(char WHICH_FITNESS)
 	for (int i = 0; i < POP_SIZE; i++)
 	{
 		// printf("updating individual %d\n", i);
-		mypop[i].updateFitness(&myTestSet, WHICH_FITNESS);
+		updateFitness(&myTestSet, &mypop[i], WHICH_FITNESS);
 		//printf("updated individual %d\n", i);
 		totalFitness += mypop[i].getFitness();
 		totalInverseFitness += 1 - mypop[i].getFitness();
