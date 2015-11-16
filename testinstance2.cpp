@@ -1,6 +1,6 @@
 #include "testinstance2.h"
 #include "testset.h"
-#include "individual2.h"
+//#include "individual2.h"
 #include <stdio.h>
 #include <iostream>
 
@@ -170,13 +170,13 @@ float TestInstance2::fitnessHiFi(Individual2* individual)
 }
 
 
-int TestInstance2::classify(TestInstance2* ti, unsigned char* rule)
+int TestInstance2::classify(Individual2* individual, unsigned char* rule)
   /** Classify a single test instance as the first rule-case that completely matches all the features.
    */
 {
   //printf("Entering classify\n");
-  int correctclass = ti->getDepth()+1;
-  unsigned char * bin = ti->getBinary();
+  int correctclass = getDepth()+1;
+  unsigned char * bin = getBinary();
 
   bool match;
   int i;
@@ -191,13 +191,13 @@ int TestInstance2::classify(TestInstance2* ti, unsigned char* rule)
         break;
       }
   }
-      if (match){ /* printf("Leaving classify\n");*/
-confMat[correctclass][i]++; return (correctclass == i-1);} //classification
-      
+    if (match)
+    { /* printf("Leaving classify\n");*/
+      individual->confMat[correctclass][i]++; return (correctclass == i-1);} //classification
     }
   // Catch-all case
   i = rand() % RULE_CASES;
-  confMat[correctclass][i]++;
+  individual->confMat[correctclass][i]++;
   //printf("Leaving classify\n");
   return (correctclass == i-1); 
 }

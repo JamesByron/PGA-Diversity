@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <time.h>
+#include <cstdlib>
 #include "config.h"
 
 //typedef unsigned char byte;
