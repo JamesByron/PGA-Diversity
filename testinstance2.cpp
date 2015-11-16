@@ -6,6 +6,8 @@
 
 using namespace std;
 
+Individual2 indiv;
+
 TestInstance2::TestInstance2(string str)
 {
   datasetForm = str;
@@ -131,7 +133,6 @@ float TestInstance2::fitnessHiFi(TestInstance2* ti)
   float result = 0.0;
   unsigned char * bin;
   signed char featcounts[RULE_CASES];
-  Individual2 indiv;
 
   indiv.countFeats(featcounts, ti);
 
@@ -148,7 +149,7 @@ float TestInstance2::fitnessHiFi(TestInstance2* ti)
     }
   // update the confusion matrix
   for (int i=0; i < RULE_CASES; i++)
-    if ( featcounts[i] == mostmatched) confMat[correctclass][i] += 1.0/nummostmatched;
+    if ( featcounts[i] == mostmatched) indiv.confMat[correctclass][i] += 1.0/nummostmatched;
   result = (((float) correctmatched)/NUM_FEATURES) * (1.0 / samematched) * (1.0 / (1 + bettermatched));
   //printf("fitnessHiFi: matched total of %d features with %d on correct rule, resulting in score: %f\n", matchedfeats, correctmatched, result);
   return result;
@@ -165,7 +166,7 @@ float TestInstance2::classiHiFi(TestInstance2* ti)
   unsigned char * bin;
   signed char featcounts[RULE_CASES];
 
-  countFeats(featcounts, ti);
+  indiv.countFeats(featcounts, ti);
 
   // now do something with the featcounts array
   correctclass = ti->getDepth()+1;
@@ -179,7 +180,7 @@ float TestInstance2::classiHiFi(TestInstance2* ti)
     }
   //printf("classiHiFi: matched ....\n");
   for (int i=0; i < RULE_CASES; i++)
-    if ( featcounts[i] == mostmatched) confMat[correctclass][i] += 1.0/nummostmatched;
+    if ( featcounts[i] == mostmatched) indiv.confMat[correctclass][i] += 1.0/nummostmatched;
   if ( mostmatched > correctmatched )
     return 0.0;
   else
@@ -202,25 +203,26 @@ int TestInstance2::classify(TestInstance2* ti)
       match = true;
       for (int j = 0; j < NUM_FEATURES; j++)
   {
-    if ( ((bin[j] & rule[i*NUM_FEATURES+j]) == 0) && (rule[i*NUM_FEATURES+j] || bin[j]) )
+    if ( ((bin[j] & indiv.rule[i*NUM_FEATURES+j]) == 0) && (indiv.rule[i*NUM_FEATURES+j] || bin[j]) )
       {
         match = false;
         break;
       }
   }
-      if (match){ /* printf("Leaving classify\n");*/ confMat[correctclass][i]++; return (correctclass == i-1);} //classification
+      if (match){ /* printf("Leaving classify\n");*/ indiv.confMat[correctclass][i]++; return (correctclass == i-1);} //classification
       
     }
   // Catch-all case
   i = rand() % RULE_CASES;
-  confMat[correctclass][i]++;
+  indiv.confMat[correctclass][i]++;
   //printf("Leaving classify\n");
   return (correctclass == i-1); 
 }
 
+/*
 void TestInstance2::updateFitness(TestSet* ts, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
-   */
+   *//*
 {
   //printf("Entering updatFitness\n");
   float sum = 0.0;
@@ -250,13 +252,14 @@ void TestInstance2::updateFitness(TestSet* ts, char WHICH_FITNESS)
   //fitness = sum / ts.NUM_TEST_CASES_TO_USE;
   //printf("Leaving updateFitness\n");
 }
+*/
 
 void TestInstance2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASSIFY)
   /** compute the "fitness" of what is presumably the full testset.  Use the appropriate measure for computing accurracy.
    */
 {
   float sum = 0.0;
-  resetConfMat();
+  indiv.resetConfMat();
   for(int i=0; i < (int)allti->size(); i++)
   {
     switch (WHICH_CLASSIFY)
@@ -266,7 +269,7 @@ void TestInstance2::updateFitness(vector<TestInstance2>* allti, char WHICH_CLASS
       }
   }
 
-  fitness = sum / allti->size();
+  indiv.fitness = sum / allti->size();
 }
 
 void TestInstance2::findAccuracy(TestSet * ts, char WHICH_CLASSIFY)
@@ -274,7 +277,7 @@ void TestInstance2::findAccuracy(TestSet * ts, char WHICH_CLASSIFY)
    */
 {
   float sum = 0.0;
-  resetConfMat();
+  indiv.resetConfMat();
   for(int i=0; i < ts->testSetSize(); i++)
   {
     switch (WHICH_CLASSIFY)
