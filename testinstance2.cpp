@@ -170,7 +170,7 @@ float TestInstance2::fitnessHiFi(Individual2* individual)
 }
 
 
-int TestInstance2::classify(Individual2* individual, unsigned char* rule)
+int TestInstance2::classify(Individual2* individual)
   /** Classify a single test instance as the first rule-case that completely matches all the features.
    */
 {
@@ -185,7 +185,7 @@ int TestInstance2::classify(Individual2* individual, unsigned char* rule)
       match = true;
       for (int j = 0; j < NUM_FEATURES; j++)
   {
-    if ( ((bin[j] & rule[i*NUM_FEATURES+j]) == 0) && (rule[i*NUM_FEATURES+j] || bin[j]) )
+    if ( ((bin[j] & individual->rule[i*NUM_FEATURES+j]) == 0) && (individual->rule[i*NUM_FEATURES+j] || bin[j]) )
       {
         match = false;
         break;

@@ -258,7 +258,7 @@ void Population::updateFitness(TestSet* ts, Individual2* individual, char WHICH_
     switch (WHICH_FITNESS)
       {
       case 'h': sum += ts->getTI(i)->fitnessHiFi(individual); break;		// HiFi
-      case 'l': if(classify(ts->getTI(i))) sum++; break;	// LoFi
+      case 'l': if(ts->getTI(i)->classify(individual)) sum++; break;	// LoFi
       }
     //printf("On test case number %d\n", i);
     //printf("TC %d: inst: %s, classified as: %d, tc-binrep: %s\n", i, testSet[i].humanReadable().c_str(), classify(testSet[i]), testSet[i].getStringRep().c_str());
@@ -268,10 +268,10 @@ void Population::updateFitness(TestSet* ts, Individual2* individual, char WHICH_
     {
       testsofthistype = 0;
       for (int j=0; j < RULE_CASES; j++)
-	testsofthistype += confMat[i][j];
-      fitness += ((testsofthistype == 0) ? 0 : confMat[i][i]/testsofthistype);
+	testsofthistype += individual->confMat[i][j];
+      individual->fitness += ((testsofthistype == 0) ? 0 : individual->confMat[i][i]/testsofthistype);
     }
-  fitness = fitness/RULE_CASES;
+  individual->fitness = individual->fitness/RULE_CASES;
 
   //fitness = sum / ts.NUM_TEST_CASES_TO_USE;
   //printf("Leaving updateFitness\n");

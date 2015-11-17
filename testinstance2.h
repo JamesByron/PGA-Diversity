@@ -17,7 +17,7 @@ public:
   unsigned char * getBinary() { return binary; };
   int getDepth() const { return depth; };
   string getStringRep();
-  int classify(Individual2* individual, unsigned char* rule);
+  int classify(Individual2* individual);
   float fitnessHiFi(Individual2* individual);
 private:
   int charDifference(char c, char d) { return (c-d)+1; };

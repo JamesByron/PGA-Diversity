@@ -1,6 +1,5 @@
 #include "testinstance2.h"
 #include "testset.h"
-#include "individual2.h"
 #include "population.h"
 #include "SingleNode.h"
 #include <time.h>
