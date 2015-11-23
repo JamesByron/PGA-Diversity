@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 /** TestSet: a test-set instance should contain all of the testinstances that are known,
     but should provide distinct types of access to that total set:
     1. the full set
@@ -21,13 +22,13 @@ using namespace std;
     Perhaps, the TestSet class should provide these various testing services....
 
  */
-
+/*
 TestSet::TestSet(vector<TestInstance2> * allti, int num)
 {
   //fulltiset = allti;
   NUM_TEST_CASES_TO_USE = num;
-  nTestInstances = allti->size() - num;
-  train = new TestInstance2[num];
+  //nTestInstances = allti->size() - num;
+  //train = new TestInstance2[num];
   // if (num == allti->size())
   // tset = allti;
   srand(time(NULL)+17033);
@@ -88,29 +89,6 @@ TestSet::TestSet(int seed, vector<TestInstance2> * allti, int num, int depth)
   //~vector(tempti);
 }
 
-// constructors that creates two disjoint data sets for training and testing 
-// with respective sizes given by the value of the split (which must correspond to num)
-
-TestSet::TestSet(vector<TestInstance2> * allti, int num, float split)
-{
-  int i = 0;
-  if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN TestSet CONSTRUCTOR\n"); exit(-1);}
-
-  NUM_TEST_CASES_TO_USE = num;
-  nTestInstances = allti->size() - num;
-  train = new TestInstance2[num];
-  srand(time(NULL)+17033);
-  shuffle(allti);
-  //srand(93108);
-  // get the training split
-  for (int i=0; i < num; i++)
-    train[i]=(*allti)[i];
-  // continue with the testing split
-  test = new TestInstance2[allti->size() - num];
-  for (int k=0; k < allti->size() - num; k++)
-    test[k]=(*allti)[i++];
-}
-
 TestSet::TestSet(int seed, vector<TestInstance2> * allti, int num, float split)
 {
   int i = 0;
@@ -131,6 +109,35 @@ TestSet::TestSet(int seed, vector<TestInstance2> * allti, int num, float split)
   test = new TestInstance2[allti->size() - num];
   for (int k=0; k < allti->size() - num; k++)
     test[k]=(*allti)[i++];
+}
+
+// constructors that creates two disjoint data sets for training and testing
+// with respective sizes given by the value of the split (which must correspond to num)
+*/
+TestSet::TestSet(vector<TestInstance2> * allti, int num, float split)
+{
+  if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN TestSet CONSTRUCTOR\n"); exit(-1);}
+
+  NUM_TEST_CASES_TO_USE = num;
+  nTestInstances = allti->size();
+  //nTestInstances = allti->size() - num;
+  //train = new TestInstance2[num];
+  test = new TestInstance2[allti->size()];
+  srand(time(NULL)+17033);
+  shuffle(allti);
+  // get the training split
+  int i = 0;
+  while (i < allti->size()) {
+	  //if (i < num) train[i] = (*allti)[i];
+	  test[i] = (*allti)[i];
+	  i++;
+  }
+  /*for (int i=0; i < num; i++)
+    train[i]=(*allti)[i];
+  // continue with the testing split
+  test = new TestInstance2[allti->size() - num];
+  for (int k=0; k < allti->size() - num; k++)
+    test[k]=(*allti)[i++];*/
 }
 
 

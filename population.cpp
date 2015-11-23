@@ -158,7 +158,7 @@ void Population::updatePopulationIntRules() {
 // update fitness of all individuals
 
 // determine fitness with respect to the training data for breeding/survival/migration purposes
-void Population::updatePopulationFitness(char WHICH_FITNESS)
+void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 {
 	maxFitness = 0.0;
 	totalFitness = 0.0;

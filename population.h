@@ -19,7 +19,7 @@ public:
   float getStdev() {return stdev;}
   Individual2 getBestIndividual() {return bestIndiv;}
   // update fitness of all individuals
-  void updatePopulationFitness(char WHICH_FITNESS);
+  void updatePopulationFitness(int numTItoUse, char WHICH_FITNESS);
   void updateFitness(TestSet* ts, Individual2* individual, char WHICH_FITNESS);
   //void updatePopulationFitness(vector<TestInstance2> * allti, char WHICH_CLASSIFY);
   //void populationAccuracy(char WHICH_CLASSIFY);
@@ -42,6 +42,7 @@ public:
   vector<int> calculateHammingForAll(Individual2* input);
   void addPopulationBitTotal(float * totals);
   void updatePopulationIntRules();
+  TestSet myTestSet;
 private:
   // functions
   int calculateHammingPair(unsigned int * a, unsigned int * b);
@@ -55,7 +56,6 @@ private:
   // variables
   int POP_SIZE;
   //vector<vector<int> > HAMMING_DIST;
-  TestSet myTestSet;
   int generation;
   float avgFitness;
   float totalFitness;
