@@ -1,4 +1,4 @@
-#include "testinstance2.h"
+#include "krktestinstance.h"
 #include "dataset.h"
 //#include "individual2.h"
 #include <stdio.h>
@@ -6,7 +6,7 @@
 
 using namespace std;
 
-TestInstance2::TestInstance2(string str)
+KRKTestInstance::KRKTestInstance(string str)
 {
   datasetForm = str;
   whiteKingFile = charDifference(str[0], 'a');
@@ -104,11 +104,11 @@ TestInstance2::TestInstance2(string str)
   return;
 }
 
-TestInstance2::~TestInstance2()
+KRKTestInstance::~KRKTestInstance()
 {
 }
 
-string TestInstance2::getStringRep()
+string KRKTestInstance::getStringRep()
 {
   string s("");
   for (int i=0; i < NUM_FEATURES; i++)
@@ -119,7 +119,7 @@ string TestInstance2::getStringRep()
   return s;
 }
 
-void TestInstance2::countFeats(signed char * featcounts, Individual2 * ind)
+void KRKTestInstance::countFeats(signed char * featcounts, Individual2 * ind)
 /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
 {
 	float result = 0.0;
@@ -136,7 +136,7 @@ void TestInstance2::countFeats(signed char * featcounts, Individual2 * ind)
 	}
 }
 
-float TestInstance2::fitnessHiFi(Individual2* individual)
+float KRKTestInstance::fitnessHiFi(Individual2* individual)
 /** fine-grained fitness evaluation: looks at every feature of every classification rule (at a performance cost) accumulating
     the number of matched features for each rule.  Final fitness based on the distribution of values in some as-yet-undetermined manner.
 */
@@ -168,7 +168,7 @@ float TestInstance2::fitnessHiFi(Individual2* individual)
 }
 
 
-int TestInstance2::classify(Individual2* individual)
+int KRKTestInstance::classify(Individual2* individual)
   /** Classify a single test instance as the first rule-case that completely matches all the features.
    */
 {
@@ -200,7 +200,7 @@ int TestInstance2::classify(Individual2* individual)
   return (correctclass == i-1); 
 }
 
-string TestInstance2::intToBinary(int i)
+string KRKTestInstance::intToBinary(int i)
 // i is in the range [1,8]
 // return an 8-digit string of 0s with a 1 in the i'th position from the right
 {
@@ -215,7 +215,7 @@ string TestInstance2::intToBinary(int i)
   return s;
 }
 
-string TestInstance2::byteToString(unsigned char c)
+string KRKTestInstance::byteToString(unsigned char c)
 {
   string s("");
   int mask = 128;
@@ -230,21 +230,21 @@ string TestInstance2::byteToString(unsigned char c)
   return s;
 }
 
-int TestInstance2::distToNearCorner(int bkr, int bkf)
+int KRKTestInstance::distToNearCorner(int bkr, int bkf)
 /** find the manhatten distance to the nearest corner of this rank and file
  */
 {
   return min(bkr,9-bkr)+min(bkf,9-bkf);
 }
 
-int TestInstance2::distToNearEdge(int rnk, int fl)
+int KRKTestInstance::distToNearEdge(int rnk, int fl)
 /** find the distance to the nearest edge -- either along rank or file
  */
 {
   return min(min(rnk,9-rnk),min(fl,9-fl));
 }
 
-int TestInstance2::lowbyte(int i)
+int KRKTestInstance::lowbyte(int i)
 /** for number between 1 and 16, return the number if less than or equal to 8, or 0 otherwise
  */
 {
@@ -254,7 +254,7 @@ int TestInstance2::lowbyte(int i)
     return 0;
 }
 
-int TestInstance2::hibyte(int i)
+int KRKTestInstance::hibyte(int i)
 /** for number between 1 and 16, return the amount above 8 if greater than 8, or 0 otherwise
  */
 {

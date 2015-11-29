@@ -1,4 +1,4 @@
-#include "testinstance2.h"
+#include "krktestinstance.h"
 #include "dataset.h"
 #include <time.h>
 #include <cmath>
@@ -23,15 +23,15 @@ using namespace std;
  */
 // constructors that creates two disjoint data sets for training and testing
 // with respective sizes given by the value of the split (which must correspond to num)
-DataSet::DataSet(vector<TestInstance2> * allti, int num, float split)
+DataSet::DataSet(vector<KRKTestInstance> * allti, int num, float split)
 {
   if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN DataSet CONSTRUCTOR\n"); exit(-1);}
 
   NUM_TEST_CASES_TO_USE = num;
   nTestInstances = allti->size();
   //nTestInstances = allti->size() - num;
-  //train = new TestInstance2[num];
-  test = new TestInstance2[allti->size()];
+  //train = new KRKTestInstance[num];
+  test = new KRKTestInstance[allti->size()];
   srand(time(NULL)+17033);
   shuffle(allti);
   // get the training split
@@ -44,7 +44,7 @@ DataSet::DataSet(vector<TestInstance2> * allti, int num, float split)
   /*for (int i=0; i < num; i++)
     train[i]=(*allti)[i];
   // continue with the testing split
-  test = new TestInstance2[allti->size() - num];
+  test = new KRKTestInstance[allti->size() - num];
   for (int k=0; k < allti->size() - num; k++)
     test[k]=(*allti)[i++];*/
 }
@@ -52,8 +52,8 @@ DataSet::DataSet(vector<TestInstance2> * allti, int num, float split)
 
 // SAMPLING FUNCTIONS
 
-void DataSet::selectRandomTestInstances(TestInstance2 * ti, vector<TestInstance2> tests)
-//void DataSet::selectRandomTestInstances(vector<TestInstance2> tests)
+void DataSet::selectRandomTestInstances(KRKTestInstance * ti, vector<KRKTestInstance> tests)
+//void DataSet::selectRandomTestInstances(vector<KRKTestInstance> tests)
   // OUT ti: stuff the randomly selected cases into this space
   // IN tests: use these test instances to select a sample
 {
@@ -66,10 +66,10 @@ void DataSet::selectRandomTestInstances(TestInstance2 * ti, vector<TestInstance2
   }
 }
 
-void DataSet::shuffle(vector<TestInstance2> * a)
+void DataSet::shuffle(vector<KRKTestInstance> * a)
 {
   int r;
-  TestInstance2 t;
+  KRKTestInstance t;
   for (int n=0; n < 3; n++)
     for (int i=0; i < a->size(); i++)
       {

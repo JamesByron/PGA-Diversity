@@ -7,12 +7,12 @@
 
 using namespace std;
 
-class TestInstance2
+class KRKTestInstance
 {
 public:
-  TestInstance2() {};
-  TestInstance2(string str);
-  ~TestInstance2();
+  KRKTestInstance() {};
+  KRKTestInstance(string str);
+  ~KRKTestInstance();
   string humanReadable() { return datasetForm; };
   unsigned char * getBinary() { return binary; };
   int getDepth() const { return depth; };
