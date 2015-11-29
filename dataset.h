@@ -22,4 +22,5 @@ private:
   void selectRandomTestInstances(KRKTestInstance * ti, vector<KRKTestInstance> tests);
   void shuffle(vector<KRKTestInstance> * v);
   KRKTestInstance * test;
+  KRKTestInstance * train;
 };
