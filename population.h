@@ -11,7 +11,7 @@ using namespace std;
 class Population
 {
 public:
-  Population(int n, int nprocs, TestSet ts, int popsize);
+  Population(int n, int nprocs, DataSet ts, int popsize);
   // accessors
   int getGeneration() { return generation; }
   float getPopulationMaxFitness() { return maxFitness; }
@@ -20,7 +20,7 @@ public:
   Individual2 getBestIndividual() {return bestIndiv;}
   // update fitness of all individuals
   void updatePopulationFitness(int numTItoUse, char WHICH_FITNESS);
-  void updateFitness(TestSet* ts, Individual2* individual, char WHICH_FITNESS);
+  void updateFitness(DataSet* ts, Individual2* individual, char WHICH_FITNESS);
   void updatePopulationRelevance(vector<float>* relevance);
   // select individuals for . . . .
   void selectToSurvive(int n);
@@ -39,7 +39,7 @@ public:
   vector<int> calculateHammingForAll(Individual2* input);
   void addPopulationBitTotal(float * totals);
   void updatePopulationIntRules();
-  TestSet myTestSet;
+  DataSet myDataSet;
 private:
   // functions
   int calculateHammingPair(unsigned int * a, unsigned int * b);

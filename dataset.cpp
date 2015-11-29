@@ -1,13 +1,12 @@
 #include "testinstance2.h"
-//#include "individual2.h"
-#include "testset.h"
+#include "dataset.h"
 #include <time.h>
 #include <cmath>
 
 using namespace std;
 
 
-/** TestSet: a test-set instance should contain all of the testinstances that are known,
+/** DataSet: a test-set instance should contain all of the testinstances that are known,
     but should provide distinct types of access to that total set:
     1. the full set
     2. all the instances of a particular classification
@@ -15,18 +14,18 @@ using namespace std;
     4. a random sample of a given size from the instances of a particular classification
     5. a uniform sample across the different classes with the same number of each class
 
-    Much of the work for providing such access should be done up front when creating the instance of TestSet.
+    Much of the work for providing such access should be done up front when creating the instance of DataSet.
     Need to preserve handle to the allti vector which gets passed in at creation, and then provide methods
     which get test instances from a particular one of the distinct samples.
 
-    Perhaps, the TestSet class should provide these various testing services....
+    Perhaps, the DataSet class should provide these various testing services....
 
  */
 // constructors that creates two disjoint data sets for training and testing
 // with respective sizes given by the value of the split (which must correspond to num)
-TestSet::TestSet(vector<TestInstance2> * allti, int num, float split)
+DataSet::DataSet(vector<TestInstance2> * allti, int num, float split)
 {
-  if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN TestSet CONSTRUCTOR\n"); exit(-1);}
+  if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN DataSet CONSTRUCTOR\n"); exit(-1);}
 
   NUM_TEST_CASES_TO_USE = num;
   nTestInstances = allti->size();
@@ -53,8 +52,8 @@ TestSet::TestSet(vector<TestInstance2> * allti, int num, float split)
 
 // SAMPLING FUNCTIONS
 
-void TestSet::selectRandomTestInstances(TestInstance2 * ti, vector<TestInstance2> tests)
-//void TestSet::selectRandomTestInstances(vector<TestInstance2> tests)
+void DataSet::selectRandomTestInstances(TestInstance2 * ti, vector<TestInstance2> tests)
+//void DataSet::selectRandomTestInstances(vector<TestInstance2> tests)
   // OUT ti: stuff the randomly selected cases into this space
   // IN tests: use these test instances to select a sample
 {
@@ -67,7 +66,7 @@ void TestSet::selectRandomTestInstances(TestInstance2 * ti, vector<TestInstance2
   }
 }
 
-void TestSet::shuffle(vector<TestInstance2> * a)
+void DataSet::shuffle(vector<TestInstance2> * a)
 {
   int r;
   TestInstance2 t;

@@ -1,5 +1,5 @@
 #include "testinstance2.h"
-#include "testset.h"
+#include "dataset.h"
 //#include "individual2.h"
 #include <stdio.h>
 #include <iostream>

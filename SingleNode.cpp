@@ -1,5 +1,5 @@
 #include "testinstance2.h"
-#include "testset.h"
+#include "dataset.h"
 #include "population.h"
 #include "SingleNode.h"
 #include <time.h>
@@ -33,7 +33,7 @@ int WHEN_FULL_TEST = 100;
 
 SingleNode * islands;
 
-SingleNode::SingleNode(int r, TestSet ts)
+SingleNode::SingleNode(int r, DataSet ts)
 {
 	myrank = r;
 	//  printf("SingleNode: construct an instance of a single-node\n");
@@ -80,7 +80,7 @@ void SingleNode::doOneGeneration(int thisgen)
 	//printf("Node %d: a_pop->nextGeneration()\n", myrank);
 	a_pop->nextGeneration(PROB_MUTATE);
 	a_pop->updatePopulationIntRules();
-	a_pop->updatePopulationFitness(a_pop->myTestSet.trainSetSize(), WHICH_FITNESS);
+	a_pop->updatePopulationFitness(a_pop->myDataSet.trainSetSize(), WHICH_FITNESS);
 }
 
 void SingleNode::updateNodeIntRules() {
@@ -287,7 +287,7 @@ vector<float> getDiversityValues(vector<float>* values, int numZeros) {
  * Computes the fitness of each individual within each island across the given test set.
  * Returns a two-dimensional vector of [islands * individuals][test instances]
  */
-vector< vector<float> > calculatePhenotypeFitnessDetail(TestSet* testInstances, int numTestInstances, char classification, int startIsland, int endIsland) {
+vector< vector<float> > calculatePhenotypeFitnessDetail(DataSet* testInstances, int numTestInstances, char classification, int startIsland, int endIsland) {
 	if ((startIsland < 0) || (endIsland > NUM_ISLANDS)) { cout << "Error in calculateFitnessDetail; island index out of range " << startIsland << ", " << endIsland << endl; cout.flush(); exit(-1); }
 	Individual2* tempIndividual;
 	vector< vector<float> > diversetableH ((endIsland-startIsland)*POP_SIZE, vector<float>(numTestInstances));
@@ -449,7 +449,7 @@ void getRelevanceByIsland(vector<float>* detail, vector <vector<float> >* island
 /**
  * This wrapper function constructs the phenotype diversity of the population.
  */
-vector<float> getPhenotypeRelevance(TestSet* testInstances, int numTestInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelevance, float relevanceWeight) {
+vector<float> getPhenotypeRelevance(DataSet* testInstances, int numTestInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelevance, float relevanceWeight) {
 	vector< vector<float> > detailedFitness = calculatePhenotypeFitnessDetail(testInstances, numTestInstances, WHICH_CLASSIFY, startIsland, endIsland);  // this stores data in the array and returns detailed results also
 	vector<float> fitnessTotals = calculatePhenotypeFitnessTotals(&detailedFitness, numTestInstances);
 	vector<float> weights =  calculatePhenotypeFitnessWeights(&fitnessTotals);
@@ -489,7 +489,7 @@ vector<float> getHammingRelevance(vector <vector<float> >* islandRelevance, bool
 	return diversityValues;
 }
 
-vector<TestInstance2> getTIVector(TestSet set, int num) {
+vector<TestInstance2> getTIVector(DataSet set, int num) {
 	vector<TestInstance2> output (num);
 	for (int i = 0; i < num; ++i) {
 	  output[i] = * set.getTI(i);
@@ -510,7 +510,7 @@ void usage(){
 	printf(" 9.  num test cases to sample\n");
 	printf(" 10. number of generations to simulate\n");
 	printf(" 11. which fitness function to use (h/l)\n");
-	printf(" 12. which classification function to use on full testset (h/l)\n");
+	printf(" 12. which classification function to use on full dataset (h/l)\n");
 	printf(" 13. (optional) mutation probability that given individual will have single-point mutation\n");
 	printf(" 14. (optional) initial seed to select sample of test instances\n");
 	printf(" 15. (optional) which class of test instances to use (only with 18 or fewer islands)\n");
@@ -616,22 +616,22 @@ int main(int argc, char * argv[])
       islands = new SingleNode[NUM_ISLANDS];
       //initialize all islands
       //printf("Initializing the islands (and populations, etc.)\n");
-      TestSet ts;
+      DataSet ts;
       //cout << "l214" << endl;
       if (argc > 15)
 	{
 	  printf("Not yet supporting stratified islands with split training/test sets\n"); exit(-1);
 	  for(int j=0; j<NUM_ISLANDS; j++)
 	    {
-	      ts = TestSet(&all_tests, NUM_TEST_CASES_TO_USE, (float)j-1);
+	      ts = DataSet(&all_tests, NUM_TEST_CASES_TO_USE, (float)j-1);
 	      islands[j] = SingleNode(j, ts);
 	      islands[j].updateNodeIntRules();
 	    }
 	}
       else
 	{
-	  // printf("Creating the TestSet from the total testinstances in the file\n");
-	  ts = TestSet(&all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
+	  // printf("Creating the DataSet from the total testinstances in the file\n");
+	  ts = DataSet(&all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
 	  //printf("Finished creating the Testset\n");
 	  for(int j=0; j<NUM_ISLANDS; j++) {
 	    islands[j] = SingleNode(j, ts);

@@ -10,7 +10,7 @@ using namespace std;
 class SingleNode
 {
  public:
-  SingleNode(int r, TestSet ts);
+  SingleNode(int r, DataSet ts);
   SingleNode();
   //~Island() {};
   //void addToCustoms(vector<Individual2> v);

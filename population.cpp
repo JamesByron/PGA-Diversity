@@ -1,5 +1,5 @@
 #include "testinstance2.h"
-#include "testset.h"
+#include "dataset.h"
 #include "population.h"
 
 using namespace std;
@@ -7,13 +7,13 @@ using namespace std;
 // GLOBAL VARIABLES
 // . . . .
 
-Population::Population(int n, int nprocs, TestSet ts, int popsize)
+Population::Population(int n, int nprocs, DataSet ts, int popsize)
 // n is the rank within the cluster of this island,
 // and nprocs in the total number of compute-nodes in this run
-// ts is the TestSet to use for evaluating this population's fitness
+// ts is the DataSet to use for evaluating this population's fitness
 // popsize is how large the population will be
 {
-	myTestSet = ts;
+	myDataSet = ts;
 	POP_SIZE = popsize;
 
 	//printf("Population: starting constructor\n");
@@ -135,7 +135,7 @@ void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 	for (int i = 0; i < POP_SIZE; i++)
 	{
 		// printf("updating individual %d\n", i);
-		updateFitness(&myTestSet, &mypop[i], WHICH_FITNESS);
+		updateFitness(&myDataSet, &mypop[i], WHICH_FITNESS);
 		//printf("updated individual %d\n", i);
 		totalFitness += mypop[i].getFitness();
 		totalInverseFitness += 1 - mypop[i].getFitness();
@@ -155,7 +155,7 @@ void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 	stdev = sqrt(stdev);
 }
 
-void Population::updateFitness(TestSet* ts, Individual2* individual, char WHICH_FITNESS)
+void Population::updateFitness(DataSet* ts, Individual2* individual, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
    */
 {

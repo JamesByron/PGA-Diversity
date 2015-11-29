@@ -4,11 +4,11 @@
 
 using namespace std;
 
-class TestSet
+class DataSet
 {
 public:
-  TestSet(vector<TestInstance2>* allti, int num, float split);
-  TestSet() {}
+  DataSet(vector<TestInstance2>* allti, int num, float split);
+  DataSet() {}
   TestInstance2 * getTI(int i)
   {
     if (i >= nTestInstances) {printf("getTestI: invalid index %d out of %d\n", i, nTestInstances); exit(-1);}
