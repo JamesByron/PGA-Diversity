@@ -9,7 +9,6 @@ using namespace std;
 TestInstance2::TestInstance2(string str)
 {
   datasetForm = str;
-
   whiteKingFile = charDifference(str[0], 'a');
   whiteKingRank = charDifference(str[2], '1');
   whiteRookFile = charDifference(str[4], 'a');
@@ -130,7 +129,6 @@ void TestInstance2::countFeats(signed char * featcounts, Individual2 * ind)
 		bin = getBinary();
 		featcounts[i] = 0;
 		for (int feat=0; feat < NUM_FEATURES; feat++)
-			//if( (bin[feat] & rule[i*NUM_FEATURES+feat]) != 0 )
 			if( ((bin[feat] & ind->rule[i*NUM_FEATURES+feat]) != 0) || (!ind->rule[i*NUM_FEATURES+feat] && !bin[feat]) )
 			{
 				featcounts[i]++;
@@ -265,21 +263,3 @@ int TestInstance2::hibyte(int i)
   else
     return 0;
 }
-/*
-void TestInstance2::countFeats(signed char * featcounts, TestInstance2 * ti)
-  /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
-/*{
-  float result = 0.0;
-  unsigned char * bin;
-  for (int i=0; i < RULE_CASES; i++)
-    {
-      bin = ti->getBinary();
-      featcounts[i] = 0;
-      for (int feat=0; feat < NUM_FEATURES; feat++)
-  //if( (bin[feat] & rule[i*NUM_FEATURES+feat]) != 0 )
-  if( ((bin[feat] & rule[i*NUM_FEATURES+feat]) != 0) || (!rule[i*NUM_FEATURES+feat] && !bin[feat]) )
-    {
-      featcounts[i]++;
-    }
-    }
-}*/

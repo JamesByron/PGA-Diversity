@@ -2,12 +2,10 @@
 #include "testset.h"
 #include "population.h"
 
-
 using namespace std;
 
 // GLOBAL VARIABLES
 // . . . .
-
 
 Population::Population(int n, int nprocs, TestSet ts, int popsize)
 // n is the rank within the cluster of this island,
@@ -39,37 +37,6 @@ Population::Population(int n, int nprocs, TestSet ts, int popsize)
 Individual2* Population::getIndividual(int index) {
 	return &mypop[index];
 }
-
-/*
-//  computes the population diversity within this population
-vector<int> Population::getExternalPopulationDiversity(Individual2 input){
-	vector<int> hamming = calculateHammingForAll(input);
-	//string inputString = input.getStringRule();
-	int best = hamming[0];
-	int worst = 1000; // Start with a high number.
-	int total = hamming[0];
-	// Get the best, worst, and total hamming distances.
-	for (int i = 1; i < hamming.size(); ++i) {
-		best = max(best, hamming[i]);  // A papulation's diversity is based on its most divergent individual.
-		if (hamming[i] != 0) {
-			worst = min(worst, hamming[i]);
-			total += hamming[i];
-		}
-	}
-	//calculate the variance
-	//float variance = 0.0;
-	//float average = (float) total / (float) hamming.size();
-	//for (int i = 0; i < hamming.size(); ++i) {
-		//variance += powf(((float) hamming[i] - average), 2.0);
-	//}
-	vector<> values (3);
-	values[0] = (float) best;
-	values[1] = (float) worst;
-	values[2] = (float) total;
-	vector<vector<int>> output (2);
-	return output;
-}
-*/
 
 // computes the hamming distance between the input individual and each individual in this population
 vector<int> Population::calculateHammingForAll(Individual2* input){
@@ -187,62 +154,6 @@ void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 	}
 	stdev = sqrt(stdev);
 }
-
-/*void Population::updatePopulationFitness(vector<TestInstance2> * allti, char WHICH_CLASSIFY)
-{
-	maxFitness = 0.0;
-	totalFitness = 0.0;
-	totalInverseFitness = 0.0;
-	stdev = 0.0;
-	bestIndiv = mypop[0];
-	for (int i = 0; i < POP_SIZE; i++)
-	{
-	        mypop[i].updateFitness(allti, WHICH_CLASSIFY);
-		totalFitness += mypop[i].getFitness();
-		totalInverseFitness += 1 - mypop[i].getFitness();
-		if(maxFitness < mypop[i].getFitness())
-		{
-			maxFitness = mypop[i].getFitness();
-			bestIndiv = mypop[i];
-		}
-	}
-
-	avgFitness = totalFitness/POP_SIZE;
-	for (int j = 0; j < POP_SIZE; j++)
-	{
-		float diff = mypop[j].getFitness() - avgFitness;
-		stdev += diff * diff/(POP_SIZE - 1);
-	}
-	stdev = sqrt(stdev);
-}*/
-
-// determine fitness as measure of accuracy over the actual holdout test set
-/*void Population::populationAccuracy(char WHICH_CLASSIFY)
-{
-	maxFitness = 0.0;
-	totalFitness = 0.0;
-	stdev = 0.0;
-	bestIndiv = mypop[0];
-	for (int i = 0; i < POP_SIZE; i++)
-	{
-		mypop[i].findAccuracy(&myTestSet, WHICH_CLASSIFY);
-		totalFitness += mypop[i].getFitness();
-		totalInverseFitness += 1 - mypop[i].getFitness();
-		if(maxFitness < mypop[i].getFitness())
-		{
-			maxFitness = mypop[i].getFitness();
-			bestIndiv = mypop[i];
-		}
-	}
-
-	avgFitness = totalFitness/POP_SIZE;
-	for (int j = 0; j < POP_SIZE; j++)
-	{
-		float diff = mypop[j].getFitness() - avgFitness;
-		stdev += diff * diff/(POP_SIZE - 1);
-	}
-	stdev = sqrt(stdev);
-}*/
 
 void Population::updateFitness(TestSet* ts, Individual2* individual, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
@@ -428,9 +339,7 @@ void Population::nextGeneration(int PROB_MUTATE)
 	return;
 }
 
-
 // private member functions
-
 
 void Population::unselectAll()
 {

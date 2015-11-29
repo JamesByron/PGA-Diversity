@@ -20,12 +20,7 @@ public:
   Individual2();
   Individual2(string str);
   Individual2(int i);
-  //float classiHiFi(TestInstance2* ti);
-
   float getFitness() { return fitness; }
-  // Testing
-  //void findAccuracy(TestSet * ts, char WHICH_CLASSIFY);
-  //float getAccuracy() { return accuracy; }
   void breedNCross(Individual2 * kids, Individual2 ind);
   // single-point crossover reproduction
   void breed1Cross(Individual2 * kids, Individual2 ind);
@@ -56,9 +51,7 @@ private:
   unsigned char toUChar(string s);
   void splitbytes(unsigned char * n1, unsigned char * n2, unsigned char r1, unsigned char r2, int split);
   string byteToString(unsigned char c);
-  //void sortNums(int * cpts, int j);
   bool selected;
-  //float accuracy;
   unsigned int intRule[RULE_CASES*NUM_FEATURES*8]; //  = {0};
   float myDiversityRelevance;
 };

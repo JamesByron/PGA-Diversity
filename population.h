@@ -21,8 +21,6 @@ public:
   // update fitness of all individuals
   void updatePopulationFitness(int numTItoUse, char WHICH_FITNESS);
   void updateFitness(TestSet* ts, Individual2* individual, char WHICH_FITNESS);
-  //void updatePopulationFitness(vector<TestInstance2> * allti, char WHICH_CLASSIFY);
-  //void populationAccuracy(char WHICH_CLASSIFY);
   void updatePopulationRelevance(vector<float>* relevance);
   // select individuals for . . . .
   void selectToSurvive(int n);
@@ -38,7 +36,6 @@ public:
   void nextGeneration(int PROB_MUTATE);
   Individual2* getIndividual(int index);
   vector<float> getInternalHammingDiversity();
-  //vector<float> getExternalPopulationDiversity(Individual2 input);
   vector<int> calculateHammingForAll(Individual2* input);
   void addPopulationBitTotal(float * totals);
   void updatePopulationIntRules();
@@ -46,7 +43,6 @@ public:
 private:
   // functions
   int calculateHammingPair(unsigned int * a, unsigned int * b);
-  //void updateInternalHammingDist();
   void unselectAll();
   int selectIndividual(int availablepop);
   int tournamentSelect(int availablepop);
@@ -55,7 +51,6 @@ private:
   int relevanceTournamentSelect(int availablepop);
   // variables
   int POP_SIZE;
-  //vector<vector<int> > HAMMING_DIST;
   int generation;
   float avgFitness;
   float totalFitness;
@@ -67,11 +62,8 @@ private:
   int newpop_count;
   // use RULE_LEN instead: int genomeLength = NUM_FEATURES*RULE_CASES*8;
   Individual2 bestIndiv;
-  //Individual2 b1[POP_SIZE];
-  //Individual2 b2[POP_SIZE];
   Individual2 * b1;
   Individual2 * b2;
   Individual2 * mypop;
   Individual2 * newpop;
-  //vector<float> relevanceVec;
 };

@@ -37,6 +37,4 @@ private:
   int blackKingFile;
   int blackKingRank;
   int depth;
-  //float confMat[RULE_CASES][RULE_CASES]; // from individual
-  //unsigned char rule[RULE_CASES*NUM_FEATURES]; // from individual
 };
