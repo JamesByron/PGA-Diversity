@@ -7,9 +7,9 @@ using namespace std;
 class DataSet
 {
 public:
-  DataSet(vector<KRKTestInstance>* allti, int num, float split);
+  DataSet(vector<TestInstance>* allti, int num, float split);
   DataSet() {}
-  KRKTestInstance * getTI(int i)
+  TestInstance * getTI(int i)
   {
     if (i >= nTestInstances) {printf("getTestI: invalid index %d out of %d\n", i, nTestInstances); exit(-1);}
     return &test[i];
@@ -19,8 +19,8 @@ public:
   int NUM_TEST_CASES_TO_USE;
 private:
   int nTestInstances;
-  void selectRandomTestInstances(KRKTestInstance * ti, vector<KRKTestInstance> tests);
-  void shuffle(vector<KRKTestInstance> * v);
-  KRKTestInstance * test;
-  KRKTestInstance * train;
+  void selectRandomTestInstances(TestInstance * ti, vector<TestInstance> tests);
+  void shuffle(vector<TestInstance> * v);
+  TestInstance * test;
+  TestInstance * train;
 };

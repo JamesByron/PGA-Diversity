@@ -1,4 +1,4 @@
-#include "krktestinstance.h"
+#include "testinstance.h"
 #include "dataset.h"
 #include "population.h"
 #include "SingleNode.h"
@@ -489,8 +489,8 @@ vector<float> getHammingRelevance(vector <vector<float> >* islandRelevance, bool
 	return diversityValues;
 }
 
-vector<KRKTestInstance> getTIVector(DataSet set, int num) {
-	vector<KRKTestInstance> output (num);
+vector<TestInstance> getTIVector(DataSet set, int num) {
+	vector<TestInstance> output (num);
 	for (int i = 0; i < num; ++i) {
 	  output[i] = * set.getTI(i);
 	}
@@ -538,7 +538,7 @@ int main(int argc, char * argv[])
   srand( time(NULL) );
   int WHEN_PRINT_DATA = 1;
   int INIT_SEED;
-  vector<KRKTestInstance> all_tests;
+  vector<TestInstance> all_tests;
   //printf("SingleNode: Ready to start.\n");
   if (argc < 13) { usage(); exit(-1); }
   time_t start, end;
@@ -583,7 +583,7 @@ int main(int argc, char * argv[])
       getline(file, line);
       if (line != "")
 	{
-	  KRKTestInstance ti = KRKTestInstance(line);
+	  TestInstance ti = TestInstance(line);
 	  all_tests.push_back(ti);
 	}
     }
@@ -638,7 +638,7 @@ int main(int argc, char * argv[])
 	    islands[j].updateNodeIntRules();
 	  }
 	}
-      vector<KRKTestInstance> tsVector = getTIVector(ts, NUM_TEST_CASES_TO_USE);
+      vector<TestInstance> tsVector = getTIVector(ts, NUM_TEST_CASES_TO_USE);
 
       bool depthdivision;
       if (argc == 15)

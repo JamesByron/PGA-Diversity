@@ -1,4 +1,4 @@
-OBJS = krktestinstance.o dataset.o individual2.o population.o
+OBJS = testinstance.o dataset.o individual2.o population.o
 
 FLAGS = -O2
 
@@ -7,10 +7,10 @@ default:
 
 singlenode: SingleNode.cpp SingleNode.h $(OBJS) config.h
 	g++ $(FLAGS) -o singlenode $(OBJS) SingleNode.cpp
-dataset.o: dataset.cpp dataset.h krktestinstance.o config.h
+dataset.o: dataset.cpp dataset.h testinstance.o config.h
 	g++ $(FLAGS) -c dataset.cpp
-krktestinstance.o: krktestinstance.cpp krktestinstance.h config.h
-	g++ $(FLAGS) -c krktestinstance.cpp
+testinstance.o: testinstance.cpp testinstance.h config.h
+	g++ $(FLAGS) -c testinstance.cpp
 population.o: population.cpp population.h individual2.o dataset.o config.h
 	g++ $(FLAGS) -c population.cpp
 individual2.o: individual2.cpp individual2.h dataset.o config.h

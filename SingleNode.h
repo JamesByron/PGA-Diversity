@@ -17,7 +17,7 @@ class SingleNode
   //void addToCustoms(Individual2 * v, int n);
   void doOneGeneration(int thisgen);
   int sendMigrants();
-  //  void NetFitnessAssessment(vector<KRKTestInstance> allti);
+  //  void NetFitnessAssessment(vector<TestInstance> allti);
   // public variables
   Population * a_pop;
   Individual2 * customs;

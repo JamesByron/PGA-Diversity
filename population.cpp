@@ -1,4 +1,4 @@
-#include "krktestinstance.h"
+#include "testinstance.h"
 #include "dataset.h"
 #include "population.h"
 
