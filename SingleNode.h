@@ -10,10 +10,11 @@
 
 using namespace std;
 
+template <class T>
 class SingleNode
 {
  public:
-  SingleNode(int r, DataSet ts);
+  SingleNode(int r, DataSet<T> ts);
   SingleNode();
   //~Island() {};
   //void addToCustoms(vector<Individual2> v);
@@ -22,7 +23,7 @@ class SingleNode
   int sendMigrants();
   //  void NetFitnessAssessment(vector<TestInstance> allti);
   // public variables
-  Population * a_pop;
+  Population<T> * a_pop;
   Individual2 * customs;
   Individual2* getIndividual(int index);
   void addIslandBitTotal(float * totals);

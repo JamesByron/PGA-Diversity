@@ -31,16 +31,16 @@ int PROB_MUTATE; // an int < RAND_MAX representing probability a single individu
 int WHEN_FULL_TEST = 100;
 // use RULE_LEN instead: int genomeLength = NUM_FEATURES*RULE_CASES*8;
 
-SingleNode * islands;
+SingleNode<KRKTestInstance> * islands;
 
-SingleNode::SingleNode(int r, DataSet ts)
+template <class T>
+SingleNode<T>::SingleNode(int r, DataSet<T> ts)
 {
 	myrank = r;
 	//  printf("SingleNode: construct an instance of a single-node\n");
 	//set the default values
-
 	//  printf("SingleNode: about to create a population\n");
-	a_pop = new Population(r, NUM_ISLANDS, ts, POP_SIZE);
+	a_pop = new Population<KRKTestInstance>(r, NUM_ISLANDS, ts, POP_SIZE);
 	a_pop->updatePopulationIntRules();
 	//  printf("SingleNode: have population and now update that pop's fitness\n");
 	a_pop->updatePopulationFitness(ts.trainSetSize(), WHICH_FITNESS);
@@ -48,13 +48,15 @@ SingleNode::SingleNode(int r, DataSet ts)
 	customs = new Individual2[NUM_IMMIGRANTS];
 }
 
-SingleNode::SingleNode()
+template <class T>
+SingleNode<T>::SingleNode()
 // Default constructor with empty test-set
 {
 
 }
 
-void SingleNode::doOneGeneration(int thisgen)
+template <class T>
+void SingleNode<T>::doOneGeneration(int thisgen)
 // do the stuff for one generation
 {
 	//printf("Node %d: sendMigrantStrings()\n", myrank);
@@ -83,23 +85,28 @@ void SingleNode::doOneGeneration(int thisgen)
 	a_pop->updatePopulationFitness(a_pop->myDataSet.trainSetSize(), WHICH_FITNESS);
 }
 
-void SingleNode::updateNodeIntRules() {
+template <class T>
+void SingleNode<T>::updateNodeIntRules() {
 	a_pop->updatePopulationIntRules();
 }
 
-void SingleNode::updateNodeRelevance(vector<float>* islandRelevance) {
+template <class T>
+void SingleNode<T>::updateNodeRelevance(vector<float>* islandRelevance) {
 	a_pop->updatePopulationRelevance(islandRelevance);
 }
 
-Individual2* SingleNode::getIndividual(int index) {
+template <class T>
+Individual2* SingleNode<T>::getIndividual(int index) {
 	return a_pop->getIndividual(index);
 }
 
-void SingleNode::addIslandBitTotal(float * totals) {
+template <class T>
+void SingleNode<T>::addIslandBitTotal(float * totals) {
 	a_pop->addPopulationBitTotal(totals);
 }
 
-int SingleNode::sendMigrants()
+template <class T>
+int SingleNode<T>::sendMigrants()
 {
 	Individual2 * migrants = new Individual2[NUM_IMMIGRANTS];
 	switch (WHICH_MIGRATION)
@@ -128,7 +135,7 @@ vector<float> getPairwiseHammingDiversityForAllNodes() {
 	int worstDiversity = 1000; // Start with a high number.
 	vector<int> tempV;
 	Individual2* currentIndividual;
-	SingleNode currentNode;
+	SingleNode<KRKTestInstance> currentNode;
 	vector< vector<int> > diversetable (TOTAL_POP, vector<int>(TOTAL_POP));
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		currentNode = islands[i];
@@ -287,7 +294,7 @@ vector<float> getDiversityValues(vector<float>* values, int numZeros) {
  * Computes the fitness of each individual within each island across the given test set.
  * Returns a two-dimensional vector of [islands * individuals][test instances]
  */
-vector< vector<float> > calculatePhenotypeFitnessDetail(DataSet* testInstances, int numTestInstances, char classification, int startIsland, int endIsland) {
+vector< vector<float> > calculatePhenotypeFitnessDetail(DataSet<KRKTestInstance>* testInstances, int numTestInstances, char classification, int startIsland, int endIsland) {
 	if ((startIsland < 0) || (endIsland > NUM_ISLANDS)) { cout << "Error in calculateFitnessDetail; island index out of range " << startIsland << ", " << endIsland << endl; cout.flush(); exit(-1); }
 	Individual2* tempIndividual;
 	vector< vector<float> > diversetableH ((endIsland-startIsland)*POP_SIZE, vector<float>(numTestInstances));
@@ -449,7 +456,7 @@ void getRelevanceByIsland(vector<float>* detail, vector <vector<float> >* island
 /**
  * This wrapper function constructs the phenotype diversity of the population.
  */
-vector<float> getPhenotypeRelevance(DataSet* testInstances, int numTestInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelevance, float relevanceWeight) {
+vector<float> getPhenotypeRelevance(DataSet<KRKTestInstance>* testInstances, int numTestInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelevance, float relevanceWeight) {
 	vector< vector<float> > detailedFitness = calculatePhenotypeFitnessDetail(testInstances, numTestInstances, WHICH_CLASSIFY, startIsland, endIsland);  // this stores data in the array and returns detailed results also
 	vector<float> fitnessTotals = calculatePhenotypeFitnessTotals(&detailedFitness, numTestInstances);
 	vector<float> weights =  calculatePhenotypeFitnessWeights(&fitnessTotals);
@@ -489,8 +496,8 @@ vector<float> getHammingRelevance(vector <vector<float> >* islandRelevance, bool
 	return diversityValues;
 }
 
-vector<TestInstance*> getTIVector(DataSet * set, int num) {
-	vector<TestInstance*> output (num);
+vector<KRKTestInstance*> getTIVector(DataSet<KRKTestInstance> * set, int num) {
+	vector<KRKTestInstance*> output (num);
 	for (int i = 0; i < num; ++i) {
 	  output[i] = set->getTI(i);
 	}
@@ -538,7 +545,7 @@ int main(int argc, char * argv[])
   srand( time(NULL) );
   int WHEN_PRINT_DATA = 1;
   int INIT_SEED;
-  vector<TestInstance*> all_tests;
+  vector<KRKTestInstance*> all_tests;
   //printf("SingleNode: Ready to start.\n");
   if (argc < 13) { usage(); exit(-1); }
   time_t start, end;
@@ -613,32 +620,38 @@ int main(int argc, char * argv[])
   float currentWeight = (WHICH_SELECT < 3) ? RELEVANCE_END : RELEVANCE_START;
   while (currentWeight >= RELEVANCE_END ) {
     for (int cycle = 0; cycle < NUM_CYCLES; cycle++) {
-      islands = new SingleNode[NUM_ISLANDS];
+      islands = new SingleNode<KRKTestInstance>[NUM_ISLANDS];
       //initialize all islands
       //printf("Initializing the islands (and populations, etc.)\n");
-      DataSet ts;
+      DataSet<KRKTestInstance> ts;
       //cout << "l214" << endl;
       if (argc > 15)
 	{
 	  printf("Not yet supporting stratified islands with split training/test sets\n"); exit(-1);
 	  for(int j=0; j<NUM_ISLANDS; j++)
 	    {
-	      ts = DataSet(&all_tests, NUM_TEST_CASES_TO_USE, (float)j-1);
-	      islands[j] = SingleNode(j, ts);
+	      ts = DataSet<KRKTestInstance>(&all_tests, NUM_TEST_CASES_TO_USE, (float)j-1);
+	      islands[j] = SingleNode<KRKTestInstance>(j, ts);
 	      islands[j].updateNodeIntRules();
 	    }
 	}
       else
 	{
 	  // printf("Creating the DataSet from the total krktestinstances in the file\n");
-	  ts = DataSet(&all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
+	  ts = DataSet<KRKTestInstance>(&all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
+	  //TestInstance* TI = (ts.getTI(0));
+	  //cout << TI->getStringRep() << endl;
+	  //KRKTestInstance* krk = (KRKTestInstance*)TI;
+	  //KRKTestInstance krk2 = *krk;
+	  //cout << krk2.getStringRep() << endl;
+	  exit(0);
 	  //printf("Finished creating the Testset\n");
 	  for(int j=0; j<NUM_ISLANDS; j++) {
-	    islands[j] = SingleNode(j, ts);
+	    islands[j] = SingleNode<KRKTestInstance>(j, ts);
 	    islands[j].updateNodeIntRules();
 	  }
 	}
-      vector<TestInstance*> tsVector = getTIVector(&ts, NUM_TEST_CASES_TO_USE);
+      vector<KRKTestInstance*> tsVector = getTIVector(&ts, NUM_TEST_CASES_TO_USE);
 
       bool depthdivision;
       if (argc == 15)

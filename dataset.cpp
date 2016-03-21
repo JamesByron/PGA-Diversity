@@ -6,7 +6,6 @@
 
 using namespace std;
 
-
 /** DataSet: a test-set instance should contain all of the krktestinstances that are known,
     but should provide distinct types of access to that total set:
     1. the full set
@@ -24,12 +23,13 @@ using namespace std;
  */
 // constructors that creates two disjoint data sets for training and testing
 // with respective sizes given by the value of the split (which must correspond to num)
-DataSet::DataSet(vector<TestInstance*> * allti, int num, float split) {
+template <class T>
+DataSet<T>::DataSet(vector<T*> * allti, int num, float split) {
 	//if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN DataSet CONSTRUCTOR\n"); exit(-1);}
 	NUM_TEST_CASES_TO_USE = num;
 	nTestInstances = allti->size() - num;
-	train = new TestInstance*[num];
-	test = new TestInstance*[allti->size() - num];
+	train = new T*[num];
+	test = new T*[allti->size() - num];
 	srand(time(NULL)+17033);
 	shuffle(allti);
 	// get the training split
@@ -43,14 +43,15 @@ DataSet::DataSet(vector<TestInstance*> * allti, int num, float split) {
 	}
 }
 
-TestInstance* DataSet::getTI(int i) {
+template <class T>
+T* DataSet<T>::getTI(int i) {
     if (i >= nTestInstances) {printf("getTestI: invalid index %d out of %d\n", i, nTestInstances); exit(-1);}
     return test[i];
   }
 
 // SAMPLING FUNCTIONS
-
-void DataSet::selectRandomTestInstances(TestInstance ** ti, vector<TestInstance*> tests)
+template <class T>
+void DataSet<T>::selectRandomTestInstances(T ** ti, vector<T*> tests)
 //void DataSet::selectRandomTestInstances(vector<TestInstance> tests)
 // OUT ti: stuff the randomly selected cases into this space
 // IN tests: use these test instances to select a sample
@@ -64,10 +65,11 @@ void DataSet::selectRandomTestInstances(TestInstance ** ti, vector<TestInstance*
 	}
 }
 
-void DataSet::shuffle(vector<TestInstance*> * a)
+template <class T>
+void DataSet<T>::shuffle(vector<T*> * a)
 {
 	int r;
-	TestInstance * t;
+	T * t;
 	for (int n=0; n < 3; n++)
 		for (int i=0; i < a->size(); i++)
 		{

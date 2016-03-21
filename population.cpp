@@ -6,8 +6,8 @@ using namespace std;
 
 // GLOBAL VARIABLES
 // . . . .
-
-Population::Population(int n, int nprocs, DataSet ts, int popsize)
+template <class T>
+Population<T>::Population(int n, int nprocs, DataSet<T> ts, int popsize)
 // n is the rank within the cluster of this island,
 // and nprocs in the total number of compute-nodes in this run
 // ts is the DataSet to use for evaluating this population's fitness
@@ -34,12 +34,14 @@ Population::Population(int n, int nprocs, DataSet ts, int popsize)
 	//printf("Population: finished constructor\n");
 }
 
-Individual2* Population::getIndividual(int index) {
+template <class T>
+Individual2* Population<T>::getIndividual(int index) {
 	return &mypop[index];
 }
 
 // computes the hamming distance between the input individual and each individual in this population
-vector<int> Population::calculateHammingForAll(Individual2* input){
+template <class T>
+vector<int> Population<T>::calculateHammingForAll(Individual2* input){
 	unsigned int * inputRule = (*input).getIntRule();
 	unsigned int * compareRule;
 	vector<int> hamming (POP_SIZE);
@@ -51,7 +53,8 @@ vector<int> Population::calculateHammingForAll(Individual2* input){
 }
 
 //  computes the hamming diversity within this population
-vector<float> Population::getInternalHammingDiversity(){
+template <class T>
+vector<float> Population<T>::getInternalHammingDiversity(){
 	unsigned int * iRule;
 	unsigned int * jRule;
 	int best = 0;
@@ -98,7 +101,8 @@ vector<float> Population::getInternalHammingDiversity(){
 }
 
 // Calculates the hamming distance for a pair of strings
-int Population::calculateHammingPair(unsigned int * a, unsigned int * b) {
+template <class T>
+int Population<T>::calculateHammingPair(unsigned int * a, unsigned int * b) {
 	int HamDiff = 0;
 	for (int i = 0; i < RULE_LEN; ++i) {
 		if (a[i] != b[i]) ++HamDiff;
@@ -106,7 +110,8 @@ int Population::calculateHammingPair(unsigned int * a, unsigned int * b) {
 	return HamDiff;
 }
 
-void Population::addPopulationBitTotal(float * totals) {
+template <class T>
+void Population<T>::addPopulationBitTotal(float * totals) {
 	unsigned int * tempRule;
 	for (int i = 0; i < POP_SIZE; ++i) {
 		tempRule = mypop[i].getIntRule();
@@ -116,7 +121,8 @@ void Population::addPopulationBitTotal(float * totals) {
 	}
 }
 
-void Population::updatePopulationIntRules() {
+template <class T>
+void Population<T>::updatePopulationIntRules() {
 	for (int i = 0; i < POP_SIZE; ++i) {
 		mypop[i].resetIntRule();
 	}
@@ -125,7 +131,8 @@ void Population::updatePopulationIntRules() {
 // update fitness of all individuals
 
 // determine fitness with respect to the training data for breeding/survival/migration purposes
-void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
+template <class T>
+void Population<T>::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 {
 	maxFitness = 0.0;
 	totalFitness = 0.0;
@@ -155,7 +162,8 @@ void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 	stdev = sqrt(stdev);
 }
 
-void Population::updateFitness(DataSet* ts, Individual2* individual, char WHICH_FITNESS)
+template <class T>
+void Population<T>::updateFitness(DataSet<T>* ts, Individual2* individual, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of krktestinstances using the appropriate fitness measure.
    */
 {
@@ -188,15 +196,16 @@ void Population::updateFitness(DataSet* ts, Individual2* individual, char WHICH_
   //printf("Leaving updateFitness\n");
 }
 
-void Population::updatePopulationRelevance(vector<float>* relevance) {
+template <class T>
+void Population<T>::updatePopulationRelevance(vector<float>* relevance) {
 	for (int i = 0; i < POP_SIZE; ++i) {
 		mypop[i].updateDiversityRelevance((*relevance)[i]);
 	}
 }
 
 // select individuals for . . . .
-
-void Population::selectToSurvive(int n)
+template <class T>
+void Population<T>::selectToSurvive(int n)
 // Select individuals to survive to next population
 {
 	static Individual2 tmpI;
@@ -221,7 +230,8 @@ void Population::selectToSurvive(int n)
 	unselectAll();
 }
 
-void Population::selectRandToMigrate(Individual2 * migrants, int num_migrants)
+template <class T>
+void Population<T>::selectRandToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs randomly selected individuals (without replacement) into the migrants array
 // ??? and sets their selected flag in the base population
 {
@@ -236,7 +246,8 @@ void Population::selectRandToMigrate(Individual2 * migrants, int num_migrants)
 	}
 }
 
-void Population::selectStrongToMigrate(Individual2 * migrants, int num_migrants)
+template <class T>
+void Population<T>::selectStrongToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs individuals (bias towards strong) into the migrants array
 // ??? and sets their selected flag in the base population
 {
@@ -255,7 +266,8 @@ void Population::selectStrongToMigrate(Individual2 * migrants, int num_migrants)
 	}
 }
 
-void Population::selectWeakToMigrate(Individual2 * migrants, int num_migrants)
+template <class T>
+void Population<T>::selectWeakToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs individuals (bias towards weak) into the migrants array and sets
 // their selected flag in the base population
 {
@@ -274,21 +286,22 @@ void Population::selectWeakToMigrate(Individual2 * migrants, int num_migrants)
 }
 
 // add immigrating individuals
-
-void Population::processImmigrants(Individual2 * v, int n)
+template <class T>
+void Population<T>::processImmigrants(Individual2 * v, int n)
 {
 	for (int i=0; i < n; i++)
 		processOneImmigrant(v[i]);
 }
 
-void Population::processOneImmigrant(Individual2 i)
+template <class T>
+void Population<T>::processOneImmigrant(Individual2 i)
 {
 	newpop[newpop_count++] = i;
 }
 
 // generate offspring
-
-void Population::generateOffspring(int n)
+template <class T>
+void Population<T>::generateOffspring(int n)
 //breed remaining individuals two at a time
 {
 	//printf("Entering generateOffspring\n");
@@ -311,8 +324,8 @@ void Population::generateOffspring(int n)
 }
 
 // switch to next generation
-
-void Population::nextGeneration(int PROB_MUTATE)
+template <class T>
+void Population<T>::nextGeneration(int PROB_MUTATE)
 {
 	//printf("Entering nextGeneration\n");
 	Individual2 * tptr;
@@ -340,8 +353,8 @@ void Population::nextGeneration(int PROB_MUTATE)
 }
 
 // private member functions
-
-void Population::unselectAll()
+template <class T>
+void Population<T>::unselectAll()
 {
 	Individual2 * tpop_ptr = mypop;
 	for(int j = 0; j < POP_SIZE; j++)
@@ -351,8 +364,8 @@ void Population::unselectAll()
 	}
 }
 
-
-int Population::selectIndividual(int availablepop)
+template <class T>
+int Population<T>::selectIndividual(int availablepop)
 {
 	switch (WHICH_SELECT) {
 	case 0: return rand() % availablepop; break;// completely random selection with no bias either toward fitness or diversity
@@ -363,7 +376,8 @@ int Population::selectIndividual(int availablepop)
 	}
 }
 
-int Population::relevanceTournamentSelect(int availablepop) {
+template <class T>
+int Population<T>::relevanceTournamentSelect(int availablepop) {
 	int bestIndex, candidate;
 	bestIndex = rand() % availablepop;
 	float bestFit = mypop[bestIndex].getDiversityRelevance();
@@ -379,7 +393,8 @@ int Population::relevanceTournamentSelect(int availablepop) {
 	return bestIndex;
 }
 
-int Population::tournamentSelect(int availablepop)
+template <class T>
+int Population<T>::tournamentSelect(int availablepop)
 // tournament selection with replacement for tournament participants -- best of tournament candidates selected
 {
 	float bestFit;
@@ -396,7 +411,8 @@ int Population::tournamentSelect(int availablepop)
 	return bestIndex;
 }
 
-int Population::altSelectIndividual()
+template <class T>
+int Population<T>::altSelectIndividual()
 {
 	static float MY_RAND_MAX = (float)RAND_MAX + 1.0;
 	float usedFit = 0.0;
@@ -421,7 +437,8 @@ int Population::altSelectIndividual()
 	return selectedIndex;
 }
 
-int Population::selectWeakIndividual()
+template <class T>
+int Population<T>::selectWeakIndividual()
 {
 	float arandnum = (((float)rand())/RAND_MAX) * totalInverseFitness;
 	int selectedIndex = 0;
