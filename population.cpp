@@ -1,5 +1,5 @@
-#include "testinstance.h"
-#include "dataset.h"
+//#include "krktestinstance.h"
+//#include "dataset.h"
 #include "population.h"
 
 using namespace std;
@@ -156,7 +156,7 @@ void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 }
 
 void Population::updateFitness(DataSet* ts, Individual2* individual, char WHICH_FITNESS)
-  /** Update the fitness of this individual over the set of testinstances using the appropriate fitness measure.
+  /** Update the fitness of this individual over the set of krktestinstances using the appropriate fitness measure.
    */
 {
   //printf("Entering updatFitness\n");

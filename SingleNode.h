@@ -4,6 +4,9 @@
 #include <vector>
 #include <sstream>
 #include <cmath>
+//#include "dataset.h"
+#ifndef SINGLENODE_H
+#define SINGLENODE_H
 
 using namespace std;
 
@@ -29,3 +32,5 @@ class SingleNode
   bool selectIndividual(int ind);
   int myrank;
 };
+
+#endif

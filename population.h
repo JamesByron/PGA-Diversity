@@ -5,6 +5,10 @@
 #include <cmath>
 #include <sstream>
 #include "config.h"
+#include "dataset.h"
+
+#ifndef POPULATION_H
+#define POPULATION_H
 
 using namespace std;
 
@@ -67,3 +71,5 @@ private:
   Individual2 * mypop;
   Individual2 * newpop;
 };
+
+#endif

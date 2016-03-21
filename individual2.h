@@ -3,6 +3,8 @@
 #include <time.h>
 #include <cstdlib>
 #include "config.h"
+#ifndef INDIVIDUAL2_H
+#define INDIVIDUAL2_H
 
 //typedef unsigned char byte;
 using namespace std;
@@ -55,3 +57,5 @@ private:
   unsigned int intRule[RULE_CASES*NUM_FEATURES*8]; //  = {0};
   float myDiversityRelevance;
 };
+
+#endif

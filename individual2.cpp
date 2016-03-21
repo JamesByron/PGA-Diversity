@@ -4,13 +4,11 @@
 
 using namespace std;
 
-Individual2::Individual2()
-{
+Individual2::Individual2() {
   selected = false;
 }
 
-Individual2::Individual2(int rl)
-{
+Individual2::Individual2(int rl) {
   string s("");
   if ( rl != RULE_LEN )  printf("w-ERROR: incorrect length of %d to Individual2(int) constructor\n", rl);
   for (int i = 0; i < RULE_LEN; i++)
@@ -24,9 +22,8 @@ Individual2::Individual2(int rl)
   selected = false;
 }
 
-Individual2::Individual2(string str)
+Individual2::Individual2(string str) {
   // expects a string of 0's and 1's, RULE_LEN chars long
-{
   if (str.length() != RULE_LEN) printf("w-ERROR: incorrect length of %d to Individual2(string) constructor\n", (int)str.length());
   setRule(str);
   selected = false;
@@ -36,8 +33,7 @@ void Individual2::updateDiversityRelevance(float relevance) {
 	myDiversityRelevance = relevance;
 }
 
-void Individual2::breedNCross(Individual2 * kids, Individual2 ind)
-{
+void Individual2::breedNCross(Individual2 * kids, Individual2 ind) {
   int crossThisTime = (rand()%MAX_NUM_CROSS_BREED)+1;
   auxBreedNCross(kids, ind, crossThisTime);
 }
@@ -46,9 +42,7 @@ void Individual2::breed1Cross(Individual2 * kids, Individual2 ind) { auxBreedNCr
 
 void Individual2::breed2Cross(Individual2 * kids, Individual2 ind) { auxBreedNCross(kids, ind, 2); }
 
-
-void Individual2::setRule(string s)
-{
+void Individual2::setRule(string s) {
   //printf("Entering setRule(string s)\n");
   for (int rc=0; rc < RULE_CASES; rc++)
     for (int f=0; f < NUM_FEATURES; f++)
@@ -56,16 +50,14 @@ void Individual2::setRule(string s)
   //printf("Leaving setRule(sring s)\n");
 }
 
-void Individual2::setRule(unsigned char * ucs)
-{
+void Individual2::setRule(unsigned char * ucs) {
   //printf("Entering  setRule(unsigned char * ucs)\n");
   for (int i=0; i < RULE_CASES*NUM_FEATURES; i++)
     rule[i] = ucs[i];
   //printf("Leaving  setRule(unsigned char * ucs)\n");
 }
 
-void Individual2::setRandomRule()
-{
+void Individual2::setRandomRule() {
   string s("");
   //printf("Entering setRule(string s)\n");
   for (int rc=0; rc < RULE_CASES; rc++)
@@ -83,9 +75,8 @@ void Individual2::setRandomRule()
   //printf("Leaving setRule(sring s)\n");
 }
 
-string Individual2::getStringRule()
-{
-	exit(-1);
+string Individual2::getStringRule() {
+  exit(-1);
   string s("");
   for (int i=0; i < RULE_CASES*NUM_FEATURES; i++) {
     s += byteToString(rule[i]);
@@ -104,13 +95,12 @@ string Individual2::getStringRule()
   return s;
 }
 
-void Individual2::mutate()
+void Individual2::mutate() {
   /** Revised 3/7/2009 (wfi): 
       Call this function ONLY IF the individual gets "hit", then roll the dice
       for which bit got hit, flip that bit, and that's it.
       NOTE: this precludes multiple bits getting flipped on the same generation.
    */
-{
   //printf("Entering mutate\n");
   int hitPos = rand()%RULE_LEN;
   rule[hitPos/8] ^= ((unsigned char)1) << (unsigned char)(hitPos%8);
@@ -119,8 +109,7 @@ void Individual2::mutate()
 // PRIVATE
 
 // auxBreedNCross ....
-void Individual2::auxBreedNCross(Individual2 * kids, Individual2 ind, int crossThisTime)
-{
+void Individual2::auxBreedNCross(Individual2 * kids, Individual2 ind, int crossThisTime) {
   //printf("Entering auxBreedNCross\n");
   // initialize crossover points
   int cpts[MAX_NUM_CROSS_BREED];
@@ -183,9 +172,7 @@ void Individual2::auxBreedNCross(Individual2 * kids, Individual2 ind, int crossT
   //printf("Leaving auxBreedNCross\n");
 }
 
-
-unsigned char Individual2::toUChar(string s)
-{
+unsigned char Individual2::toUChar(string s) {
   unsigned char auc = 0;
   for (int i=0; i < 8; i++)
     {
@@ -195,11 +182,10 @@ unsigned char Individual2::toUChar(string s)
   return auc;
 }
 
-void Individual2::splitbytes(unsigned char * n1, unsigned char * n2, unsigned char r1, unsigned char r2, int split)
+void Individual2::splitbytes(unsigned char * n1, unsigned char * n2, unsigned char r1, unsigned char r2, int split) {
   // IN-OUT n1 and n2 expected to be 0 at start
   // stuff n1 with the first "split" bits from r1, and n2 with the first "split" bits from r2
   // and then the rest of the bits of n1 from the rest of r2, and n2 from r1 respectively
-{
   //printf("Entering splitbytes\n");
   unsigned char mask = 128;
   unsigned char tmp;
@@ -215,8 +201,7 @@ void Individual2::splitbytes(unsigned char * n1, unsigned char * n2, unsigned ch
   //printf("AFTER SPLIT      :: n1: %s, r1: %d, n2: %s, r2: %d\n",byteToString(*n1).c_str(), r1, byteToString(*n2).c_str(), r2);
 }
 
-string Individual2::byteToString(unsigned char c)
-{
+string Individual2::byteToString(unsigned char c) {
   string s("");
   unsigned char mask = 128;
   for (int i=0; i < 8; i++)
@@ -251,18 +236,15 @@ void Individual2::resetIntRule() {
 	}
 }
 
-void Individual2::resetConfMat()
+void Individual2::resetConfMat() {
   // reset the confusion matrix
-{
   for(int i=0; i < RULE_CASES; i++)
     for(int j=0; j < RULE_CASES; j++)
       confMat[i][j]=0;
 }
     
-void Individual2::dumpConfMat(FILE *lf)
-  /** Print out this individual's confusion matrix as most recently populated
-   */
-{
+void Individual2::dumpConfMat(FILE *lf) {
+  /** Print out this individual's confusion matrix as most recently populated */
   for(int i=0; i < RULE_CASES ; i++)
     {
       fprintf(lf, "ConfMat %3d: %8.2f", i, confMat[i][0]);
@@ -272,10 +254,8 @@ void Individual2::dumpConfMat(FILE *lf)
     }
 }
 
-
-void Individual2::sortNums(int * cpts, int j)
+void Individual2::sortNums(int * cpts, int j) {
 // sort the j crossover points 
-{
   while (j > 0){
     for (int i=0; i < (j-1); i++)
       {

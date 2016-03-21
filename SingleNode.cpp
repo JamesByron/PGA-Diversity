@@ -1,5 +1,5 @@
-#include "testinstance.h"
-#include "dataset.h"
+//#include "krktestinstance.h"
+//#include "dataset.h"
 #include "population.h"
 #include "SingleNode.h"
 #include <time.h>
@@ -489,10 +489,10 @@ vector<float> getHammingRelevance(vector <vector<float> >* islandRelevance, bool
 	return diversityValues;
 }
 
-vector<TestInstance> getTIVector(DataSet set, int num) {
-	vector<TestInstance> output (num);
+vector<TestInstance*> getTIVector(DataSet * set, int num) {
+	vector<TestInstance*> output (num);
 	for (int i = 0; i < num; ++i) {
-	  output[i] = * set.getTI(i);
+	  output[i] = set->getTI(i);
 	}
 	return output;
 }
@@ -532,13 +532,13 @@ int main(int argc, char * argv[])
    argv[12] which classification function to use,
    argv[13] (optional) mutation probability that given individual will have single-point mutation
    argv[14] (optional) initial seed to use to select sample of test instances
-   argv[15] (optional) depth of testinstance selecion (-1:draw, 0:zero, 1:one,...,16:sixteen)
+   argv[15] (optional) depth of krktestinstance selecion (-1:draw, 0:zero, 1:one,...,16:sixteen)
  */
 {
   srand( time(NULL) );
   int WHEN_PRINT_DATA = 1;
   int INIT_SEED;
-  vector<TestInstance> all_tests;
+  vector<TestInstance*> all_tests;
   //printf("SingleNode: Ready to start.\n");
   if (argc < 13) { usage(); exit(-1); }
   time_t start, end;
@@ -583,8 +583,8 @@ int main(int argc, char * argv[])
       getline(file, line);
       if (line != "")
 	{
-	  TestInstance ti = TestInstance(line);
-	  all_tests.push_back(ti);
+	  KRKTestInstance ti = KRKTestInstance(line);
+	  all_tests.push_back(&ti);
 	}
     }
   //cout << "l209" << endl;
@@ -630,7 +630,7 @@ int main(int argc, char * argv[])
 	}
       else
 	{
-	  // printf("Creating the DataSet from the total testinstances in the file\n");
+	  // printf("Creating the DataSet from the total krktestinstances in the file\n");
 	  ts = DataSet(&all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
 	  //printf("Finished creating the Testset\n");
 	  for(int j=0; j<NUM_ISLANDS; j++) {
@@ -638,7 +638,7 @@ int main(int argc, char * argv[])
 	    islands[j].updateNodeIntRules();
 	  }
 	}
-      vector<TestInstance> tsVector = getTIVector(ts, NUM_TEST_CASES_TO_USE);
+      vector<TestInstance*> tsVector = getTIVector(&ts, NUM_TEST_CASES_TO_USE);
 
       bool depthdivision;
       if (argc == 15)
