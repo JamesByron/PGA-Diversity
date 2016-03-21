@@ -4,7 +4,7 @@
 #include <vector>
 #include "config.h"
 //#include "dataset.h"
-#include "testinstance.cpp"
+#include "testinstance.h"
 //#include "individual2.h"
 #ifndef KRKTESTINSTANCE_H
 #define KRKTESTINSTANCE_H

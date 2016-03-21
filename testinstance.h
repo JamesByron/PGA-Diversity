@@ -6,6 +6,8 @@
 //#include <string>
 //#include "config.h"
 #include "individual2.h"
+#ifndef TESTINSTANCE_H
+#define TESTINSTANCE_H
 
 using namespace std;
 
@@ -72,3 +74,5 @@ protected:
 	string datasetForm;
 	int depth;
 };
+
+#endif
