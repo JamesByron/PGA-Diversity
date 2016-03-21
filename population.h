@@ -12,11 +12,10 @@
 
 using namespace std;
 
-template <class T>
 class Population
 {
 public:
-  Population(int n, int nprocs, DataSet<T> ts, int popsize);
+  Population(int n, int nprocs, DataSet<KRKTestInstance> ts, int popsize);
   // accessors
   int getGeneration() { return generation; }
   float getPopulationMaxFitness() { return maxFitness; }
@@ -25,7 +24,7 @@ public:
   Individual2 getBestIndividual() {return bestIndiv;}
   // update fitness of all individuals
   void updatePopulationFitness(int numTItoUse, char WHICH_FITNESS);
-  void updateFitness(DataSet<T>* ts, Individual2* individual, char WHICH_FITNESS);
+  void updateFitness(DataSet<KRKTestInstance>* ts, Individual2* individual, char WHICH_FITNESS);
   void updatePopulationRelevance(vector<float>* relevance);
   // select individuals for . . . .
   void selectToSurvive(int n);
@@ -44,7 +43,7 @@ public:
   vector<int> calculateHammingForAll(Individual2* input);
   void addPopulationBitTotal(float * totals);
   void updatePopulationIntRules();
-  DataSet<T> myDataSet;
+  DataSet<KRKTestInstance> myDataSet;
 private:
   // functions
   int calculateHammingPair(unsigned int * a, unsigned int * b);

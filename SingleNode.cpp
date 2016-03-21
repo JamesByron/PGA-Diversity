@@ -31,16 +31,16 @@ int PROB_MUTATE; // an int < RAND_MAX representing probability a single individu
 int WHEN_FULL_TEST = 100;
 // use RULE_LEN instead: int genomeLength = NUM_FEATURES*RULE_CASES*8;
 
-SingleNode<KRKTestInstance> * islands;
+SingleNode * islands;
 
-template <class T>
-SingleNode<T>::SingleNode(int r, DataSet<T> ts)
+//template <class T>
+SingleNode::SingleNode(int r, DataSet<KRKTestInstance> ts)
 {
 	myrank = r;
 	//  printf("SingleNode: construct an instance of a single-node\n");
 	//set the default values
 	//  printf("SingleNode: about to create a population\n");
-	a_pop = new Population<KRKTestInstance>(r, NUM_ISLANDS, ts, POP_SIZE);
+	a_pop = new Population(r, NUM_ISLANDS, ts, POP_SIZE);
 	a_pop->updatePopulationIntRules();
 	//  printf("SingleNode: have population and now update that pop's fitness\n");
 	a_pop->updatePopulationFitness(ts.trainSetSize(), WHICH_FITNESS);
@@ -48,15 +48,15 @@ SingleNode<T>::SingleNode(int r, DataSet<T> ts)
 	customs = new Individual2[NUM_IMMIGRANTS];
 }
 
-template <class T>
-SingleNode<T>::SingleNode()
+//template <class T>
+SingleNode::SingleNode()
 // Default constructor with empty test-set
 {
 
 }
 
-template <class T>
-void SingleNode<T>::doOneGeneration(int thisgen)
+//template <class T>
+void SingleNode::doOneGeneration(int thisgen)
 // do the stuff for one generation
 {
 	//printf("Node %d: sendMigrantStrings()\n", myrank);
@@ -85,28 +85,28 @@ void SingleNode<T>::doOneGeneration(int thisgen)
 	a_pop->updatePopulationFitness(a_pop->myDataSet.trainSetSize(), WHICH_FITNESS);
 }
 
-template <class T>
-void SingleNode<T>::updateNodeIntRules() {
+//template <class T>
+void SingleNode::updateNodeIntRules() {
 	a_pop->updatePopulationIntRules();
 }
 
-template <class T>
-void SingleNode<T>::updateNodeRelevance(vector<float>* islandRelevance) {
+//template <class T>
+void SingleNode::updateNodeRelevance(vector<float>* islandRelevance) {
 	a_pop->updatePopulationRelevance(islandRelevance);
 }
 
-template <class T>
-Individual2* SingleNode<T>::getIndividual(int index) {
+//template <class T>
+Individual2* SingleNode::getIndividual(int index) {
 	return a_pop->getIndividual(index);
 }
 
-template <class T>
-void SingleNode<T>::addIslandBitTotal(float * totals) {
+//template <class T>
+void SingleNode::addIslandBitTotal(float * totals) {
 	a_pop->addPopulationBitTotal(totals);
 }
 
-template <class T>
-int SingleNode<T>::sendMigrants()
+//template <class T>
+int SingleNode::sendMigrants()
 {
 	Individual2 * migrants = new Individual2[NUM_IMMIGRANTS];
 	switch (WHICH_MIGRATION)
@@ -135,7 +135,7 @@ vector<float> getPairwiseHammingDiversityForAllNodes() {
 	int worstDiversity = 1000; // Start with a high number.
 	vector<int> tempV;
 	Individual2* currentIndividual;
-	SingleNode<KRKTestInstance> currentNode;
+	SingleNode currentNode;
 	vector< vector<int> > diversetable (TOTAL_POP, vector<int>(TOTAL_POP));
 	for (int i = 0; i < NUM_ISLANDS; ++i) {
 		currentNode = islands[i];
@@ -620,7 +620,7 @@ int main(int argc, char * argv[])
   float currentWeight = (WHICH_SELECT < 3) ? RELEVANCE_END : RELEVANCE_START;
   while (currentWeight >= RELEVANCE_END ) {
     for (int cycle = 0; cycle < NUM_CYCLES; cycle++) {
-      islands = new SingleNode<KRKTestInstance>[NUM_ISLANDS];
+      islands = new SingleNode[NUM_ISLANDS];
       //initialize all islands
       //printf("Initializing the islands (and populations, etc.)\n");
       DataSet<KRKTestInstance> ts;
@@ -631,7 +631,7 @@ int main(int argc, char * argv[])
 	  for(int j=0; j<NUM_ISLANDS; j++)
 	    {
 	      ts = DataSet<KRKTestInstance>(&all_tests, NUM_TEST_CASES_TO_USE, (float)j-1);
-	      islands[j] = SingleNode<KRKTestInstance>(j, ts);
+	      islands[j] = SingleNode(j, ts);
 	      islands[j].updateNodeIntRules();
 	    }
 	}
@@ -644,10 +644,10 @@ int main(int argc, char * argv[])
 	  //KRKTestInstance* krk = (KRKTestInstance*)TI;
 	  //KRKTestInstance krk2 = *krk;
 	  //cout << krk2.getStringRep() << endl;
-	  exit(0);
+
 	  //printf("Finished creating the Testset\n");
 	  for(int j=0; j<NUM_ISLANDS; j++) {
-	    islands[j] = SingleNode<KRKTestInstance>(j, ts);
+	    islands[j] = SingleNode(j, ts);
 	    islands[j].updateNodeIntRules();
 	  }
 	}

@@ -6,8 +6,8 @@ using namespace std;
 
 // GLOBAL VARIABLES
 // . . . .
-template <class T>
-Population<T>::Population(int n, int nprocs, DataSet<T> ts, int popsize)
+//template <class T>
+Population::Population(int n, int nprocs, DataSet<KRKTestInstance> ts, int popsize)
 // n is the rank within the cluster of this island,
 // and nprocs in the total number of compute-nodes in this run
 // ts is the DataSet to use for evaluating this population's fitness
@@ -34,14 +34,14 @@ Population<T>::Population(int n, int nprocs, DataSet<T> ts, int popsize)
 	//printf("Population: finished constructor\n");
 }
 
-template <class T>
-Individual2* Population<T>::getIndividual(int index) {
+//template <class T>
+Individual2* Population::getIndividual(int index) {
 	return &mypop[index];
 }
 
 // computes the hamming distance between the input individual and each individual in this population
-template <class T>
-vector<int> Population<T>::calculateHammingForAll(Individual2* input){
+//template <class T>
+vector<int> Population::calculateHammingForAll(Individual2* input){
 	unsigned int * inputRule = (*input).getIntRule();
 	unsigned int * compareRule;
 	vector<int> hamming (POP_SIZE);
@@ -53,8 +53,8 @@ vector<int> Population<T>::calculateHammingForAll(Individual2* input){
 }
 
 //  computes the hamming diversity within this population
-template <class T>
-vector<float> Population<T>::getInternalHammingDiversity(){
+//template <class T>
+vector<float> Population::getInternalHammingDiversity(){
 	unsigned int * iRule;
 	unsigned int * jRule;
 	int best = 0;
@@ -101,8 +101,8 @@ vector<float> Population<T>::getInternalHammingDiversity(){
 }
 
 // Calculates the hamming distance for a pair of strings
-template <class T>
-int Population<T>::calculateHammingPair(unsigned int * a, unsigned int * b) {
+//template <class T>
+int Population::calculateHammingPair(unsigned int * a, unsigned int * b) {
 	int HamDiff = 0;
 	for (int i = 0; i < RULE_LEN; ++i) {
 		if (a[i] != b[i]) ++HamDiff;
@@ -110,8 +110,8 @@ int Population<T>::calculateHammingPair(unsigned int * a, unsigned int * b) {
 	return HamDiff;
 }
 
-template <class T>
-void Population<T>::addPopulationBitTotal(float * totals) {
+//template <class T>
+void Population::addPopulationBitTotal(float * totals) {
 	unsigned int * tempRule;
 	for (int i = 0; i < POP_SIZE; ++i) {
 		tempRule = mypop[i].getIntRule();
@@ -121,8 +121,8 @@ void Population<T>::addPopulationBitTotal(float * totals) {
 	}
 }
 
-template <class T>
-void Population<T>::updatePopulationIntRules() {
+//template <class T>
+void Population::updatePopulationIntRules() {
 	for (int i = 0; i < POP_SIZE; ++i) {
 		mypop[i].resetIntRule();
 	}
@@ -131,8 +131,8 @@ void Population<T>::updatePopulationIntRules() {
 // update fitness of all individuals
 
 // determine fitness with respect to the training data for breeding/survival/migration purposes
-template <class T>
-void Population<T>::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
+//template <class T>
+void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 {
 	maxFitness = 0.0;
 	totalFitness = 0.0;
@@ -162,8 +162,8 @@ void Population<T>::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 	stdev = sqrt(stdev);
 }
 
-template <class T>
-void Population<T>::updateFitness(DataSet<T>* ts, Individual2* individual, char WHICH_FITNESS)
+//template <class T>
+void Population::updateFitness(DataSet<KRKTestInstance>* ts, Individual2* individual, char WHICH_FITNESS)
   /** Update the fitness of this individual over the set of krktestinstances using the appropriate fitness measure.
    */
 {
@@ -176,7 +176,13 @@ void Population<T>::updateFitness(DataSet<T>* ts, Individual2* individual, char 
   {
     switch (WHICH_FITNESS)
       {
-      case 'h': sum += ts->getTI(i)->fitnessHiFi(individual); break;		// HiFi
+      case 'h': {
+    	  KRKTestInstance* krk = ts->getTI(i);
+    	  cout << "Test" << endl;
+    	  cout << krk->getStringRep() << endl;
+    	  exit(0);
+    	  //sum += ts->getTI(i)->fitnessHiFi(individual);
+    	  break; }		// HiFi
       case 'l': if(ts->getTI(i)->classify(individual)) sum++; break;	// LoFi
       }
     //printf("On test case number %d\n", i);
@@ -196,16 +202,16 @@ void Population<T>::updateFitness(DataSet<T>* ts, Individual2* individual, char 
   //printf("Leaving updateFitness\n");
 }
 
-template <class T>
-void Population<T>::updatePopulationRelevance(vector<float>* relevance) {
+//template <class T>
+void Population::updatePopulationRelevance(vector<float>* relevance) {
 	for (int i = 0; i < POP_SIZE; ++i) {
 		mypop[i].updateDiversityRelevance((*relevance)[i]);
 	}
 }
 
 // select individuals for . . . .
-template <class T>
-void Population<T>::selectToSurvive(int n)
+//template <class T>
+void Population::selectToSurvive(int n)
 // Select individuals to survive to next population
 {
 	static Individual2 tmpI;
@@ -230,8 +236,8 @@ void Population<T>::selectToSurvive(int n)
 	unselectAll();
 }
 
-template <class T>
-void Population<T>::selectRandToMigrate(Individual2 * migrants, int num_migrants)
+//template <class T>
+void Population::selectRandToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs randomly selected individuals (without replacement) into the migrants array
 // ??? and sets their selected flag in the base population
 {
@@ -246,8 +252,8 @@ void Population<T>::selectRandToMigrate(Individual2 * migrants, int num_migrants
 	}
 }
 
-template <class T>
-void Population<T>::selectStrongToMigrate(Individual2 * migrants, int num_migrants)
+//template <class T>
+void Population::selectStrongToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs individuals (bias towards strong) into the migrants array
 // ??? and sets their selected flag in the base population
 {
@@ -266,8 +272,8 @@ void Population<T>::selectStrongToMigrate(Individual2 * migrants, int num_migran
 	}
 }
 
-template <class T>
-void Population<T>::selectWeakToMigrate(Individual2 * migrants, int num_migrants)
+//template <class T>
+void Population::selectWeakToMigrate(Individual2 * migrants, int num_migrants)
 // stuffs individuals (bias towards weak) into the migrants array and sets
 // their selected flag in the base population
 {
@@ -286,22 +292,22 @@ void Population<T>::selectWeakToMigrate(Individual2 * migrants, int num_migrants
 }
 
 // add immigrating individuals
-template <class T>
-void Population<T>::processImmigrants(Individual2 * v, int n)
+//template <class T>
+void Population::processImmigrants(Individual2 * v, int n)
 {
 	for (int i=0; i < n; i++)
 		processOneImmigrant(v[i]);
 }
 
-template <class T>
-void Population<T>::processOneImmigrant(Individual2 i)
+//template <class T>
+void Population::processOneImmigrant(Individual2 i)
 {
 	newpop[newpop_count++] = i;
 }
 
 // generate offspring
-template <class T>
-void Population<T>::generateOffspring(int n)
+//template <class T>
+void Population::generateOffspring(int n)
 //breed remaining individuals two at a time
 {
 	//printf("Entering generateOffspring\n");
@@ -324,8 +330,8 @@ void Population<T>::generateOffspring(int n)
 }
 
 // switch to next generation
-template <class T>
-void Population<T>::nextGeneration(int PROB_MUTATE)
+//template <class T>
+void Population::nextGeneration(int PROB_MUTATE)
 {
 	//printf("Entering nextGeneration\n");
 	Individual2 * tptr;
@@ -353,8 +359,8 @@ void Population<T>::nextGeneration(int PROB_MUTATE)
 }
 
 // private member functions
-template <class T>
-void Population<T>::unselectAll()
+//template <class T>
+void Population::unselectAll()
 {
 	Individual2 * tpop_ptr = mypop;
 	for(int j = 0; j < POP_SIZE; j++)
@@ -364,8 +370,8 @@ void Population<T>::unselectAll()
 	}
 }
 
-template <class T>
-int Population<T>::selectIndividual(int availablepop)
+//template <class T>
+int Population::selectIndividual(int availablepop)
 {
 	switch (WHICH_SELECT) {
 	case 0: return rand() % availablepop; break;// completely random selection with no bias either toward fitness or diversity
@@ -376,8 +382,8 @@ int Population<T>::selectIndividual(int availablepop)
 	}
 }
 
-template <class T>
-int Population<T>::relevanceTournamentSelect(int availablepop) {
+//template <class T>
+int Population::relevanceTournamentSelect(int availablepop) {
 	int bestIndex, candidate;
 	bestIndex = rand() % availablepop;
 	float bestFit = mypop[bestIndex].getDiversityRelevance();
@@ -393,8 +399,8 @@ int Population<T>::relevanceTournamentSelect(int availablepop) {
 	return bestIndex;
 }
 
-template <class T>
-int Population<T>::tournamentSelect(int availablepop)
+//template <class T>
+int Population::tournamentSelect(int availablepop)
 // tournament selection with replacement for tournament participants -- best of tournament candidates selected
 {
 	float bestFit;
@@ -411,8 +417,8 @@ int Population<T>::tournamentSelect(int availablepop)
 	return bestIndex;
 }
 
-template <class T>
-int Population<T>::altSelectIndividual()
+//template <class T>
+int Population::altSelectIndividual()
 {
 	static float MY_RAND_MAX = (float)RAND_MAX + 1.0;
 	float usedFit = 0.0;
@@ -437,8 +443,8 @@ int Population<T>::altSelectIndividual()
 	return selectedIndex;
 }
 
-template <class T>
-int Population<T>::selectWeakIndividual()
+//template <class T>
+int Population::selectWeakIndividual()
 {
 	float arandnum = (((float)rand())/RAND_MAX) * totalInverseFitness;
 	int selectedIndex = 0;

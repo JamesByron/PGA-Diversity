@@ -23,6 +23,7 @@ using namespace std;
  */
 // constructors that creates two disjoint data sets for training and testing
 // with respective sizes given by the value of the split (which must correspond to num)
+/*
 template <class T>
 DataSet<T>::DataSet(vector<T*> * allti, int num, float split) {
 	//if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN DataSet CONSTRUCTOR\n"); exit(-1);}
@@ -42,13 +43,13 @@ DataSet<T>::DataSet(vector<T*> * allti, int num, float split) {
 		test[k]=(*allti)[i++];
 	}
 }
-
+/*
 template <class T>
 T* DataSet<T>::getTI(int i) {
     if (i >= nTestInstances) {printf("getTestI: invalid index %d out of %d\n", i, nTestInstances); exit(-1);}
     return test[i];
   }
-
+/*
 // SAMPLING FUNCTIONS
 template <class T>
 void DataSet<T>::selectRandomTestInstances(T ** ti, vector<T*> tests)
@@ -64,7 +65,7 @@ void DataSet<T>::selectRandomTestInstances(T ** ti, vector<T*> tests)
 		ti[i]=tests[index];
 	}
 }
-
+/*
 template <class T>
 void DataSet<T>::shuffle(vector<T*> * a)
 {
@@ -78,4 +79,4 @@ void DataSet<T>::shuffle(vector<T*> * a)
 			(*a)[r] = (*a)[i];
 			(*a)[i] = t;
 		}
-}
+}*/
