@@ -36,8 +36,12 @@ public:
   DataSet() {}
   T * getTI(int i) {
 	    if (i >= nTestInstances) {printf("getTestI: invalid index %d out of %d\n", i, nTestInstances); exit(-1);}
-	    return test[i];
+	    return (T*)test[i];
 	  }
+  T * getTrainI(int i) {
+  	    if (i >= NUM_TEST_CASES_TO_USE) {printf("getTestI: invalid index %d out of %d\n", i, nTestInstances); exit(-1);}
+  	    return (T*)train[i];
+  	  }
   int trainSetSize() { return NUM_TEST_CASES_TO_USE; }
   int testSetSize() { return nTestInstances; }
   int NUM_TEST_CASES_TO_USE;

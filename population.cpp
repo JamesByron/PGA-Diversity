@@ -172,16 +172,20 @@ void Population::updateFitness(DataSet<KRKTestInstance>* ts, Individual2* indivi
   float testsofthistype;
   individual->setFitness(0.0);
   individual->resetConfMat();
-  for(int i=0; i < ts->NUM_TEST_CASES_TO_USE; i++)
+  for(int i=0; i < ts->testSetSize(); i++)
   {
     switch (WHICH_FITNESS)
       {
       case 'h': {
-    	  KRKTestInstance* krk = ts->getTI(i);
+    	  KRKTestInstance krk = (KRKTestInstance)*ts->getTI(i);
+    	  /*TestInstance* TI = ts->getTI(i);
+    	  KRKTestInstance* krk = &((KRKTestInstance)(*TI))
     	  cout << "Test" << endl;
     	  cout << krk->getStringRep() << endl;
-    	  exit(0);
+    	  exit(0);*/
     	  //sum += ts->getTI(i)->fitnessHiFi(individual);
+    	  sum += krk.fitnessHiFi(individual);
+    	  //cout << "It worked" << endl;
     	  break; }		// HiFi
       case 'l': if(ts->getTI(i)->classify(individual)) sum++; break;	// LoFi
       }
