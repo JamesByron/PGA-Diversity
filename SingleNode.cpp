@@ -294,18 +294,24 @@ vector<float> getDiversityValues(vector<float>* values, int numZeros) {
  * Computes the fitness of each individual within each island across the given test set.
  * Returns a two-dimensional vector of [islands * individuals][test instances]
  */
-vector< vector<float> > calculatePhenotypeFitnessDetail(DataSet<KRKTestInstance>* testInstances, int numTestInstances, char classification, int startIsland, int endIsland) {
+vector< vector<float> > calculatePhenotypeFitnessDetail(DataSet<KRKTestInstance>* testInstances, char classification, char whichSet, int startIsland, int endIsland) {
 	if ((startIsland < 0) || (endIsland > NUM_ISLANDS)) { cout << "Error in calculateFitnessDetail; island index out of range " << startIsland << ", " << endIsland << endl; cout.flush(); exit(-1); }
+	int numTestInstances = 0;
+	if (whichSet == 'f') numTestInstances = testInstances->testSetSize();
+	if (whichSet == 't') numTestInstances = testInstances->trainSetSize() ;
 	Individual2* tempIndividual;
+	KRKTestInstance tempTI;
 	vector< vector<float> > diversetableH ((endIsland-startIsland)*POP_SIZE, vector<float>(numTestInstances));
 	for (int i = startIsland; i < endIsland; ++i) {
 		for (int j = 0; j < POP_SIZE; ++j) {
 			tempIndividual = islands[i].getIndividual(j);
 			(*tempIndividual).resetConfMat();
 			for (int k = 0; k < numTestInstances; ++k) {
+				if (whichSet == 't') tempTI = (KRKTestInstance)(*testInstances->getTrainI(k));
+				else if (whichSet == 'f') tempTI = (KRKTestInstance)(*testInstances->getTestI(k));
 				switch (classification) {
-				case 'h': diversetableH[((i-startIsland)*POP_SIZE)+j][k] = (testInstances->getTI(k)->fitnessHiFi(tempIndividual)); break;//(*tempIndividual).classiHiFi(&(*testInstances)[k]); break;
-				case 'l': diversetableH[((i-startIsland)*POP_SIZE)+j][k] = (float)(testInstances->getTI(k)->classify(tempIndividual)); break;//(float)(*tempIndividual).classify(&(*testInstances)[k]); break;
+				case 'h': diversetableH[((i-startIsland)*POP_SIZE)+j][k] = tempTI.fitnessHiFi(tempIndividual); break;
+				case 'l': diversetableH[((i-startIsland)*POP_SIZE)+j][k] = (float)(tempTI.classify(tempIndividual)); break;
 				}
 			}
 		}
@@ -456,8 +462,14 @@ void getRelevanceByIsland(vector<float>* detail, vector <vector<float> >* island
 /**
  * This wrapper function constructs the phenotype diversity of the population.
  */
-vector<float> getPhenotypeRelevance(DataSet<KRKTestInstance>* testInstances, int numTestInstances, int startIsland, int endIsland, bool isOverallDiversity, vector <vector<float> >* islandRelevance, float relevanceWeight) {
-	vector< vector<float> > detailedFitness = calculatePhenotypeFitnessDetail(testInstances, numTestInstances, WHICH_CLASSIFY, startIsland, endIsland);  // this stores data in the array and returns detailed results also
+vector<float> getPhenotypeRelevance(DataSet<KRKTestInstance>* testInstances, int startIsland, int endIsland, bool isOverallDiversity, bool isFullTestSet, vector <vector<float> >* islandRelevance, float relevanceWeight) {
+	int numTestInstances = testInstances->trainSetSize();
+	char whichSet = 't';
+	if (isFullTestSet) {
+		whichSet = 'f';
+		numTestInstances = testInstances->testSetSize();
+	}
+	vector< vector<float> > detailedFitness = calculatePhenotypeFitnessDetail(testInstances, WHICH_CLASSIFY, whichSet, startIsland, endIsland);  // this stores data in the array and returns detailed results also
 	vector<float> fitnessTotals = calculatePhenotypeFitnessTotals(&detailedFitness, numTestInstances);
 	vector<float> weights =  calculatePhenotypeFitnessWeights(&fitnessTotals);
 	int numZeros = 0;
@@ -496,10 +508,13 @@ vector<float> getHammingRelevance(vector <vector<float> >* islandRelevance, bool
 	return diversityValues;
 }
 
-vector<KRKTestInstance*> getTIVector(DataSet<KRKTestInstance> * set, int num) {
+vector<KRKTestInstance*> getTIVector(DataSet<KRKTestInstance> * set, char whichSet) {
+	int num = set->testSetSize();
+	if (whichSet == 't') num = set->trainSetSize();
 	vector<KRKTestInstance*> output (num);
 	for (int i = 0; i < num; ++i) {
-	  output[i] = set->getTI(i);
+	  if (whichSet == 'f') output[i] = (KRKTestInstance*)set->getTestI(i);
+	  else if (whichSet == 't') output[i] = (KRKTestInstance*)set->getTrainI(i);
 	}
 	return output;
 }
@@ -639,19 +654,14 @@ int main(int argc, char * argv[])
 	{
 	  // printf("Creating the DataSet from the total krktestinstances in the file\n");
 	  ts = DataSet<KRKTestInstance>(&all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
-	  //TestInstance* TI = (ts.getTI(0));
-	  //cout << TI->getStringRep() << endl;
-	  //KRKTestInstance* krk = (KRKTestInstance*)TI;
-	  //KRKTestInstance krk2 = *krk;
-	  //cout << krk2.getStringRep() << endl;
-
 	  //printf("Finished creating the Testset\n");
 	  for(int j=0; j<NUM_ISLANDS; j++) {
 	    islands[j] = SingleNode(j, ts);
 	    islands[j].updateNodeIntRules();
 	  }
 	}
-      vector<KRKTestInstance*> tsVector = getTIVector(&ts, NUM_TEST_CASES_TO_USE);
+      // we move this into DataSet and call based on the cirmstance.
+      //vector<KRKTestInstance*> tsVector = getTIVector(&ts, NUM_TEST_CASES_TO_USE);
 
       bool depthdivision;
       if (argc == 15)
@@ -675,7 +685,7 @@ int main(int argc, char * argv[])
       vector <vector<float> > islandRelevance (NUM_ISLANDS, vector<float> (POP_SIZE));
       vector<float> HamDiv (4, 0.0);//getPairwiseHammingDiversityForAllNodes();
       vector<float> FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
-      vector<float> PhenDiv = getPhenotypeRelevance(&ts, ts.testSetSize(), 0, NUM_ISLANDS, true, &islandRelevance, currentWeight);
+      vector<float> PhenDiv = getPhenotypeRelevance(&ts, 0, NUM_ISLANDS, true, true, &islandRelevance, currentWeight);
       vector<float> HamRel = getHammingRelevance(&islandRelevance, true, currentWeight);
       for (int node = 0; node < NUM_ISLANDS; ++node) {
 	islands[node].updateNodeRelevance(&islandRelevance[node]);  // update the relevance at the first generation
@@ -706,7 +716,7 @@ int main(int argc, char * argv[])
 	  }
 	  //HamDiv = getPairwiseHammingDiversityForAllNodes(); // This operation in very expensive.
 	  FitDiv = getFitnessDiversity(0, NUM_ISLANDS);
-	  PhenDiv = getPhenotypeRelevance(&ts, ts.trainSetSize(), 0, NUM_ISLANDS, true, &islandRelevance, currentWeight);  // we use the training set untel it's time to use the full test set
+	  PhenDiv = getPhenotypeRelevance(&ts, 0, NUM_ISLANDS, true, false, &islandRelevance, currentWeight);  // we use the training set untel it's time to use the full test set
 	  HamRel = getHammingRelevance(&islandRelevance, true, currentWeight);
 	  fprintf(logFile, "Overall Most Fit %f on island %i at generation %i Max Hamming Diversity %i Min Hamming Diversity %i Average Hamming Diversity %f Hamming Diversity Variance %f Max Fitness Diversity %f Min Fitness Diversity %f Average Fitness Diversity %f Fitness Diversity Variance %f Max Phenotype Diversity %f Min Phenotype Diversity %f Average Phenotype Diversity %f Phenotype Diversity Variance %f TI with no weight %i Max Hamming-Estimated Diversity %f Min Hamming-Estimated Diversity %f Average Hamming-Estimated Diversity %f Hamming-Estimated Diversity Variance %f\n",
 			  mostFit, mostFitIsland, islands[0].a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
@@ -717,7 +727,7 @@ int main(int argc, char * argv[])
 	    mostFit = 0;
 	    for(int island=0; island < NUM_ISLANDS; island++)
 	      {
-		  islands[island].a_pop->updatePopulationFitness(ts.testSetSize(), WHICH_CLASSIFY);
+		  islands[island].a_pop->updatePopulationFitness(WHICH_CLASSIFY, 'f');
 		  if(islands[island].a_pop->getPopulationMaxFitness() > mostFit)
 		  {
 		    mostFit = islands[island].a_pop->getPopulationMaxFitness();
@@ -727,7 +737,7 @@ int main(int argc, char * argv[])
 			islands[island].a_pop->getPopulationMaxFitness(), islands[island].a_pop->getPopulationAvgFitness(), islands[island].a_pop->getGeneration(), island, islands[island].a_pop->getStdev());
 		//i.a_pop->getBestIndividual().dumpConfMat(logFile);
 	      }
-	    PhenDiv = getPhenotypeRelevance(&ts, ts.testSetSize(), 0, NUM_ISLANDS, false, &islandRelevance, currentWeight);
+	    PhenDiv = getPhenotypeRelevance(&ts, 0, NUM_ISLANDS, true, true, &islandRelevance, currentWeight);
 	    fprintf(logFile, "FULL TEST SET Overall Most Fit %f on island %i at generation %i Max Hamming Diversity %i Min Hamming Diversity %i Average Hamming Diversity %f Hamming Diversity Variance %f Max Fitness Diversity %f Min Fitness Diversity %f Average Fitness Diversity %f Fitness Diversity Variance %f Max Phenotype Diversity %f Min Phenotype Diversity %f Average Phenotype Diversity %f Phenotype Diversity Variance %f TI with no weight %i Max Hamming-Estimated Diversity %f Min Hamming-Estimated Diversity %f Average Hamming-Estimated Diversity %f Hamming-Estimated Diversity Variance %f\n",
 		    mostFit, mostFitIsland, islands[0].a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);
 	    for (int x = 0; x < NUM_ISLANDS; ++x) {

@@ -132,7 +132,7 @@ void Population::updatePopulationIntRules() {
 
 // determine fitness with respect to the training data for breeding/survival/migration purposes
 //template <class T>
-void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
+void Population::updatePopulationFitness(char WHICH_FITNESS, char whichSet)
 {
 	maxFitness = 0.0;
 	totalFitness = 0.0;
@@ -142,7 +142,7 @@ void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 	for (int i = 0; i < POP_SIZE; i++)
 	{
 		// printf("updating individual %d\n", i);
-		updateFitness(&myDataSet, &mypop[i], WHICH_FITNESS);
+		updateFitness(&myDataSet, &mypop[i], WHICH_FITNESS, whichSet);
 		//printf("updated individual %d\n", i);
 		totalFitness += mypop[i].getFitness();
 		totalInverseFitness += 1 - mypop[i].getFitness();
@@ -163,7 +163,7 @@ void Population::updatePopulationFitness(int numTItoUse, char WHICH_FITNESS)
 }
 
 //template <class T>
-void Population::updateFitness(DataSet<KRKTestInstance>* ts, Individual2* individual, char WHICH_FITNESS)
+void Population::updateFitness(DataSet<KRKTestInstance>* ts, Individual2* individual, char WHICH_FITNESS, char whichSet)
   /** Update the fitness of this individual over the set of krktestinstances using the appropriate fitness measure.
    */
 {
@@ -172,22 +172,19 @@ void Population::updateFitness(DataSet<KRKTestInstance>* ts, Individual2* indivi
   float testsofthistype;
   individual->setFitness(0.0);
   individual->resetConfMat();
+  KRKTestInstance krk;
   for(int i=0; i < ts->testSetSize(); i++)
   {
+	  if (whichSet == 'f') krk = (KRKTestInstance)*ts->getTestI(i); // for full test set
+	  else if (whichSet == 't') krk = (KRKTestInstance)*ts->getTrainI(i); // for training set
     switch (WHICH_FITNESS)
       {
       case 'h': {
-    	  KRKTestInstance krk = (KRKTestInstance)*ts->getTI(i);
-    	  /*TestInstance* TI = ts->getTI(i);
-    	  KRKTestInstance* krk = &((KRKTestInstance)(*TI))
-    	  cout << "Test" << endl;
-    	  cout << krk->getStringRep() << endl;
-    	  exit(0);*/
-    	  //sum += ts->getTI(i)->fitnessHiFi(individual);
     	  sum += krk.fitnessHiFi(individual);
-    	  //cout << "It worked" << endl;
     	  break; }		// HiFi
-      case 'l': if(ts->getTI(i)->classify(individual)) sum++; break;	// LoFi
+      case 'l': {
+    	  if(krk.classify(individual)) sum++;
+    	  break; }// LoFi
       }
     //printf("On test case number %d\n", i);
     //printf("TC %d: inst: %s, classified as: %d, tc-binrep: %s\n", i, testSet[i].humanReadable().c_str(), classify(testSet[i]), testSet[i].getStringRep().c_str());

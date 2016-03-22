@@ -34,12 +34,12 @@ public:
 		}
 	}
   DataSet() {}
-  T * getTI(int i) {
-	    if (i >= nTestInstances) {printf("getTestI: invalid index %d out of %d\n", i, nTestInstances); exit(-1);}
+  T * getTestI(int i) {
+	    if (i >= nTestInstances) {printf("getTestI: invalid index %d out of %d into Test Set.\n", i, nTestInstances); exit(-1);}
 	    return (T*)test[i];
 	  }
   T * getTrainI(int i) {
-  	    if (i >= NUM_TEST_CASES_TO_USE) {printf("getTestI: invalid index %d out of %d\n", i, nTestInstances); exit(-1);}
+  	    if (i >= NUM_TEST_CASES_TO_USE) {printf("getTrainI: invalid index %d out of %d into training set.\n", i, NUM_TEST_CASES_TO_USE); exit(-1);}
   	    return (T*)train[i];
   	  }
   int trainSetSize() { return NUM_TEST_CASES_TO_USE; }

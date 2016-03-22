@@ -23,8 +23,8 @@ public:
   float getStdev() {return stdev;}
   Individual2 getBestIndividual() {return bestIndiv;}
   // update fitness of all individuals
-  void updatePopulationFitness(int numTItoUse, char WHICH_FITNESS);
-  void updateFitness(DataSet<KRKTestInstance>* ts, Individual2* individual, char WHICH_FITNESS);
+  void updatePopulationFitness(char WHICH_FITNESS, char whichSet);
+  void updateFitness(DataSet<KRKTestInstance>* ts, Individual2* individual, char WHICH_FITNESS, char whichSet);
   void updatePopulationRelevance(vector<float>* relevance);
   // select individuals for . . . .
   void selectToSurvive(int n);
