@@ -132,8 +132,9 @@ void Population::updatePopulationIntRules() {
 
 // determine fitness with respect to the training data for breeding/survival/migration purposes
 //template <class T>
-void Population::updatePopulationFitness(char WHICH_FITNESS, char whichSet)
-{
+void Population::updatePopulationFitness(char fitnessClassifier, char whichSet) {
+	//cout << "update pop Fittenss:" << fitnessClassifier << endl;
+	if (fitnessClassifier == ' ' || whichSet == ' ') exit(0);
 	maxFitness = 0.0;
 	totalFitness = 0.0;
 	totalInverseFitness = 0.0;
@@ -142,7 +143,7 @@ void Population::updatePopulationFitness(char WHICH_FITNESS, char whichSet)
 	for (int i = 0; i < POP_SIZE; i++)
 	{
 		// printf("updating individual %d\n", i);
-		updateFitness(&myDataSet, &mypop[i], WHICH_FITNESS, whichSet);
+		updateFitness(&myDataSet, &mypop[i], fitnessClassifier, whichSet);
 		//printf("updated individual %d\n", i);
 		totalFitness += mypop[i].getFitness();
 		totalInverseFitness += 1 - mypop[i].getFitness();
@@ -163,7 +164,7 @@ void Population::updatePopulationFitness(char WHICH_FITNESS, char whichSet)
 }
 
 //template <class T>
-void Population::updateFitness(DataSet<KRKTestInstance>* ts, Individual2* individual, char WHICH_FITNESS, char whichSet)
+void Population::updateFitness(DataSet<KRKTestInstance>* ts, Individual2* individual, char fitnessClassifier, char whichSet)
   /** Update the fitness of this individual over the set of krktestinstances using the appropriate fitness measure.
    */
 {
@@ -172,15 +173,16 @@ void Population::updateFitness(DataSet<KRKTestInstance>* ts, Individual2* indivi
   float testsofthistype;
   individual->setFitness(0.0);
   individual->resetConfMat();
+  int setSize = ts->trainSetSize();
+  if (whichSet == 'f') setSize = ts->testSetSize();
   KRKTestInstance krk;
-  for(int i=0; i < ts->testSetSize(); i++)
-  {
+  for(int i=0; i < setSize; i++) {
 	  if (whichSet == 'f') krk = (KRKTestInstance)*ts->getTestI(i); // for full test set
 	  else if (whichSet == 't') krk = (KRKTestInstance)*ts->getTrainI(i); // for training set
-    switch (WHICH_FITNESS)
+    switch (fitnessClassifier)
       {
       case 'h': {
-    	  sum += krk.fitnessHiFi(individual);
+    	  sum += krk.fitnessHiFi(individual); //cout << sum << " exiting" << endl; exit(0);
     	  break; }		// HiFi
       case 'l': {
     	  if(krk.classify(individual)) sum++;

@@ -162,6 +162,7 @@ float KRKTestInstance::fitnessHiFi(Individual2* individual)
     if ( featcounts[i] == mostmatched) individual->confMat[correctclass][i] += 1.0/nummostmatched;
   result = (((float) correctmatched)/NUM_FEATURES) * (1.0 / samematched) * (1.0 / (1 + bettermatched));
   //printf("fitnessHiFi: matched total of %d features with %d on correct rule, resulting in score: %f\n", matchedfeats, correctmatched, result);
+  //cout << result << endl; if (rand() < RAND_MAX/10000) { cout << "Random Exit" << endl; exit(0); }
   return result;
 }
 
