@@ -32,8 +32,11 @@ public:
 		for (int k=0; k < allti->size() - num; k++) {
 			test[k]=(*allti)[i++];
 		}
+		printDS();
 	}
+
   DataSet() {}
+
   T * getTestI(int i) {
 	    if (i >= nTestInstances) {printf("getTestI: invalid index %d out of %d into Test Set.\n", i, nTestInstances); exit(-1);}
 	    return (T*)test[i];
@@ -73,6 +76,28 @@ private:
 		}
   T ** test;
   T ** train;
+
+  void printDS() {
+  	KRKTestInstance * testI;
+  	int counts[20] = {0};
+  	int depth = ((KRKTestInstance*)getTestI(0))->getDepth();
+  	cout << "\n" << "Test Set:" << endl;
+  	for (int i = 0; i < testSetSize(); i++) {
+  		testI = ((KRKTestInstance*)getTestI(i));
+  		counts[testI->getDepth()]++;
+  		//if (depth == testI->getDepth()) cout << i << ":" << testI->getDepth() << ",  ";
+  	}
+  	depth = ((KRKTestInstance*)getTrainI(0))->getDepth();
+  	cout << "\n\n" << "Train Set:" << endl;
+  	for (int i = 0; i < trainSetSize(); i++) {
+  		testI = ((KRKTestInstance*)getTrainI(i));
+  		counts[testI->getDepth()]++;
+  		//if (depth == testI->getDepth()) cout << i << ":" << testI->getDepth() << ",  ";
+  	}
+  	for (int i = 0; i < 20; i++) {
+  		cout << i << ":" << counts[i] << endl;
+  	}
+  }
 };
 
 #endif

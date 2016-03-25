@@ -536,6 +536,38 @@ void usage(){
 	printf(" 15. (optional) which class of test instances to use (only with 18 or fewer islands)\n");
 }
 
+void printDS(DataSet<KRKTestInstance>* ds) {
+	KRKTestInstance * testI;
+	int depth = ds->getTestI(0)->getDepth();
+	cout << "\n" << "Test Set:" << endl;
+	for (int i = 0; i < ds->testSetSize(); i++) {
+		testI = ds->getTestI(i);
+		if (depth == testI->getDepth()) cout << i << ":" << testI->getDepth() << ",  ";
+	}
+	depth = ds->getTrainI(0)->getDepth();
+	cout << "\n\n" << "Train Set:" << endl;
+	for (int i = 0; i < ds->trainSetSize(); i++) {
+		testI = ds->getTrainI(i);
+		if (depth == testI->getDepth()) cout << i << ":" << testI->getDepth() << ",  ";
+	}
+}
+
+void printTIVector(vector<KRKTestInstance*>* vec) {
+	int depth = (*vec)[0]->getDepth();
+	int counts[20] = {0};
+	cout << "\n" << "Complete vector Set within SingleNode:" << endl;
+	for (int i = 0; i < vec->size(); i++) {
+		//if (depth != (*vec)[i]->getDepth()) cout << i << ":" << (*vec)[i]->getDepth() << ",  ";
+		counts[(*vec)[i]->getDepth()]++;
+	}
+	cout << "Vector: " << (*vec).size() << ", " << depth << endl;
+	for (int i = 0; i < 20; i++) {
+		cout << i << ":" << counts[i] << endl;
+	}
+	exit(0);
+}
+
+
 int main(int argc, char * argv[])
 /* args:
    argv[1] datafile,
@@ -599,6 +631,7 @@ int main(int argc, char * argv[])
   //cout << "l196" << endl;
   file.open(filename.c_str());
   string line;
+  int counts[20] = {0};
   while(!file.eof())
     {
       //cout << "l201" << endl;
@@ -606,9 +639,13 @@ int main(int argc, char * argv[])
       if (line != "")
 	{
 	  KRKTestInstance ti = KRKTestInstance(line);
+	  counts[ti.getDepth()]++;
 	  all_tests.push_back(&ti);
 	}
-    }
+    } cout << "Counting directly within SingloNode" << endl;
+  for (int i = 0; i < 20; i++) {
+	 cout << i << ": " << counts[i] << endl;
+  }
   //cout << "l209" << endl;
   if (argc == 15 && NUM_ISLANDS > 18)
     { printf("Invalid combination of depth and number of islands\n"); usage(); exit(-1); }
@@ -653,7 +690,10 @@ int main(int argc, char * argv[])
       else
 	{
 	  // printf("Creating the DataSet from the total krktestinstances in the file\n");
+      cout << "Here you go..." << endl;
 	  ts = DataSet<KRKTestInstance>(&all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
+	  printTIVector(&all_tests);
+	  exit(0);
 	  //printf("Finished creating the Testset\n");
 	  for(int j=0; j<NUM_ISLANDS; j++) {
 	    islands[j] = SingleNode(j, ts);

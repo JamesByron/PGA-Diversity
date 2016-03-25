@@ -23,8 +23,15 @@ public:
   int distToNearCorner(int bkr, int bkf);
   int distToNearEdge(int rnk, int fl);
   void countFeats(signed char * featcounts, Individual2 * ind);
+  string humanReadable() { return datasetForm; };
+  unsigned char * getBinary() { return binary; };
+  int getDepth() const { return depth; };
+  int charDifference(char c, char d) { return (c-d)+1; };
 
 protected:
+	unsigned char binary[NUM_FEATURES];
+	string datasetForm;
+	int depth;
   int whiteKingFile;
   int whiteKingRank;
   int whiteRookFile;

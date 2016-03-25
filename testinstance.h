@@ -63,16 +63,6 @@ public:
 		else
 			return 0;
 	}
-
-	string humanReadable() { return datasetForm; };
-	unsigned char * getBinary() { return binary; };
-	int getDepth() const { return depth; };
-	int charDifference(char c, char d) { return (c-d)+1; };
-
-protected:
-	unsigned char binary[NUM_FEATURES];
-	string datasetForm;
-	int depth;
 };
 
 #endif
