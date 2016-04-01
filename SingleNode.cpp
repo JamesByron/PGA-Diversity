@@ -552,19 +552,18 @@ void printDS(DataSet<KRKTestInstance>* ds) {
 	}
 }
 
-void printTIVector(vector<KRKTestInstance*>* vec) {
-	int depth = (*vec)[0]->getDepth();
+void printTIVector(vector<KRKTestInstance>* vec) {
+	int depth = (*vec)[0].getDepth();
 	int counts[20] = {0};
 	cout << "\n" << "Complete vector Set within SingleNode:" << endl;
 	for (int i = 0; i < vec->size(); i++) {
 		//if (depth != (*vec)[i]->getDepth()) cout << i << ":" << (*vec)[i]->getDepth() << ",  ";
-		counts[(*vec)[i]->getDepth()]++;
+		counts[(*vec)[i].getDepth()]++;
 	}
 	cout << "Vector: " << (*vec).size() << ", " << depth << endl;
 	for (int i = 0; i < 20; i++) {
 		cout << i << ":" << counts[i] << endl;
 	}
-	exit(0);
 }
 
 
@@ -592,7 +591,7 @@ int main(int argc, char * argv[])
   char testSet = 'f';
   int WHEN_PRINT_DATA = 1;
   int INIT_SEED;
-  vector<KRKTestInstance*> all_tests;
+  vector<KRKTestInstance> all_tests;
   //printf("SingleNode: Ready to start.\n");
   if (argc < 13) { usage(); exit(-1); }
   time_t start, end;
@@ -631,7 +630,6 @@ int main(int argc, char * argv[])
   //cout << "l196" << endl;
   file.open(filename.c_str());
   string line;
-  int counts[20] = {0};
   while(!file.eof())
     {
       //cout << "l201" << endl;
@@ -639,13 +637,9 @@ int main(int argc, char * argv[])
       if (line != "")
 	{
 	  KRKTestInstance ti = KRKTestInstance(line);
-	  counts[ti.getDepth()]++;
-	  all_tests.push_back(&ti);
+	  all_tests.push_back(ti);
 	}
-    } cout << "Counting directly within SingloNode" << endl;
-  for (int i = 0; i < 20; i++) {
-	 cout << i << ": " << counts[i] << endl;
-  }
+    }
   //cout << "l209" << endl;
   if (argc == 15 && NUM_ISLANDS > 18)
     { printf("Invalid combination of depth and number of islands\n"); usage(); exit(-1); }
@@ -690,10 +684,8 @@ int main(int argc, char * argv[])
       else
 	{
 	  // printf("Creating the DataSet from the total krktestinstances in the file\n");
-      cout << "Here you go..." << endl;
 	  ts = DataSet<KRKTestInstance>(&all_tests, NUM_TEST_CASES_TO_USE, (float)NUM_TEST_CASES_TO_USE/all_tests.size());
-	  printTIVector(&all_tests);
-	  exit(0);
+	  //printTIVector(&all_tests);
 	  //printf("Finished creating the Testset\n");
 	  for(int j=0; j<NUM_ISLANDS; j++) {
 	    islands[j] = SingleNode(j, ts);
@@ -779,8 +771,8 @@ int main(int argc, char * argv[])
 		  }
 		fprintf(logFile, "FULL TEST SET Island Most Fit %f Average Fitness %f of generation %i on island %i Standard Deviation %f\n",
 			islands[island].a_pop->getPopulationMaxFitness(), islands[island].a_pop->getPopulationAvgFitness(), islands[island].a_pop->getGeneration(), island, islands[island].a_pop->getStdev());
-		islands[island].a_pop->getBestIndividual().dumpConfMat(logFile);
-	      } exit(0);
+		//islands[island].a_pop->getBestIndividual().dumpConfMat(logFile);
+	      }
 	    PhenDiv = getPhenotypeRelevance(&ts, 0, NUM_ISLANDS, true, true, &islandRelevance, currentWeight, WHICH_CLASSIFY);
 	    fprintf(logFile, "FULL TEST SET Overall Most Fit %f on island %i at generation %i Max Hamming Diversity %i Min Hamming Diversity %i Average Hamming Diversity %f Hamming Diversity Variance %f Max Fitness Diversity %f Min Fitness Diversity %f Average Fitness Diversity %f Fitness Diversity Variance %f Max Phenotype Diversity %f Min Phenotype Diversity %f Average Phenotype Diversity %f Phenotype Diversity Variance %f TI with no weight %i Max Hamming-Estimated Diversity %f Min Hamming-Estimated Diversity %f Average Hamming-Estimated Diversity %f Hamming-Estimated Diversity Variance %f\n",
 		    mostFit, mostFitIsland, islands[0].a_pop->getGeneration(), (int) HamDiv[0], (int) HamDiv[1], HamDiv[2], HamDiv[3], FitDiv[0], FitDiv[1], FitDiv[2], FitDiv[3], PhenDiv[0], PhenDiv[1], PhenDiv[2], PhenDiv[3], (int)PhenDiv[4], HamRel[0], HamRel[1], HamRel[2], HamRel[3]);

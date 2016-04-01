@@ -15,24 +15,24 @@ template <class T>
 class DataSet
 {
 public:
-  DataSet(vector<T*> * allti, int num, float split) {
+  DataSet(vector<T> * allti, int num, float split) {
 		//if ( fabs(split - ((float) num)/allti->size()) > 0.1 ) {printf("BAD TRAIN/TEST SPLIT VALUE IN DataSet CONSTRUCTOR\n"); exit(-1);}
 		NUM_TEST_CASES_TO_USE = num;
 		nTestInstances = allti->size() - num;
 		train = new T*[num];
 		test = new T*[allti->size() - num];
-		srand(time(NULL)+17033);
+		//srand(time(NULL)+17033);
 		shuffle(allti);
 		// get the training split
 		int i = 0;
 		while (i < num) {
-			train[i] = (*allti)[i++];
+			train[i] = &(*allti)[i++];
 		}
 		// continue with the testing split
 		for (int k=0; k < allti->size() - num; k++) {
-			test[k]=(*allti)[i++];
+			test[k]=&(*allti)[i++];
 		}
-		printDS();
+		//printDS();
 	}
 
   DataSet() {}
@@ -62,9 +62,9 @@ private:
 				ti[i]=tests[index];
 			}
 		}
-  void shuffle(vector<T*> * a) {
+  void shuffle(vector<T> * a) {
 			int r;
-			T * t;
+			T t;
 			for (int n=0; n < 3; n++)
 				for (int i=0; i < a->size(); i++)
 				{
@@ -78,6 +78,7 @@ private:
   T ** train;
 
   void printDS() {
+	cout << "printDS in dataset" << endl;
   	KRKTestInstance * testI;
   	int counts[20] = {0};
   	int depth = ((KRKTestInstance*)getTestI(0))->getDepth();
