@@ -656,7 +656,7 @@ int main(int argc, char * argv[])
   	   << POP_SIZE << "p" \
   	   << NUM_TEST_CASES_TO_USE << "ti" \
   	   << MAX_GENERATIONS << "g";
-        out2 << "selection-" << WHICH_SELECT;
+        out2 << "selection-" << WHICH_SELECT << "-rep-" << argv[2];
         s = out2.str();
         outFile += s;
         s = out1.str();

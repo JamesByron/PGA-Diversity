@@ -77,7 +77,7 @@ private:
   T ** test;
   T ** train;
 
-  void printDS() {
+  /*void printDS() {
 	cout << "printDS in dataset" << endl;
   	KRKTestInstance * testI;
   	int counts[20] = {0};
@@ -98,7 +98,7 @@ private:
   	for (int i = 0; i < 20; i++) {
   		cout << i << ":" << counts[i] << endl;
   	}
-  }
+  }*/
 };
 
 #endif
