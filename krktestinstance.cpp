@@ -1,8 +1,12 @@
+<<<<<<< HEAD:krktestinstance.cpp
 #include "krktestinstance.h"
 //#include "dataset.h"
 #include <stdio.h>
 #include <iostream>
 
+=======
+#include "testinstance2.h"
+>>>>>>> 26720b1e9d8d4a342c22ab4eaa070d6a1531dcee:testinstance2.cpp
 using namespace std;
 
 KRKTestInstance::KRKTestInstance(string str) {
@@ -117,6 +121,7 @@ string KRKTestInstance::getStringRep()
   return s;
 }
 
+<<<<<<< HEAD:krktestinstance.cpp
 void KRKTestInstance::countFeats(signed char * featcounts, Individual2 * ind)
 /** process the testinstance and stuff the feature match counts into the given array. Used by both fitnessHiFi and classiHiFi. */
 {
@@ -199,6 +204,38 @@ int KRKTestInstance::classify(Individual2* individual)
 }
 
 int KRKTestInstance::distToNearCorner(int bkr, int bkf)
+=======
+string TestInstance2::intToBinary(int i)
+// i is in the range [1,8]
+// return an 8-digit string of 0s with a 1 in the i'th position from the right
+{
+  string s = "";
+  while (s.length() < (8-i))
+  { s = s + "0"; }
+  if (s.length() < 8) 
+    s = s + "1";
+  while (s.length() < 8)
+  { s = s + "0"; }
+  return s;
+}
+
+string TestInstance2::byteToString(unsigned char c)
+{
+  string s("");
+  int mask = 128;
+  for (int i=0; i < 8; i++)
+    {
+      if ( (c & mask) == 0 )
+	s += "0";
+      else
+	s += "1";
+      mask /= 2;
+    }
+  return s;
+}
+
+int TestInstance2::distToNearCorner(int bkr, int bkf)
+>>>>>>> 26720b1e9d8d4a342c22ab4eaa070d6a1531dcee:testinstance2.cpp
 /** find the manhatten distance to the nearest corner of this rank and file
  */
 {
