@@ -11,24 +11,19 @@ using namespace std;
 // GLOBAL VARIABLES
 FILE *logFile; // for log data
 
-// migration
 char WHICH_MIGRATION; // r: Random, s: Strong, w: Weak, n: None, f: Fake random migrant, . . .
 int WHEN_MIGRATE;
 int NUM_MIGRANTS_PER_ISLAND;
 int NUM_IMMIGRANTS;
-// topography
 int NUM_ISLANDS;
 int NUM_NEIGHBORS;
-// population
 int POP_SIZE;
 int NUM_TEST_CASES_TO_USE;
 int DEPTH_OF_TEST_INSTANCES;
-// other
 int MAX_GENERATIONS;
 char WHICH_FITNESS;
 char WHICH_CLASSIFY;
 int PROB_MUTATE; // an int < RAND_MAX representing probability a single individual will get "hit"
-int WHEN_FULL_TEST = 100;
 // use RULE_LEN instead: int genomeLength = NUM_FEATURES*RULE_CASES*8;
 
 SingleNode * islands;
@@ -522,7 +517,8 @@ void usage(){
 	printf(" 1.  test instance data file\n");
 	printf(" 2.  logfile tag\n");
 	printf(" 3.  migration strategy (r/s/w/f/n)\n");
-	printf(" 4.  migration interval\n"); 
+	printf(" 4.  migration interval\n");
+	printf(" 4. (optional) initial seed to select sample of test instances\n");
 	printf(" 5.  num migrants per island\n");
 	printf(" 6.  number of islands\n");
 	printf(" 7.  num neighbors (must be less than the number of islands)\n");
@@ -532,8 +528,7 @@ void usage(){
 	printf(" 11. which fitness function to use (h/l)\n");
 	printf(" 12. which classification function to use on full dataset (h/l)\n");
 	printf(" 13. (optional) mutation probability that given individual will have single-point mutation\n");
-	printf(" 14. (optional) initial seed to select sample of test instances\n");
-	printf(" 15. (optional) which class of test instances to use (only with 18 or fewer islands)\n");
+	//printf(" 15. (optional) which class of test instances to use (only with 18 or fewer islands)\n");
 }
 
 void printDS(DataSet<KRKTestInstance>* ds) {
@@ -572,62 +567,83 @@ int main(int argc, char * argv[])
    argv[1] datafile,
    argv[2] logfile-tag,
    argv[3] migration-strategy (r:Rand, s:Strong, w:Weak, f:Fake, n:None),
-   argv[4] migration interval (WHEN_MIGRATE),
-   argv[5] number migrants per island,
-   argv[6] number of islands,
-   argv[7] number of neighbors,
-   argv[8] size of population,
-   argv[9] number of test cases to use,
-   argv[10] number of generations to simulate,
-   argv[11] which fitness function to use,
-   argv[12] which classification function to use,
-   argv[13] (optional) mutation probability that given individual will have single-point mutation
-   argv[14] (optional) initial seed to use to select sample of test instances
-   argv[15] (optional) depth of krktestinstance selecion (-1:draw, 0:zero, 1:one,...,16:sixteen)
+   argv[3] (optional) initial seed to use to select sample of test instances
+   	   argv[4] migration interval (WHEN_MIGRATE),
+   	   argv[5] number migrants per island,
+   	   argv[6] number of islands,
+   	   argv[7] number of neighbors,
+   	   argv[8] size of population,
+   	   argv[9] number of test cases to use,
+   	   argv[10] number of generations to simulate,
+   	   argv[11] which fitness function to use,
+   	   argv[12] which classification function to use,
+   	   argv[13] (optional) mutation probability that given individual will have single-point mutation
+   	   not used argv[15] (optional) depth of krktestinstance selecion (-1:draw, 0:zero, 1:one,...,16:sixteen)
  */
 {
-  srand( time(NULL) );
+  //argc[3] can be EITHER a migration strategy or a random seed if there are no further args.
+  long seed = RANDOM_SEED;
+  if (argc == 4) {
+	  seed = atol(argv[3]);
+  }
+  if (seed == 0) seed = time(NULL);
+  cout << "Using Random seed of " << seed << endl;
+  srand( seed );
   char trainingSet = 't';
   char testSet = 'f';
   int WHEN_PRINT_DATA = 1;
-  int INIT_SEED;
   vector<KRKTestInstance> all_tests;
-  //printf("SingleNode: Ready to start.\n");
-  if (argc < 13) { usage(); exit(-1); }
   time_t start, end;
-
-  // read filename from which to get test instances
-  string filename = argv[1];
-
-  WHICH_MIGRATION = argv[3][0];
-  WHEN_MIGRATE = atoi(argv[4]);//atoi(argv[4]);
-  NUM_MIGRANTS_PER_ISLAND = atoi(argv[5]);
-  NUM_ISLANDS = atoi(argv[6]);
-  NUM_NEIGHBORS = atoi(argv[7]);
+  string filename = "insData";
+  string logFileName;;
+  //if (argc < 13) { usage(); exit(-1); }
+  if (argc > 1) {
+    filename = argv[1]; // data file
+  }
+  if (argc > 2) {
+	logFileName = argv[2];// log file tag
+  }
+  else {
+	  stringstream ss;
+	  ss << "log-" << seed;
+	  logFileName = ss.str();
+  }
+  if (argc > 4 && argc < 13) {cout << "Invalid parameters." << endl; exit(-1);}
+  if (argc > 4) { // all other inputs
+    WHICH_MIGRATION = argv[3][0];
+    WHEN_MIGRATE = atoi(argv[4]);
+    NUM_MIGRANTS_PER_ISLAND = atoi(argv[5]);
+    NUM_ISLANDS = atoi(argv[6]);
+    NUM_NEIGHBORS = atoi(argv[7]);
+    POP_SIZE = atoi(argv[8]);
+    NUM_TEST_CASES_TO_USE = atoi(argv[9]);
+    MAX_GENERATIONS = atoi(argv[10]);
+    WHICH_FITNESS = argv[11][0];
+    WHICH_CLASSIFY = argv[12][0];
+  }
+  else {
+	  cout << "Using default parameters." << endl;
+	  WHICH_MIGRATION = WHICH_MIGRATION_DEFAULT;
+	  WHEN_MIGRATE = WHEN_MIGRATE_DEFAULT;
+	  NUM_MIGRANTS_PER_ISLAND = NUM_MIGRANTS_PER_ISLAND_DEFAULT;
+	  NUM_ISLANDS = NUM_ISLANDS_DEFAULT;
+	  NUM_NEIGHBORS = NUM_NEIGHBORS_DEFAULT;
+	  POP_SIZE = POP_SIZE_DEFAULT;
+	  NUM_TEST_CASES_TO_USE = NUM_TEST_CASES_TO_USE_DEFAULT;
+	  MAX_GENERATIONS = MAX_GENERATIONS_DEFAULT;
+	  WHICH_FITNESS = WHICH_FITNESS_DEFAULT;
+	  WHICH_CLASSIFY = WHICH_CLASSIFY_DEFAULT;
+    }
+  NUM_IMMIGRANTS = NUM_MIGRANTS_PER_ISLAND * NUM_NEIGHBORS;
   if (NUM_NEIGHBORS >= NUM_ISLANDS) { printf("Max number of neighbors is one less than number of islands\n"); usage(); exit(-1); }
   if ((WHICH_MIGRATION == 'n') && (NUM_NEIGHBORS != 0)) { usage(); exit(-1); }
-  POP_SIZE = atoi(argv[8]);
   if (PROB_REMAIN * POP_SIZE < NUM_NEIGHBORS * NUM_MIGRANTS_PER_ISLAND) {printf("too many migrants per neighbor for given population size\n"); usage(); exit(-1); }
-  NUM_IMMIGRANTS = NUM_MIGRANTS_PER_ISLAND * NUM_NEIGHBORS;
-  NUM_TEST_CASES_TO_USE = atoi(argv[9]);
-  MAX_GENERATIONS = atoi(argv[10]);
-  WHICH_FITNESS = argv[11][0];
-  WHICH_CLASSIFY = argv[12][0];
   if (argc >= 14)
     PROB_MUTATE = (int)(RAND_MAX * atof(argv[13]));
   else
     PROB_MUTATE = (int)(RAND_MAX * 1.0/POP_SIZE); // default: one individual in population has one bit flipped
-  if (argc >= 15)
-    INIT_SEED = atoi(argv[14]);
-  else
-    INIT_SEED = time(NULL) + 93108;
-  //printf("Seed value: %d\n", INIT_SEED);
-  //  DEPTH_OF_TEST_INSTANCES = atoi(argv[11]);
-
-  //printf("SingleNode: about to open test instance file\n");
   //get test instances from file
   ifstream file;
-  //cout << "l196" << endl;
   file.open(filename.c_str());
   string line;
   while(!file.eof())
@@ -647,7 +663,7 @@ int main(int argc, char * argv[])
         string s, outFile;
         stringstream out1, out2;
         outFile += "log/sim.";
-        out1 << "rep-" << argv[2] << WHICH_FITNESS << "fifit-" << WHICH_CLASSIFY << "ficlsfy-" \
+        out1 << "rep-" << logFileName << WHICH_FITNESS << "fifit-" << WHICH_CLASSIFY << "ficlsfy-" \
   	   << WHICH_MIGRATION << "ms" \
   	   << WHEN_MIGRATE << "mi" \
   	   << NUM_MIGRANTS_PER_ISLAND << "mn" \
@@ -656,7 +672,7 @@ int main(int argc, char * argv[])
   	   << POP_SIZE << "p" \
   	   << NUM_TEST_CASES_TO_USE << "ti" \
   	   << MAX_GENERATIONS << "g";
-        out2 << "selection-" << WHICH_SELECT << "-rep-" << argv[2];
+        out2 << "selection-" << WHICH_SELECT << "-rep-" << logFileName;
         s = out2.str();
         outFile += s;
         s = out1.str();
@@ -666,6 +682,8 @@ int main(int argc, char * argv[])
   float currentWeight = (WHICH_SELECT < 3) ? RELEVANCE_END : RELEVANCE_START;
   while (currentWeight >= RELEVANCE_END ) {
     for (int cycle = 0; cycle < NUM_CYCLES; cycle++) {
+      int WHEN_FULL_TEST = WHEN_FULL_DATA_START;
+      int threshold = WHEN_FULL_DATA_THRESHOLD;
       islands = new SingleNode[NUM_ISLANDS];
       //initialize all islands
       //printf("Initializing the islands (and populations, etc.)\n");
@@ -760,7 +778,11 @@ int main(int argc, char * argv[])
 	    islands[node].updateNodeRelevance(&islandRelevance[node]);
 	  }
 	  if (((gen+1) % WHEN_FULL_TEST) == 0) {// need the +1 because population's gen-count has been updated during doOneGen
-	    mostFit = 0;
+	    if ((gen+1) >= threshold) {
+	    	threshold *= WHEN_FULL_DATA_MULTIPLY;
+	    	WHEN_FULL_TEST *= WHEN_FULL_DATA_MULTIPLY;
+	    }
+		mostFit = 0;
 	    for(int island=0; island < NUM_ISLANDS; island++)
 	      {
 		  islands[island].a_pop->updatePopulationFitness(WHICH_CLASSIFY, testSet);
@@ -790,6 +812,10 @@ int main(int argc, char * argv[])
   // print end time
   end = time(NULL);
   fprintf(logFile, "\n\nElapsed time %f seconds or %f minutes\n%s", difftime(end, start), difftime(end, start)/60.0, s.c_str() );
+  fprintf(logFile,"\nParameters used:\nRandom Seed %ld\nWHICH_MIGRATION %c\nWHEN_MIGRATE %i\nNUM_MIGRANTS_PER_ISLAND %i\nNUM_ISLANDS %i\nNUM_NEIGHBORS %i\nPOP_SIZE %i\nNUM_TEST_CASES_TO_USE %i\nMAX_GENERATIONS %i\nWHICH_FITNESS %c\nWHICH_CLASSIFY %c\n",seed,WHICH_MIGRATION,WHEN_MIGRATE,NUM_MIGRANTS_PER_ISLAND,NUM_ISLANDS,NUM_NEIGHBORS,POP_SIZE,NUM_TEST_CASES_TO_USE,MAX_GENERATIONS,WHICH_FITNESS,WHICH_CLASSIFY);
+  fprintf(logFile, "\n\nConfig.h contents:\nNUM_FEATURES %i\nINST_LEN %i\nN_ULONG_IN_RULE %i\nRULE_CASES %i\nRULE_LEN %i\nONE_FREQ %i\nMAX_NUM_CROSS_BREED %i\nPROB_REMAIN %f\nTAG %i\nWHICH_SELECT %i\nTOURNAMENT_SIZE %i\nRELEVANCE_START %f\nRELEVANCE_END %f\nRELEVANCE_INCREMENT %f\nNUM_CYCLES %i\nRANDOM_SEED %i\nWHEN_FULL_DATA_MULTIPLY %i\nWHEN_FULL_DATA_THRESHOLD %i\nWHEN_FULL_DATA_START %i\nWHICH_MIGRATION_DEFAULT %c\nWHEN_MIGRATE_DEFAULT %i\nNUM_MIGRANTS_PER_ISLAND_DEFAULT %i\nNUM_ISLANDS_DEFAULT %i\nNUM_NEIGHBORS_DEFAULT %i\nPOP_SIZE_DEFAULT %i\nNUM_TEST_CASES_TO_USE_DEFAULT %i\nMAX_GENERATIONS_DEFAULT %i\nWHICH_FITNESS_DEFAULT %c\nWHICH_CLASSIFY_DEFAULT %c\n",NUM_FEATURES,INST_LEN,N_ULONG_IN_RULE,RULE_CASES,RULE_LEN,ONE_FREQ,MAX_NUM_CROSS_BREED,PROB_REMAIN,TAG,WHICH_SELECT,TOURNAMENT_SIZE,RELEVANCE_START,RELEVANCE_END,RELEVANCE_INCREMENT,NUM_CYCLES,RANDOM_SEED,WHEN_FULL_DATA_MULTIPLY,WHEN_FULL_DATA_THRESHOLD,WHEN_FULL_DATA_START,WHICH_MIGRATION_DEFAULT,WHEN_MIGRATE_DEFAULT,NUM_MIGRANTS_PER_ISLAND_DEFAULT,NUM_ISLANDS_DEFAULT,NUM_NEIGHBORS_DEFAULT,POP_SIZE_DEFAULT,NUM_TEST_CASES_TO_USE_DEFAULT,MAX_GENERATIONS_DEFAULT,WHICH_FITNESS_DEFAULT,WHICH_CLASSIFY_DEFAULT);
+
+
   fclose(logFile);
   return 0;
 }
