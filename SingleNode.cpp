@@ -266,6 +266,7 @@ vector<float> getDiversityValues(vector<float>* values, int numZeros) {
 	int counter = 0;
 	float worst = 99999999;
 	float mean, x, delta, var, best = 0.0;
+	cout << "mean: " << mean << endl;
 	for (int i = 0; i < (*values).size(); ++i) {
 		++counter;
 		x = (*values)[i];
