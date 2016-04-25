@@ -279,11 +279,12 @@ vector<float> getDiversityValues(vector<float>* values, int numZeros) {
 	output[0] = best;
 	output[1] = worst;
 	output[2] = mean; //the accuracy of mean is probably sufficient
-	cout << endl << "var: " << var << " counter: " << counter << endl;
 	output[3] = var / (float)counter; // counter = POP_SIZE * NUM_ISLANDS
-	cout << output[3] << endl;
 	output[4] = numZeros;
-	/*if (rand() < RAND_MAX/100) {
+	/*
+	 * cout << endl << "var: " << var << " counter: " << counter << endl;
+	 * cout << output[3] << endl;
+	 * if (rand() < RAND_MAX/100) {
 			cout << endl;
 			for (int i = 0; i < (*values).size(); ++i) {
 				cout << (*values)[i] << ",";
