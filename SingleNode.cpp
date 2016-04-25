@@ -279,7 +279,9 @@ vector<float> getDiversityValues(vector<float>* values, int numZeros) {
 	output[0] = best;
 	output[1] = worst;
 	output[2] = mean; //the accuracy of mean is probably sufficient
+	cout << endl << "var: " << var << " counter: " << counter << endl;
 	output[3] = var / (float)counter; // counter = POP_SIZE * NUM_ISLANDS
+	cout << output[3] << endl;
 	output[4] = numZeros;
 	return output;
 }
@@ -471,6 +473,7 @@ vector<float> getPhenotypeRelevance(DataSet<KRKTestInstance>* testInstances, int
 		if ((weights[i] < 0) || (weights[i] > 1.0)) {cout << endl << "error in phenotype weights: invalid value: " << weights[i] << endl; exit(-1);}
 	}
 	vector<float> individualRelevance = calculateIndividualPhenotypeRelevance(&detailedFitness, &weights);
+	cout << "\nPhenotype Diversity" << endl;
 	vector<float> pDiversity = getDiversityValues(&individualRelevance, numZeros);
 	if (isOverallDiversity && (WHICH_SELECT == 3)) {
 		// individualRelevance has values that have been accumulated over the number of test instances.

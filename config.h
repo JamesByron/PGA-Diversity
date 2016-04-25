@@ -7,10 +7,10 @@
 #define MAX_NUM_CROSS_BREED 20
 #define PROB_REMAIN 0.2
 #define TAG 17
-#define WHICH_SELECT 4 // tournament [1] default, fitness proportional [2], diversity guided tournament select [3]
+#define WHICH_SELECT 3 // tournament [1] default, fitness proportional [2], diversity guided tournament select [3]
 #define TOURNAMENT_SIZE 5
-#define RELEVANCE_START 0.25
-#define RELEVANCE_END 0.25
+#define RELEVANCE_START 1.0
+#define RELEVANCE_END 1.0
 #define RELEVANCE_INCREMENT 0.25
 #define NUM_CYCLES 1
 #define RANDOM_SEED 0 //1461439101
@@ -24,6 +24,6 @@
 #define NUM_NEIGHBORS_DEFAULT 0
 #define POP_SIZE_DEFAULT 400
 #define NUM_TEST_CASES_TO_USE_DEFAULT 1000
-#define MAX_GENERATIONS_DEFAULT 100
+#define MAX_GENERATIONS_DEFAULT 1000
 #define WHICH_FITNESS_DEFAULT 'h'
 #define WHICH_CLASSIFY_DEFAULT 'h'
