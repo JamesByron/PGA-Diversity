@@ -283,14 +283,14 @@ vector<float> getDiversityValues(vector<float>* values, int numZeros) {
 	output[3] = var / (float)counter; // counter = POP_SIZE * NUM_ISLANDS
 	cout << output[3] << endl;
 	output[4] = numZeros;
-	/*if (rand() < RAND_MAX/100) {
+	if (rand() < RAND_MAX/100) {
 			cout << endl;
 			for (int i = 0; i < (*values).size(); ++i) {
 				cout << (*values)[i] << ",";
 			}
 			cout << endl;
 			exit(0);
-		}*/
+		}
 	return output;
 }
 
