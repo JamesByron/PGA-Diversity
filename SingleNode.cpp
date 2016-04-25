@@ -237,7 +237,7 @@ vector<float> getFitnessDiversity(int startIsland, int endIsland) {
 	if ((startIsland < 0) || (endIsland > NUM_ISLANDS)) { cout << "Error in getFitnessDiversity; island index out of range " << startIsland << ", " << endIsland << endl; exit(-1); }
 	int counter = 0;
 	float worst = 1000.0;
-	float mean, x, delta, var, best = 0.0;
+	float mean=0.0, x=0.0, delta=0.0, var=0.0, best=0.0;
 	for (int i = startIsland; i < endIsland; ++i) {
 		//islands[i].a_pop->updatePopulationFitness(testInstances, classification);
 		for (int j = 0; j < POP_SIZE; ++j) {
@@ -265,7 +265,7 @@ vector<float> getFitnessDiversity(int startIsland, int endIsland) {
 vector<float> getDiversityValues(vector<float>* values, int numZeros) {
 	int counter = 0;
 	float worst = 99999999;
-	float mean, x, delta, var, best = 0.0;
+	float mean=0.0, x=0.0, delta=0.0, var=0.0, best=0.0;
 	cout << "mean: " << mean << endl;
 	for (int i = 0; i < (*values).size(); ++i) {
 		++counter;
