@@ -268,12 +268,18 @@ vector<float> getDiversityValues(vector<float>* values, int numZeros) {
 	float mean, x, delta, var, best = 0.0;
 	for (int i = 0; i < (*values).size(); ++i) {
 		++counter;
+		if (*islands[0].a_pop->generation == 10) {
+			cout << (*values)[i] << ",";
+		}
 		x = (*values)[i];
 		if (x < worst) worst = x;
 		else if (x > best) best = x;
 		delta = x - mean;
 		mean = mean + (delta / (float)counter);
 		var = var + (delta * (x - mean));
+	}
+	if (*islands[0].a_pop->generation == 10) {
+		exit(0);
 	}
 	vector<float> output (5);
 	output[0] = best;
