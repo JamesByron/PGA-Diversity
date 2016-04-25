@@ -473,7 +473,7 @@ vector<float> getPhenotypeRelevance(DataSet<KRKTestInstance>* testInstances, int
 		if ((weights[i] < 0) || (weights[i] > 1.0)) {cout << endl << "error in phenotype weights: invalid value: " << weights[i] << endl; exit(-1);}
 	}
 	vector<float> individualRelevance = calculateIndividualPhenotypeRelevance(&detailedFitness, &weights);
-	cout << "\nPhenotype Diversity" << endl;
+	cout << "\nPhenotype Diversity";
 	vector<float> pDiversity = getDiversityValues(&individualRelevance, numZeros);
 	if (isOverallDiversity && (WHICH_SELECT == 3)) {
 		// individualRelevance has values that have been accumulated over the number of test instances.
