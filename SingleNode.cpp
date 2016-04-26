@@ -421,10 +421,10 @@ vector<float> calculatePhenotypeFitnessWeights(vector<float>* fitnessTotals) {
 	}
 	total = sqrt(total);*/
 	for (int i = 0; i < (*fitnessTotals).size(); ++i) {
-		//if (((*fitnessTotals)[i] < 0) || ((*fitnessTotals)[i] > POP_SIZE)) {cout << "\ncalculatePhenotypeFitnessWeights: error in computing fitness weights. Value is " << (*fitnessTotals)[i] << ". Max is " << POP_SIZE << ".\n"; cout.flush(); exit(-1);}
-		if ((*fitnessTotals)[i] > POP_SIZE) {
-			//TODO : This is just a stop gap measure!
-			(*fitnessTotals)[i] = POP_SIZE;
+		if (((*fitnessTotals)[i] < 0) || ((*fitnessTotals)[i] > POP_SIZE)) {
+			cout << "\ncalculatePhenotypeFitnessWeights: error in computing fitness weights. Value is " << (*fitnessTotals)[i] << " at index " << i << ". Max is " << POP_SIZE << ".\n" << endl;
+			cout.flush();
+			exit(-1);
 		}
 		//TODO : Is fitnessTotals allowing there to be nubmers greater than 50? Is it a float precision issue?
 		weights[i] = ((float)POP_SIZE - (*fitnessTotals)[i]) / (float)POP_SIZE;
@@ -524,9 +524,10 @@ vector<KRKTestInstance*> getTIVector(DataSet<KRKTestInstance> * set, char whichS
 }
 
 void usage(){
-	printf("Arguments to Singlenode version of GAchess executable:\n");
+	printf("Optional arguments to Singlenode version of GAchess executable:\n");
 	printf(" 1.  test instance data file\n");
 	printf(" 2.  logfile tag\n");
+	printf("3.  (optional) initial seed to use to select sample of test instances\n");
 	printf(" 3.  migration strategy (r/s/w/f/n)\n");
 	printf(" 4.  migration interval\n");
 	printf(" 4. (optional) initial seed to select sample of test instances\n");
