@@ -5,6 +5,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
+#include <limits>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ int MAX_GENERATIONS;
 char WHICH_FITNESS;
 char WHICH_CLASSIFY;
 int PROB_MUTATE; // an int < RAND_MAX representing probability a single individual will get "hit"
+float epsilon = std::numeric_limits<float>::epsilon(); //0.000001;
 // use RULE_LEN instead: int genomeLength = NUM_FEATURES*RULE_CASES*8;
 
 SingleNode * islands;
@@ -172,6 +174,10 @@ vector<float> getPairwiseHammingDiversityForAllNodes() {
 	output[2] = average;
 	output[3] = varianceTotal / ((float) POP_SIZE*NUM_ISLANDS);
 	return output;
+}
+
+bool almostEqual(float a, float b) {
+	return fabs(a - b) > epsilon;
 }
 
 // for debugging purposes
