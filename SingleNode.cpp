@@ -484,8 +484,8 @@ vector<float> getPhenotypeRelevance(DataSet<KRKTestInstance>* testInstances, int
 	vector<float> weights =  calculatePhenotypeFitnessWeights(&fitnessTotals);
 	int numZeros = 0;
 	for (int i = 0; i < weights.size(); ++i) {
-		if (weights[i] == 1.0) numZeros++;  // checks to see how many test instances have 0 weight.
-		if ((weights[i] < 0) || (weights[i] > 1.0)) {cout << endl << "error in phenotype weights: invalid value: " << weights[i] << endl; exit(-1);}
+		if (almostEqual(weights[i], 1.0)) numZeros++;  // checks to see how many test instances have 0 weight.
+		else if ((weights[i] < 0) || (weights[i] > 1.0)) {cout << endl << "error in phenotype weights: invalid value: " << weights[i] << endl; exit(-1);}
 	}
 	vector<float> individualRelevance = calculateIndividualPhenotypeRelevance(&detailedFitness, &weights);
 	vector<float> pDiversity = getDiversityValues(&individualRelevance, numZeros);
