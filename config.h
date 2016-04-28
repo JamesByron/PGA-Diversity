@@ -9,9 +9,9 @@
 #define TAG 17
 #define WHICH_SELECT 3 // tournament [1] default, fitness proportional [2], diversity guided tournament select [3]
 #define TOURNAMENT_SIZE 5
-#define RELEVANCE_START 0.75
-#define RELEVANCE_END 0.75
-#define RELEVANCE_INCREMENT 0.25
+#define RELEVANCE_START 0.75 // High value
+#define RELEVANCE_END 0.75 // Low value
+#define RELEVANCE_INCREMENT 0.25  // actually, DECREMENT by this amount
 #define NUM_CYCLES 1
 #define RANDOM_SEED 0 //1461439101
 #define WHEN_FULL_DATA_MULTIPLY 10

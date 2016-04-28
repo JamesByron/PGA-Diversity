@@ -177,7 +177,7 @@ vector<float> getPairwiseHammingDiversityForAllNodes() {
 }
 
 bool almostEqual(float a, float b) {
-	return fabs(a - b) > epsilon;
+	return fabs(a - b) <= epsilon;
 }
 
 // for debugging purposes
@@ -690,7 +690,7 @@ int main(int argc, char * argv[])
   	   << POP_SIZE << "p" \
   	   << NUM_TEST_CASES_TO_USE << "ti" \
   	   << MAX_GENERATIONS << "g";
-        out2 << "selection-" << WHICH_SELECT << "-rep-" << logFileName;
+        out2 << "selection-" << WHICH_SELECT << "-relwt-" << RELEVANCE_START << "-" << logFileName;
         s = out2.str();
         outFile += s;
         s = out1.str();
