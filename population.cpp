@@ -442,7 +442,7 @@ int Population::altSelectIndividual()
 			arandnum -= mypop[selectedIndex].getFitness();
 		selectedIndex++;
 	}
-	if ( selectedIndex >= POP_SIZE ) {printf("COULD NOT SELECT INDIVIDUAL\n"); exit(-3);}
+	if ( selectedIndex >= POP_SIZE ) {printf("altSelectIndividual: COULD NOT SELECT INDIVIDUAL (MY_RAND_MAX %f; arandnum remaining %f; selectedIndex %i; (totalFitness - usedFit) %f)\n", MY_RAND_MAX, arandnum, selectedIndex, (totalFitness - usedFit)); exit(-3);}
 	return selectedIndex;
 }
 
