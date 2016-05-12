@@ -50,7 +50,7 @@ private:
   void unselectAll();
   int selectIndividual(int availablepop);
   int tournamentSelect(int availablepop);
-  int altSelectIndividual();
+  int altSelectIndividual(int availablepop);
   int selectWeakIndividual();
   int relevanceTournamentSelect(int availablepop);
   // variables
