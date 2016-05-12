@@ -435,12 +435,12 @@ int Population::altSelectIndividual(int availablepop)
 	float arandnum = (((float)rand())/MY_RAND_MAX) * availableFitness;
 	//arandnum -= (arandnum * epsilon); I don't think this is necessary
 	int selectedIndex = 0;
-	while ( (selectedIndex < availablepop) && (arandnum > mypop[selectedIndex].getFitness() ))
+	while ( (selectedIndex < availablepop-1) && (arandnum > mypop[selectedIndex].getFitness() ))
 	{
 	  arandnum -= mypop[selectedIndex].getFitness();
 	  selectedIndex++;
 	}
-	if ( selectedIndex >= POP_SIZE ) {printf("altSelectIndividual: COULD NOT SELECT INDIVIDUAL (MY_RAND_MAX %f; arandnum remaining %f; selectedIndex %i;\n", MY_RAND_MAX, arandnum, selectedIndex); exit(-3);}
+	if ( selectedIndex >= availablepop ) {printf("altSelectIndividual: COULD NOT SELECT INDIVIDUAL (MY_RAND_MAX %f; arandnum remaining %f; selectedIndex %i;\n", MY_RAND_MAX, arandnum, selectedIndex); exit(-3);}
 	//cout << selectedIndex << endl;
 	return selectedIndex;
 }
