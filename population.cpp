@@ -1,6 +1,7 @@
 //#include "krktestinstance.h"
 //#include "dataset.h"
 #include "population.h"
+#include <limits>
 
 using namespace std;
 
@@ -320,7 +321,7 @@ void Population::generateOffspring(int n)
 	{
 		int parent1 = selectIndividual(POP_SIZE);
 		int parent2 = selectIndividual(POP_SIZE);
-		while( parent1 == parent2 ) { parent2 = selectIndividual(POP_SIZE); }
+		while( parent1 == parent2 ) {parent2 = selectIndividual(POP_SIZE); }
 		//printf("Node %d(generateOffspring for %d of %d): selected two parents -- ready to breed(%d+%d)\n", myrank, i, n,  parent1, parent2);
 		mypop[parent1].breedNCross(kids, mypop[parent2]);
 		//printf("Node %d(generateOffspring): finished breeding\n", myrank);
@@ -423,6 +424,7 @@ int Population::tournamentSelect(int availablepop)
 //template <class T>
 int Population::altSelectIndividual()
 {
+	float epsilon = std::numeric_limits<float>::epsilon();
 	static float MY_RAND_MAX = (float)RAND_MAX + 1.0;
 	float usedFit = 0.0;
 	int usedCount = 0;
@@ -434,15 +436,18 @@ int Population::altSelectIndividual()
 		}
 	//printf("Node %d(altSelectIndividual): Finished accumulating used fitness\n", myrank);
 	if ( usedCount == POP_SIZE ) { printf("Node %d(altSelectIndividual): ENTIRE POPULATION IS SELECTED!\n", myrank); exit(-3); }
+	//float arandnum = ((float)RAND_MAX/MY_RAND_MAX) * (totalFitness - usedFit); // for testing floating point precision problem
 	float arandnum = (((float)rand())/MY_RAND_MAX) * (totalFitness - usedFit);
+	//arandnum -= (arandnum * epsilon); I don't think this is necessary
 	int selectedIndex = 0;
 	while ( (selectedIndex < POP_SIZE) && (arandnum > mypop[selectedIndex].getFitness() || mypop[selectedIndex].isSelected() ) )
 	{
 		if ( !mypop[selectedIndex].isSelected() )
-			arandnum -= mypop[selectedIndex].getFitness();
+			arandnum -= mypop[selectedIndex].getFitness() + epsilon;
 		selectedIndex++;
 	}
 	if ( selectedIndex >= POP_SIZE ) {printf("altSelectIndividual: COULD NOT SELECT INDIVIDUAL (MY_RAND_MAX %f; arandnum remaining %f; selectedIndex %i; (totalFitness - usedFit) %f)\n", MY_RAND_MAX, arandnum, selectedIndex, (totalFitness - usedFit)); exit(-3);}
+	//cout << selectedIndex << endl;
 	return selectedIndex;
 }
 
