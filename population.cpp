@@ -1,6 +1,7 @@
 //#include "krktestinstance.h"
 //#include "dataset.h"
 #include "population.h"
+#include <limits>
 
 using namespace std;
 
@@ -320,7 +321,7 @@ void Population::generateOffspring(int n)
 	{
 		int parent1 = selectIndividual(POP_SIZE);
 		int parent2 = selectIndividual(POP_SIZE);
-		while( parent1 == parent2 ) { parent2 = selectIndividual(POP_SIZE); }
+		while( parent1 == parent2 ) {parent2 = selectIndividual(POP_SIZE); }
 		//printf("Node %d(generateOffspring for %d of %d): selected two parents -- ready to breed(%d+%d)\n", myrank, i, n,  parent1, parent2);
 		mypop[parent1].breedNCross(kids, mypop[parent2]);
 		//printf("Node %d(generateOffspring): finished breeding\n", myrank);
@@ -379,7 +380,7 @@ int Population::selectIndividual(int availablepop)
 	switch (WHICH_SELECT) {
 	case 0: return rand() % availablepop; break;// completely random selection with no bias either toward fitness or diversity
 	case 1: return tournamentSelect(availablepop); break;
-	case 2: return altSelectIndividual(); break;
+	case 2: return altSelectIndividual(availablepop); break;
 	case 3: return relevanceTournamentSelect(availablepop); break;
 	case 4: return relevanceTournamentSelect(availablepop); break;
 	}
@@ -421,28 +422,27 @@ int Population::tournamentSelect(int availablepop)
 }
 
 //template <class T>
-int Population::altSelectIndividual()
+int Population::altSelectIndividual(int availablepop)
 {
+	float epsilon = std::numeric_limits<float>::epsilon();
 	static float MY_RAND_MAX = (float)RAND_MAX + 1.0;
-	float usedFit = 0.0;
-	int usedCount = 0;
-	//printf("Node %d(altSelectIndividual): About to accumulate used fitness\n", myrank);
-	for(int i=0; i < POP_SIZE; i++)
-		if ( mypop[i].isSelected() ) {
-			usedFit += mypop[i].getFitness();
-			usedCount++;
-		}
-	//printf("Node %d(altSelectIndividual): Finished accumulating used fitness\n", myrank);
-	if ( usedCount == POP_SIZE ) { printf("Node %d(altSelectIndividual): ENTIRE POPULATION IS SELECTED!\n", myrank); exit(-3); }
-	float arandnum = (((float)rand())/MY_RAND_MAX) * (totalFitness - usedFit);
+	float availableFitness = 0.0;
+	//printf("Node %d(altSelectIndividual): About to accumulate available fitness\n", myrank);
+	for(int i=0; i < availablepop; i++)
+	  availableFitness += mypop[i].getFitness();
+	//printf("Node %d(altSelectIndividual): Finished accumulating available fitness\n", myrank);
+	//float arandnum = ((float)RAND_MAX/MY_RAND_MAX) * (totalFitness - usedFit); // for testing floating point precision problem
+	float arandnum = (((float)rand())/MY_RAND_MAX) * availableFitness;
+	//arandnum -= (arandnum * epsilon); I don't think this is necessary
 	int selectedIndex = 0;
-	while ( (selectedIndex < POP_SIZE) && (arandnum > mypop[selectedIndex].getFitness() || mypop[selectedIndex].isSelected() ) )
+	while ( (selectedIndex < availablepop-1) && (arandnum > mypop[selectedIndex].getFitness() ))
 	{
-		if ( !mypop[selectedIndex].isSelected() )
-			arandnum -= mypop[selectedIndex].getFitness();
-		selectedIndex++;
+	  arandnum -= mypop[selectedIndex].getFitness();
+	  selectedIndex++;
 	}
-	if ( selectedIndex >= POP_SIZE ) {printf("COULD NOT SELECT INDIVIDUAL\n"); exit(-3);}
+	//if ( selectedIndex >= availablepop ) {
+	//   printf("altSelectIndividual: COULD NOT SELECT INDIVIDUAL (MY_RAND_MAX %f; arandnum remaining %f; selectedIndex %i;\n", MY_RAND_MAX, arandnum, selectedIndex); exit(-3);}
+	//cout << selectedIndex << endl;
 	return selectedIndex;
 }
 
