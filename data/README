@@ -1,0 +1,62 @@
+TO-DO: figure out best way to handle data files that have results from
+       multiple runs from different relevances.
+
+filtering data:
+	1. remove the log lines for training set and FULL Island
+	   cat <raw-data-files> | grep -v "^Overall" | grep -v "^Island" | grep -v "FULL TEST SET Island" > FTO<unique-identifying-tag>
+	2. extract just the data fields we want
+	   cat FTO<uit> | awk ' /FULL/ {print $13, $7, $33, $37, $41, $45, $49, $53, $57, $61, $70, $74, $78, $82, $66}; !/FULL/ {print $0}' > distilledFTO-<uit>
+	3. manually edit <distilled-FULLOveral>: remove blank lines between cycles 
+	   within single relevance setting.  NOTE: when 'cycles' with different relevance weights 
+	   reside within the same data file, this will need to be split apart.
+	4. compute averages using averages.pl perl script
+	   cat <MODIFIED-distilled-FULLOverall> | ./averages.pl > <agvs-gnuplot-file>
+
+
+select-0/:
+	no bias toward fitness or diversity;
+	uniform random selection
+
+select-1/:
+	tournament selection with no diversity;
+	tournament size = 5 (?)
+
+select-3/:
+	phenotype diversity with weights of 1.0, 0.75, 0.5, 0.25
+
+select-4/:
+	(estimated) hamming distance diversity with different weights of 1.0, 0.75, 0.5, 0.25
+
+
+avgs-all.gp:
+	index 0: tournament selection -- no diversity
+	index 1: phenotype selection, weight 1.0
+	index 2: phenotype selection, weight 0.75
+	index 3: phenotype selection, weight 0.5
+	index 4: phenotype selection, weight 0.25
+	index 5: (est.) hamming selection, weight 1.0
+	index 6: (est.) hamming selection, weight 0.75
+	index 7: (est.) hamming selection, weight 0.5
+	index 8: (est.) hamming selection, weight 0.25
+	index 9: proportionate selection -- no diversity
+
+Field:
+1 generation (13)
+2 overall most fit (7)
+3 max fitness diversity (33)
+4 min fitness diversity (37)
+5 avg fitness diversity (41)
+6 var fitness diversity (45)
+7 max phenotype diversity (49)
+8 min phenotype diversity (53)
+9 avg phenotype diversity (57)
+10 var phenotype diversity (61)
+11 max est. hamming div (70)
+12 min est. hamming div (74)
+13 avg est. hamming div (78)
+14 var est. hamming div (82)
+15 TI w/ no weight (66)
+
+Gnuplot commands:-
+	plot 'avgs-all.gp' index 0 using 1:2 w lines t "fitness only", 'avgs-all.gp' index 1 using 1:2 w lines t "phenotype wgt 1.0", 'avgs-all.gp' index 5 using 1:2 w lines t "hamming wgt 1.0"
+	change index and title (t) as needed
